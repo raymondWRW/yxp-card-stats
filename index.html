@@ -18,6 +18,12 @@
   </p>
 </header>
 
+<div id="tabbar">
+  <button class="tab on" data-tab="cards" data-i18n="tabCards">Cards · S7–8</button>
+  <button class="tab" data-tab="builds" data-i18n="tabBuilds">Builds · S9</button>
+</div>
+
+<section id="view-cards">
 <div class="controls">
   <div class="ctl">
     <label data-i18n="tier">DaoXin tier</label>
@@ -75,6 +81,23 @@
 
 <main id="grid"></main>
 <div id="empty" class="empty" hidden data-i18n="nomatch">No cards match these filters.</div>
+</section>
+
+<section id="view-builds" hidden>
+  <div class="builds-bar">
+    <div id="crumbs" class="crumbs"></div>
+    <div class="ctl" id="bsort-ctl">
+      <label data-i18n="sortby">Sort by</label>
+      <select id="bsort">
+        <option value="wr" data-i18n="top4rate">Top-4 win rate</option>
+        <option value="place" data-i18n="avgplace">Avg placement</option>
+        <option value="pop" data-i18n="popularity">Popularity</option>
+      </select>
+    </div>
+    <div class="builds-note" id="buildsNote"></div>
+  </div>
+  <div id="builds-content"></div>
+</section>
 
 <footer>
   <span data-i18n="footData">Data:</span>

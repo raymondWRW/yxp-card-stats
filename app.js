@@ -16,6 +16,16 @@ const UI = {
     all: "All", none: "None", allSel: "All", nSel: "selected", searchPh: "card name…",
     sect: "Sect", baseLevel: "base", overall: "overall",
     notEnough: "Not enough data to calculate win rate at this Min games.",
+    tabCards: "Cards · S7–8", tabBuilds: "Builds · S9", top4rate: "Top-4 win rate",
+    avgplace: "Avg placement", sidejobs: "Side-jobs played", power: "Power profile",
+    boards: "Popular boards", matchup: "Matchup vs character", realm: "Realm",
+    games: "Games", topFinish: "Top-4 rate", placement: "Placement distribution",
+    characters: "Characters", axisEarly: "Early", axisMid: "Mid", axisLate: "Late",
+    axisFirst: "First", axisSecond: "Second", roundWR: "round WR",
+    buildsNote: "Season 9 · DaoXin ≥ 3000 · top-4 placement = win. Absolute rates run high (winners record more) — compare characters relatively.",
+    noBuildData: "Not enough games for this build yet.",
+    selectCareer: "Pick a side-job below to see its build detail.",
+    usedTimes: "used", vsReal: "vs real opponents",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -28,6 +38,16 @@ const UI = {
     all: "全部", none: "清空", allSel: "全部", nSel: "项已选", searchPh: "卡牌名称…",
     sect: "门派", baseLevel: "基础", overall: "总体",
     notEnough: "当前最少场次下数据不足，无法计算胜率。",
+    tabCards: "卡牌 · S7–8", tabBuilds: "流派 · S9", top4rate: "前四胜率",
+    avgplace: "平均名次", sidejobs: "搭配副职", power: "强度雷达",
+    boards: "热门卡组", matchup: "对位胜率", realm: "境界",
+    games: "场次", topFinish: "前四率", placement: "名次分布",
+    characters: "角色", axisEarly: "前期", axisMid: "中期", axisLate: "后期",
+    axisFirst: "先手", axisSecond: "后手", roundWR: "回合胜率",
+    buildsNote: "第9赛季 · 道心≥3000 · 前四视为胜。绝对胜率偏高（赢家上传更多）——请横向比较角色。",
+    noBuildData: "该流派样本不足。",
+    selectCareer: "选择下方副职查看具体流派。",
+    usedTimes: "出现", vsReal: "对真实玩家",
   },
 };
 // season number -> {en,zh}
@@ -69,6 +89,7 @@ async function boot() {
   NAMES = await fetch("data/names.json").then((r) => r.json());
   await loadThreshold(4000);
   wireStatic();
+  wireBuilds();
 }
 async function loadThreshold(th) {
   S.th = th;
@@ -406,6 +427,7 @@ function applyLang() {
   });
   render();
   if (S.modalFam != null) renderModal();
+  if (BS.active) renderBuilds();
 }
 
 // ---- wiring ----------------------------------------------------------------
@@ -429,6 +451,183 @@ function wireStatic() {
   $(".modal-bg").addEventListener("click", closeModal);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
   document.addEventListener("click", () => document.querySelectorAll(".ms-panel").forEach((p) => p.hidden = true));
+}
+
+// ============================================================================
+//  BUILDS VIEW (Season 9, hsreplay-style)
+// ============================================================================
+const WIKI_ROOT = "https://sharpobject.github.io/yxp_wiki/assets/";
+const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.png`;
+const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.png`;
+const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
+
+const BS = { active: false, data: null, screen: "list", char: null, career: null, sort: "wr", realm: null, range: null };
+
+async function loadBuilds() {
+  if (!BS.data) {
+    BS.data = await fetch("data/season9.json").then((r) => r.json());
+    const rng = {}; RADAR_AXES.forEach(([k]) => rng[k] = [Infinity, -Infinity]);
+    for (const id in BS.data.builds) {
+      const b = BS.data.builds[id]; if (b.g < 20) continue;
+      RADAR_AXES.forEach(([k]) => { const v = b.radar[k]; if (v < rng[k][0]) rng[k][0] = v; if (v > rng[k][1]) rng[k][1] = v; });
+    }
+    RADAR_AXES.forEach(([k]) => { if (rng[k][0] === Infinity) rng[k] = [0, 1]; });
+    BS.range = rng;
+  }
+  renderBuilds();
+}
+const avgPlace = (place, g) => g ? place.reduce((s, n, i) => s + (i + 1) * n, 0) / g : 0;
+// Aggregate a character from its career-1..7 builds (excludes career 0 = no side-job).
+function charStat(id) {
+  let g = 0, top4 = 0; const place = new Array(8).fill(0); const careers = {};
+  for (let cr = 1; cr <= 7; cr++) {
+    const b = BS.data.builds[`${id}_${cr}`]; if (!b || !b.g) continue;
+    g += b.g; top4 += b.top4;
+    for (let i = 0; i < 8; i++) place[i] += b.place[i];
+    careers[cr] = [b.g, b.top4];
+  }
+  if (!g) return null;
+  return { id, g, top4, wr: top4 / g, avg: avgPlace(place, g), place, careers };
+}
+const buildStat = (char, career) => BS.data.builds[`${char}_${career}`];
+
+function renderBuilds() {
+  if (!BS.data) return;
+  $("#buildsNote").textContent = t("buildsNote");
+  $("#bsort-ctl").style.display = BS.screen === "list" ? "" : "none";
+  renderCrumbs();
+  const host = $("#builds-content");
+  if (BS.screen === "list") renderCharList(host);
+  else if (BS.screen === "char") renderCharDetail(host);
+  else renderBuildDetail(host);
+}
+function renderCrumbs() {
+  const c = $("#crumbs"); c.innerHTML = "";
+  const add = (label, fn, cur) => { const s = document.createElement(cur ? "span" : "a"); s.textContent = label; s.className = cur ? "cur" : ""; if (fn) s.onclick = fn; c.appendChild(s); };
+  const sep = () => { const s = document.createElement("span"); s.className = "sep"; s.textContent = "›"; c.appendChild(s); };
+  add(t("characters"), BS.screen !== "list" ? () => { BS.screen = "list"; renderBuilds(); } : null, BS.screen === "list");
+  if (BS.char != null && BS.screen !== "list") { sep(); add(charName(BS.char), BS.screen === "build" ? () => { BS.screen = "char"; renderBuilds(); } : null, BS.screen === "char"); }
+  if (BS.screen === "build") { sep(); add(careerName(BS.career), null, true); }
+}
+function renderCharList(host) {
+  const rows = Object.keys(BS.data.chars).map((id) => charStat(+id)).filter((r) => r && r.g > 0);
+  if (BS.sort === "place") rows.sort((a, b) => a.avg - b.avg);
+  else if (BS.sort === "pop") rows.sort((a, b) => b.g - a.g);
+  else rows.sort((a, b) => b.wr - a.wr);
+  const grid = document.createElement("div"); grid.className = "cgrid";
+  for (const r of rows) {
+    const big = BS.sort === "place" ? r.avg.toFixed(2) : BS.sort === "pop" ? r.g.toLocaleString() : (r.wr * 100).toFixed(1) + "%";
+    const sub = BS.sort === "place" ? t("avgplace") : BS.sort === "pop" ? t("games") : t("topFinish");
+    const el = document.createElement("div"); el.className = "cchip";
+    el.innerHTML = `<img loading="lazy" src="${charAvatar(r.id)}" onerror="this.style.visibility='hidden'">
+      <div class="cn">${charName(r.id)}</div><div class="cs">${sectName(+String(r.id)[0])}</div>
+      <div class="big" style="color:${BS.sort === 'wr' ? wrColor(r.wr) : 'var(--text)'}">${big}</div>
+      <div class="sub2">${sub} · n=${r.g.toLocaleString()}</div>`;
+    el.onclick = () => { BS.char = r.id; BS.screen = "char"; renderBuilds(); };
+    grid.appendChild(el);
+  }
+  host.innerHTML = ""; host.appendChild(grid);
+}
+function placeBarsHTML(place, g) {
+  const mx = Math.max(1, ...place); let s = '<div class="placebars">';
+  for (let i = 0; i < 8; i++) {
+    s += `<div class="pb" title="#${i + 1}: ${place[i]} (${g ? (100 * place[i] / g).toFixed(0) : 0}%)">
+      <i style="height:${place[i] / mx * 100}%;background:${i < 4 ? 'var(--good)' : 'var(--bad)'}"></i><span>${i + 1}</span></div>`;
+  }
+  return s + "</div>";
+}
+function renderCharDetail(host) {
+  const id = BS.char, c = charStat(id);
+  const careers = Object.keys(c.careers).map(Number).sort((a, b) => c.careers[b][0] - c.careers[a][0]);
+  const maxg = Math.max(1, ...careers.map((cr) => c.careers[cr][0]));
+  let html = `<div class="bh"><img class="av" src="${charAvatar(id)}" onerror="this.style.visibility='hidden'">
+    <div class="htxt"><h2>${charName(id)}</h2><div class="meta">${sectName(+String(id)[0])}</div>
+      <div class="kpis">
+        <div class="kpi"><b style="color:${wrColor(c.wr)}">${(c.wr * 100).toFixed(1)}%</b><span>${t("topFinish")}</span></div>
+        <div class="kpi"><b>${c.avg.toFixed(2)}</b><span>${t("avgplace")}</span></div>
+        <div class="kpi"><b>${c.g.toLocaleString()}</b><span>${t("games")}</span></div>
+      </div></div></div>`;
+  html += `<div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(c.place, c.g)}</div>`;
+  html += `<div class="bsection"><h3>${t("sidejobs")} <span style="color:var(--muted);font-size:12px">— ${t("selectCareer")}</span></h3>`;
+  for (const cr of careers) {
+    const [g, top4] = c.careers[cr]; const wr = g ? top4 / g : 0;
+    html += `<div class="sjrow" data-career="${cr}"><img src="${sidejobBadge(cr)}" onerror="this.style.visibility='hidden'">
+      <div class="nm">${careerName(cr)}</div><div class="barwrap"><i style="width:${100 * g / maxg}%"></i></div>
+      <div class="rt">${g.toLocaleString()} ${t("games")} · <b style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</b></div></div>`;
+  }
+  html += `</div>`;
+  host.innerHTML = html;
+  host.querySelectorAll(".sjrow").forEach((r) => r.onclick = () => { BS.career = +r.dataset.career; BS.screen = "build"; BS.realm = null; renderBuilds(); });
+}
+function radarSVG(b) {
+  const R = 86, cx = 120, cy = 108;
+  const vals = RADAR_AXES.map(([k]) => { const [mn, mx] = BS.range[k]; return mx > mn ? Math.max(0, Math.min(1, (b.radar[k] - mn) / (mx - mn))) : 0.5; });
+  const ang = (i) => (-90 + i * 72) * Math.PI / 180;
+  const pt = (i, r) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r];
+  let svg = `<svg width="240" height="216" viewBox="0 0 240 216">`;
+  [0.33, 0.66, 1].forEach((rr) => { svg += `<polygon points="${RADAR_AXES.map((_, i) => pt(i, rr).join(",")).join(" ")}" fill="none" stroke="#2c3445"/>`; });
+  RADAR_AXES.forEach(([k, lk], i) => {
+    const [x, y] = pt(i, 1); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3445"/>`;
+    const [lx, ly] = pt(i, 1.2); svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle" dominant-baseline="middle">${t(lk)}</text>`;
+  });
+  svg += `<polygon points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"/>`;
+  return svg + `</svg>`;
+}
+function matchupHTML(b) {
+  const rows = b.matchup.filter((m) => m[1] >= 8).sort((a, b) => b[1] - a[1]);
+  if (!rows.length) return `<div class="empty" style="padding:14px">${t("noBuildData")}</div>`;
+  let s = '<div class="mgrid">';
+  for (const [oc, rn, w] of rows) {
+    const wr = rn ? w / rn : 0;
+    s += `<div class="mcell"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
+      <div><div class="mn">${charName(oc)}</div><div class="mwr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</div><div class="mnn">n=${rn}</div></div></div>`;
+  }
+  return s + "</div>";
+}
+function renderBoards(b) {
+  const box = $("#boardsBox"); if (!box) return;
+  const realms = Object.keys(b.boards).filter((r) => b.boards[r].length).map(Number).sort((a, b) => a - b);
+  if (!realms.length) { box.innerHTML = `<div class="empty" style="padding:14px">${t("noBuildData")}</div>`; return; }
+  if (BS.realm == null || !realms.includes(BS.realm)) BS.realm = realms[realms.length - 1];
+  const fam = BS.data.families;
+  let html = `<div class="realmtabs">` + realms.map((r) => `<button class="${r === BS.realm ? 'on' : ''}" data-r="${r}">${t("realm")} ${r}</button>`).join("") + `</div>`;
+  for (const [fidxs, n, wins] of b.boards[BS.realm]) {
+    const wr = n ? wins / n : 0;
+    const imgs = fidxs.map((i) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; return `<img title="${nm}" loading="lazy" src="${WIKI}${f.img}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${f.img}_en.png'">`; }).join("");
+    html += `<div class="board"><div class="cards">${imgs}</div>
+      <div class="bstat"><span class="wr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span> ${t("roundWR")}<br>
+      <span style="color:var(--muted)">${t("usedTimes")} ${n.toLocaleString()}×</span></div></div>`;
+  }
+  box.innerHTML = html;
+  box.querySelectorAll(".realmtabs button").forEach((btn) => btn.onclick = () => { BS.realm = +btn.dataset.r; renderBoards(b); });
+}
+function renderBuildDetail(host) {
+  const b = buildStat(BS.char, BS.career);
+  if (!b || b.g < 1) { host.innerHTML = `<div class="empty">${t("noBuildData")}</div>`; return; }
+  const wr = b.g ? b.top4 / b.g : 0, avg = avgPlace(b.place, b.g);
+  host.innerHTML = `<div class="bh"><img class="av" src="${charAvatar(BS.char)}" onerror="this.style.visibility='hidden'">
+    <div class="htxt"><h2>${charName(BS.char)} · ${careerName(BS.career)}</h2><div class="meta">${sectName(+String(BS.char)[0])}</div>
+      <div class="kpis">
+        <div class="kpi"><b style="color:${wrColor(wr)}">${(wr * 100).toFixed(1)}%</b><span>${t("topFinish")}</span></div>
+        <div class="kpi"><b>${avg.toFixed(2)}</b><span>${t("avgplace")}</span></div>
+        <div class="kpi"><b>${b.g.toLocaleString()}</b><span>${t("games")}</span></div>
+      </div></div></div>
+    <div class="bcols">
+      <div><div class="bsection"><h3>${t("power")}</h3>${radarSVG(b)}</div>
+        <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div></div>
+      <div><div class="bsection"><h3>${t("boards")}</h3><div id="boardsBox"></div></div>
+        <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")})</span></h3>${matchupHTML(b)}</div></div>
+    </div>`;
+  renderBoards(b);
+}
+function wireBuilds() {
+  document.querySelectorAll("#tabbar .tab").forEach((tb) => tb.onclick = () => {
+    document.querySelectorAll("#tabbar .tab").forEach((x) => x.classList.remove("on")); tb.classList.add("on");
+    const isB = tb.dataset.tab === "builds";
+    $("#view-cards").hidden = isB; $("#view-builds").hidden = !isB; BS.active = isB;
+    if (isB) loadBuilds();
+  });
+  $("#bsort").addEventListener("change", (e) => { BS.sort = e.target.value; renderBuilds(); });
 }
 
 boot();
