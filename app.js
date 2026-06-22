@@ -26,6 +26,7 @@ const UI = {
     noBuildData: "Not enough games for this build yet.",
     selectCareer: "Pick a side-job below to see its build detail.",
     usedTimes: "used", vsReal: "vs real opponents",
+    lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -48,6 +49,7 @@ const UI = {
     noBuildData: "该流派样本不足。",
     selectCareer: "选择下方副职查看具体流派。",
     usedTimes: "出现", vsReal: "对真实玩家",
+    lateBoards: "后期对位卡组", matchHint: "点击对手 →",
   },
 };
 // season number -> {en,zh}
@@ -590,10 +592,34 @@ function matchupHTML(b) {
   let s = '<div class="mgrid">';
   for (const [oc, rn, w] of rows) {
     const wr = rn ? w / rn : 0;
-    s += `<div class="mcell"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
+    const has = b.mboards && b.mboards[oc] ? "" : " nob";
+    s += `<div class="mcell${has}" data-opp="${oc}"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
       <div><div class="mn">${charName(oc)}</div><div class="mwr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</div><div class="mnn">n=${rn}</div></div></div>`;
   }
-  return s + "</div>";
+  return s + '</div><div id="matchupDetail" class="matchup-detail"></div>';
+}
+function renderMatchupDetail(b, oc) {
+  const box = $("#matchupDetail"); if (!box) return;
+  document.querySelectorAll(".mcell").forEach((c) => c.classList.toggle("on", +c.dataset.opp === oc));
+  const m = b.matchup.find((x) => x[0] === oc);
+  const wr = m && m[1] ? m[2] / m[1] : 0;
+  const mb = (b.mboards || {})[oc];
+  let html = `<div class="mdh"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
+    <span><b>${t("lateBoards")} ${charName(oc)}</b> · <span style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span>
+    ${t("roundWR")} (n=${m ? m[1] : 0})</span></div>`;
+  if (!mb || !mb.length) {
+    html += `<div class="empty" style="padding:10px">${t("noBuildData")}</div>`;
+  } else {
+    const fam = BS.data.families;
+    for (const [fidxs, n, wins] of mb) {
+      const bwr = n ? wins / n : 0;
+      const imgs = fidxs.map((i) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; return `<img title="${nm}" loading="lazy" src="${WIKI}${f.img}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${f.img}_en.png'">`; }).join("");
+      html += `<div class="board"><div class="cards">${imgs}</div>
+        <div class="bstat"><span class="wr" style="color:${wrColor(bwr)}">${(bwr * 100).toFixed(0)}%</span> ${t("roundWR")}<br>
+        <span class="muted">${t("usedTimes")} ${n.toLocaleString()}×</span></div></div>`;
+    }
+  }
+  box.innerHTML = html;
 }
 function renderBoards(b) {
   const box = $("#boardsBox"); if (!box) return;
@@ -627,9 +653,10 @@ function renderBuildDetail(host) {
       <div><div class="bsection"><h3>${t("power")}</h3>${radarSVG(b)}</div>
         <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div></div>
       <div><div class="bsection"><h3>${t("boards")}</h3><div id="boardsBox"></div></div>
-        <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")})</span></h3>${matchupHTML(b)}</div></div>
+        <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")}) · ${t("matchHint")}</span></h3>${matchupHTML(b)}</div></div>
     </div>`;
   renderBoards(b);
+  host.querySelectorAll(".mcell").forEach((c) => c.onclick = () => renderMatchupDetail(b, +c.dataset.opp));
 }
 function wireBuilds() {
   document.querySelectorAll("#tabbar .tab").forEach((tb) => tb.onclick = () => {

@@ -161,8 +161,16 @@ footer{padding:18px 24px 40px;color:var(--muted);font-size:12px;border-top:1px s
 
 .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
 .mcell{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
-  border-radius:10px;padding:8px}
+  border-radius:10px;padding:8px;cursor:pointer;transition:border-color .08s}
+.mcell:hover{border-color:var(--accent)}
+.mcell.on{border-color:var(--accent);background:var(--panel2)}
+.mcell.nob{opacity:.6}
 .mcell img{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#0c0e12}
 .mcell .mn{font-size:12px}
 .mcell .mwr{font-weight:700;font-size:14px}
 .mcell .mnn{font-size:11px;color:var(--muted)}
+.matchup-detail{margin-top:14px}
+.matchup-detail:empty{display:none}
+.mdh{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:14px}
+.mdh img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#0c0e12}
+.muted{color:var(--muted)}
