@@ -96,7 +96,8 @@ footer{padding:18px 24px 40px;color:var(--muted);font-size:12px;border-top:1px s
   color:var(--muted);font-size:13px;text-align:center;padding:0 16px}
 
 /* ===== tabs ===== */
-#tabbar{display:flex;gap:8px;padding:6px 24px 0}
+#tabbar{display:flex;align-items:center;gap:8px;padding:8px 24px 0}
+#tabbar #lang{margin-left:auto}
 .tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
   padding:10px 14px;font-size:15px;cursor:pointer}
 .tab.on{color:var(--text);border-color:var(--accent)}

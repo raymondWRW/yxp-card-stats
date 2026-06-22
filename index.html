@@ -19,11 +19,15 @@
 </header>
 
 <div id="tabbar">
-  <button class="tab on" data-tab="cards" data-i18n="tabCards">Cards · S7–8</button>
-  <button class="tab" data-tab="builds" data-i18n="tabBuilds">Builds · S9</button>
+  <button class="tab" data-tab="cards" data-i18n="tabCards">Cards · S7–8</button>
+  <button class="tab on" data-tab="builds" data-i18n="tabBuilds">Builds · S9</button>
+  <div class="seg" id="lang">
+    <button data-v="en" class="on">EN</button>
+    <button data-v="zh">中文</button>
+  </div>
 </div>
 
-<section id="view-cards">
+<section id="view-cards" hidden>
 <div class="controls">
   <div class="ctl">
     <label data-i18n="tier">DaoXin tier</label>
@@ -32,14 +36,6 @@
       <button data-v="6000">≥ 6000</button>
     </div>
   </div>
-  <div class="ctl">
-    <label data-i18n="language">Language</label>
-    <div class="seg" id="lang">
-      <button data-v="en" class="on">EN</button>
-      <button data-v="zh">中文</button>
-    </div>
-  </div>
-
   <div class="ctl" id="season-ctl">
     <label data-i18n="season">Season</label>
     <div class="ms" data-ms="season"></div>
@@ -83,7 +79,7 @@
 <div id="empty" class="empty" hidden data-i18n="nomatch">No cards match these filters.</div>
 </section>
 
-<section id="view-builds" hidden>
+<section id="view-builds">
   <div class="builds-bar">
     <div id="crumbs" class="crumbs"></div>
     <div class="ctl" id="bsort-ctl">

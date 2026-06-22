@@ -87,10 +87,13 @@ const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; 
 // ---- load ------------------------------------------------------------------
 async function boot() {
   NAMES = await fetch("data/names.json").then((r) => r.json());
-  await loadThreshold(4000);
   wireStatic();
   wireBuilds();
+  BS.active = true;          // Season-9 Builds is the default landing view
+  await loadBuilds();
+  applyLang();
 }
+let CARDS_INIT = false;      // cards data is loaded lazily on first Cards-tab open
 async function loadThreshold(th) {
   S.th = th;
   if (!cache[th]) cache[th] = await fetch(`data/data_${th}.json`).then((r) => r.json());
@@ -274,6 +277,7 @@ function cardName(c) { return (S.lang === "zh" && c.cn) ? c.cn : (c.en || c.cn |
 function sectLabel(code) { return (SECT_CODE[code] || { en: code, zh: code })[S.lang]; }
 
 function render() {
+  if (!DATA) return;          // cards data not loaded yet (Builds is the default view)
   const A = galleryAgg();
   const { wins, losses, total } = A;
   let rows = [];
@@ -466,13 +470,15 @@ const BS = { active: false, data: null, screen: "list", char: null, career: null
 async function loadBuilds() {
   if (!BS.data) {
     BS.data = await fetch("data/season9.json").then((r) => r.json());
-    const rng = {}; RADAR_AXES.forEach(([k]) => rng[k] = [Infinity, -Infinity]);
+    // For each radar axis, keep all builds' values sorted -> radar shows each
+    // build's PERCENTILE on that axis, i.e. strength relative to other builds.
+    const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
     for (const id in BS.data.builds) {
       const b = BS.data.builds[id]; if (b.g < 20) continue;
-      RADAR_AXES.forEach(([k]) => { const v = b.radar[k]; if (v < rng[k][0]) rng[k][0] = v; if (v > rng[k][1]) rng[k][1] = v; });
+      RADAR_AXES.forEach(([k]) => axv[k].push(b.radar[k]));
     }
-    RADAR_AXES.forEach(([k]) => { if (rng[k][0] === Infinity) rng[k] = [0, 1]; });
-    BS.range = rng;
+    RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
+    BS.axv = axv;
   }
   renderBuilds();
 }
@@ -561,7 +567,12 @@ function renderCharDetail(host) {
 }
 function radarSVG(b) {
   const R = 86, cx = 120, cy = 108;
-  const vals = RADAR_AXES.map(([k]) => { const [mn, mx] = BS.range[k]; return mx > mn ? Math.max(0, Math.min(1, (b.radar[k] - mn) / (mx - mn))) : 0.5; });
+  const vals = RADAR_AXES.map(([k]) => {
+    const arr = BS.axv[k]; if (!arr || !arr.length) return 0.5;
+    const v = b.radar[k]; let c = 0;
+    for (let i = 0; i < arr.length; i++) if (arr[i] <= v) c++;
+    return c / arr.length;   // percentile among all builds on this axis
+  });
   const ang = (i) => (-90 + i * 72) * Math.PI / 180;
   const pt = (i, r) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r];
   let svg = `<svg width="240" height="216" viewBox="0 0 240 216">`;
@@ -626,6 +637,7 @@ function wireBuilds() {
     const isB = tb.dataset.tab === "builds";
     $("#view-cards").hidden = isB; $("#view-builds").hidden = !isB; BS.active = isB;
     if (isB) loadBuilds();
+    else if (!CARDS_INIT) { CARDS_INIT = true; loadThreshold(4000); }
   });
   $("#bsort").addEventListener("change", (e) => { BS.sort = e.target.value; renderBuilds(); });
 }
