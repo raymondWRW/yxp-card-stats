@@ -28,6 +28,7 @@ const UI = {
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "round win rate by phase (% = actual, shape = relative)",
+    powerScore: "Power", powerTip: "standardized average placement (50 = average character)",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -52,6 +53,7 @@ const UI = {
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段回合胜率（% 为实际，形状为相对）",
+    powerScore: "强度", powerTip: "标准化平均名次（50 = 平均水平）",
   },
 };
 // season number -> {en,zh}
@@ -469,7 +471,7 @@ const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.png`;
 const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.png`;
 const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
 
-const BS = { active: false, data: null, screen: "list", char: null, career: null, sort: "wr", realm: null, range: null };
+const BS = { active: false, data: null, screen: "list", char: null, career: null, sort: "power", realm: null, power: {} };
 
 async function loadBuilds() {
   if (!BS.data) {
@@ -483,8 +485,26 @@ async function loadBuilds() {
     }
     RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
     BS.axv = axv;
+    computePower();
   }
   renderBuilds();
+}
+// Power = standardized average placement across characters (lower placement = stronger).
+// Centered at 50, ~12 points per SD. Popularity correction is unnecessary here
+// (see analysis: corr(log pop, placement) ~ -0.15), so placement is used directly.
+function computePower() {
+  const stats = Object.keys(BS.data.chars).map((id) => charStat(+id)).filter(Boolean);
+  const aps = stats.map((s) => s.avg);
+  const mean = aps.reduce((a, b) => a + b, 0) / aps.length;
+  const sd = Math.sqrt(aps.reduce((a, b) => a + (b - mean) ** 2, 0) / aps.length) || 1;
+  BS.power = {};
+  for (const s of stats) {
+    BS.power[s.id] = Math.max(1, Math.min(99, Math.round(50 + 12 * (mean - s.avg) / sd)));
+  }
+}
+function powerColor(p) {
+  const x = Math.max(0, Math.min(1, (p - 35) / 30));
+  return `rgb(${Math.round(232 + (54 - 232) * x)},${Math.round(85 + (196 - 85) * x)},${Math.round(78 + (107 - 78) * x)})`;
 }
 const avgPlace = (place, g) => g ? place.reduce((s, n, i) => s + (i + 1) * n, 0) / g : 0;
 // Aggregate a character from its career-1..7 builds (excludes career 0 = no side-job).
@@ -523,15 +543,16 @@ function renderCharList(host) {
   const rows = Object.keys(BS.data.chars).map((id) => charStat(+id)).filter((r) => r && r.g > 0);
   if (BS.sort === "place") rows.sort((a, b) => a.avg - b.avg);
   else if (BS.sort === "pop") rows.sort((a, b) => b.g - a.g);
-  else rows.sort((a, b) => b.wr - a.wr);
+  else rows.sort((a, b) => (BS.power[b.id] || 0) - (BS.power[a.id] || 0));
   const grid = document.createElement("div"); grid.className = "cgrid";
   for (const r of rows) {
-    const big = BS.sort === "place" ? r.avg.toFixed(2) : BS.sort === "pop" ? r.g.toLocaleString() : (r.wr * 100).toFixed(1) + "%";
-    const sub = BS.sort === "place" ? t("avgplace") : BS.sort === "pop" ? t("games") : t("topFinish");
+    const pw = BS.power[r.id] || 0;
+    const big = BS.sort === "place" ? r.avg.toFixed(2) : BS.sort === "pop" ? r.g.toLocaleString() : pw;
+    const sub = BS.sort === "place" ? t("avgplace") : BS.sort === "pop" ? t("games") : t("powerScore");
     const el = document.createElement("div"); el.className = "cchip";
     el.innerHTML = `<img loading="lazy" src="${charAvatar(r.id)}" onerror="this.style.visibility='hidden'">
       <div class="cn">${charName(r.id)}</div><div class="cs">${sectName(+String(r.id)[0])}</div>
-      <div class="big" style="color:${BS.sort === 'wr' ? wrColor(r.wr) : 'var(--text)'}">${big}</div>
+      <div class="big" style="color:${BS.sort === 'power' ? powerColor(pw) : 'var(--text)'}">${big}</div>
       <div class="sub2">${sub} · n=${r.g.toLocaleString()}</div>`;
     el.onclick = () => { BS.char = r.id; BS.screen = "char"; renderBuilds(); };
     grid.appendChild(el);
@@ -553,7 +574,7 @@ function renderCharDetail(host) {
   let html = `<div class="bh"><img class="av" src="${charAvatar(id)}" onerror="this.style.visibility='hidden'">
     <div class="htxt"><h2>${charName(id)}</h2><div class="meta">${sectName(+String(id)[0])}</div>
       <div class="kpis">
-        <div class="kpi"><b style="color:${wrColor(c.wr)}">${(c.wr * 100).toFixed(1)}%</b><span>${t("topFinish")}</span></div>
+        <div class="kpi"><b style="color:${powerColor(BS.power[id] || 0)}">${BS.power[id] || 0}</b><span>${t("powerScore")}</span></div>
         <div class="kpi"><b>${c.avg.toFixed(2)}</b><span>${t("avgplace")}</span></div>
         <div class="kpi"><b>${c.g.toLocaleString()}</b><span>${t("games")}</span></div>
       </div></div></div>`;
@@ -647,11 +668,10 @@ function renderBoards(b) {
 function renderBuildDetail(host) {
   const b = buildStat(BS.char, BS.career);
   if (!b || b.g < 1) { host.innerHTML = `<div class="empty">${t("noBuildData")}</div>`; return; }
-  const wr = b.g ? b.top4 / b.g : 0, avg = avgPlace(b.place, b.g);
+  const avg = avgPlace(b.place, b.g);
   host.innerHTML = `<div class="bh"><img class="av" src="${charAvatar(BS.char)}" onerror="this.style.visibility='hidden'">
     <div class="htxt"><h2>${charName(BS.char)} · ${careerName(BS.career)}</h2><div class="meta">${sectName(+String(BS.char)[0])}</div>
       <div class="kpis">
-        <div class="kpi"><b style="color:${wrColor(wr)}">${(wr * 100).toFixed(1)}%</b><span>${t("topFinish")}</span></div>
         <div class="kpi"><b>${avg.toFixed(2)}</b><span>${t("avgplace")}</span></div>
         <div class="kpi"><b>${b.g.toLocaleString()}</b><span>${t("games")}</span></div>
       </div></div></div>
