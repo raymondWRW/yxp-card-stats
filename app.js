@@ -28,7 +28,7 @@ const UI = {
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "round win rate by phase (% = actual, shape = relative)",
-    powerScore: "Power", powerTip: "standardized average placement (50 = average character)",
+    powerScore: "Power", powerTip: "standardized average placement, lightly shrunk for low-sample characters (50 = average)",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -53,7 +53,7 @@ const UI = {
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段回合胜率（% 为实际，形状为相对）",
-    powerScore: "强度", powerTip: "标准化平均名次（50 = 平均水平）",
+    powerScore: "强度", powerTip: "标准化平均名次，对样本较少的角色做轻度收缩（50 = 平均）",
   },
 };
 // season number -> {en,zh}
@@ -489,18 +489,23 @@ async function loadBuilds() {
   }
   renderBuilds();
 }
-// Power = standardized average placement across characters (lower placement = stronger).
-// Centered at 50, ~12 points per SD. Popularity correction is unnecessary here
-// (see analysis: corr(log pop, placement) ~ -0.15), so placement is used directly.
+// Power = standardized average placement across characters (lower placement = stronger),
+// with a light empirical-Bayes shrinkage of each character's avg placement toward the
+// global mean by sample size: shrunk = (n*ap + K*mean)/(n+K). K=500 pseudo-games gives
+// low-sample characters a small pull toward average (~15% at n~2500, ~2% at n~25k).
+// Centered at 50, ~12 points per SD.
+const POWER_K = 500;
 function computePower() {
   const stats = Object.keys(BS.data.chars).map((id) => charStat(+id)).filter(Boolean);
   const aps = stats.map((s) => s.avg);
   const mean = aps.reduce((a, b) => a + b, 0) / aps.length;
-  const sd = Math.sqrt(aps.reduce((a, b) => a + (b - mean) ** 2, 0) / aps.length) || 1;
+  const shrunk = stats.map((s) => (s.g * s.avg + POWER_K * mean) / (s.g + POWER_K));
+  const sm = shrunk.reduce((a, b) => a + b, 0) / shrunk.length;
+  const sd = Math.sqrt(shrunk.reduce((a, b) => a + (b - sm) ** 2, 0) / shrunk.length) || 1;
   BS.power = {};
-  for (const s of stats) {
-    BS.power[s.id] = Math.max(1, Math.min(99, Math.round(50 + 12 * (mean - s.avg) / sd)));
-  }
+  stats.forEach((s, i) => {
+    BS.power[s.id] = Math.max(1, Math.min(99, Math.round(50 + 12 * (sm - shrunk[i]) / sd)));
+  });
 }
 function powerColor(p) {
   const x = Math.max(0, Math.min(1, (p - 35) / 30));
