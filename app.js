@@ -31,6 +31,7 @@ const UI = {
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥",
+    subBuilds: "Season 9 · DaoXin-ranked builds · recency-weighted (~1-week half-life)",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -58,6 +59,7 @@ const UI = {
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥",
+    subBuilds: "第9赛季 · 道心排位流派 · 近期加权（约一周半衰期）",
   },
 };
 // season number -> {en,zh}
@@ -480,19 +482,26 @@ const BOARD_MIN = 30;   // a board needs >= this many raw occurrences to show by
 
 async function loadBuilds() {
   if (!BS.data) {
+    // light file: meta + chars + tiers — drives the leaderboard, loads instantly
     BS.data = await fetch("data/season9.json").then((r) => r.json());
-    // For each radar axis, keep all builds' values sorted -> radar shows each
-    // build's PERCENTILE on that axis, i.e. strength relative to other builds.
-    const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
-    for (const id in BS.data.builds) {
-      const b = BS.data.builds[id]; if (b.g < 20) continue;
-      RADAR_AXES.forEach(([k]) => axv[k].push(b.radar[k]));
-    }
-    RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
-    BS.axv = axv;
     computePower(BS.tier);
   }
   renderBuilds();
+}
+let BUILDS_LOADED = false;
+// Heavy file (builds + families) is fetched only when the user first opens a build detail.
+async function ensureBuilds() {
+  if (BUILDS_LOADED) return;
+  const bd = await fetch("data/season9_builds.json").then((r) => r.json());
+  BS.data.builds = bd.builds; BS.data.families = bd.families;
+  // radar axis percentiles (needs all builds' radar values)
+  const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
+  for (const id in BS.data.builds) {
+    const b = BS.data.builds[id]; if (b.g < 20) continue;
+    RADAR_AXES.forEach(([k]) => axv[k].push(b.radar[k]));
+  }
+  RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
+  BS.axv = axv; BUILDS_LOADED = true;
 }
 // Power = standardized, SKILL-ADJUSTED average placement (recency-weighted).
 // Controls for player skill (rank score): each character's placement is re-baselined to
@@ -616,9 +625,11 @@ function renderCharDetail(host) {
   }
   html += `</div>`;
   host.innerHTML = html;
-  host.querySelectorAll(".sjrow").forEach((r) => r.onclick = () => {
-    BS.career = +r.dataset.career; BS.screen = "build"; BS.realm = null;
-    BS.boardsShowAll = false; BS.mShowAll = false; renderBuilds();
+  host.querySelectorAll(".sjrow").forEach((r) => r.onclick = async () => {
+    BS.career = +r.dataset.career; BS.realm = null;
+    BS.boardsShowAll = false; BS.mShowAll = false;
+    await ensureBuilds();                 // lazy-load the heavy build data
+    BS.screen = "build"; renderBuilds();
   });
 }
 function radarSVG(b) {
@@ -726,6 +737,7 @@ function wireBuilds() {
     document.querySelectorAll("#tabbar .tab").forEach((x) => x.classList.remove("on")); tb.classList.add("on");
     const isB = tb.dataset.tab === "builds";
     $("#view-cards").hidden = isB; $("#view-builds").hidden = !isB; BS.active = isB;
+    $("#sub-cards").hidden = isB; $("#sub-builds").hidden = !isB;   // tab-appropriate subtitle
     if (isB) loadBuilds();
     else if (!CARDS_INIT) { CARDS_INIT = true; loadThreshold(4000); }
   });
