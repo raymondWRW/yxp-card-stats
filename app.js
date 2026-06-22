@@ -30,6 +30,7 @@ const UI = {
     powerNote: "round win rate by phase (% = actual, shape = relative)",
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
+    tier2: "DaoXin ≥",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -56,6 +57,7 @@ const UI = {
     powerNote: "各阶段回合胜率（% 为实际，形状为相对）",
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
+    tier2: "道心 ≥",
   },
 };
 // season number -> {en,zh}
@@ -473,7 +475,7 @@ const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.png`;
 const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.png`;
 const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
 
-const BS = { active: false, data: null, screen: "list", char: null, career: null, sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false };
+const BS = { active: false, data: null, screen: "list", char: null, career: null, sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false, tier: 3000 };
 const BOARD_MIN = 30;   // a board needs >= this many raw occurrences to show by default
 
 async function loadBuilds() {
@@ -488,7 +490,7 @@ async function loadBuilds() {
     }
     RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
     BS.axv = axv;
-    computePower();
+    computePower(BS.tier);
   }
   renderBuilds();
 }
@@ -498,21 +500,18 @@ async function loadBuilds() {
 //   b   = within-character slope of placement vs rank  = Σ_c(swrp - swr·AP_c) / Σ_c(swr² - swr²/sw)
 //   adj = AP_c − b·(R_c − R̄)      (R_c = avg rank, R̄ = global avg rank)
 //   Power = 50 + 12·(mean(adj) − adj_c)/sd(adj)
-function computePower() {
+function computePower(tier) {
   const rows = [];
   let gSwr = 0, gSw = 0;
   for (const id of Object.keys(BS.data.chars).map(Number)) {
-    const s = charStat(id); if (!s) continue;
-    const ch = BS.data.chars[String(id)];
-    const sw = ch.g;                              // weighted games (== Σw)
-    if (!sw || !ch.swr) continue;
-    const AP = s.avg, R = ch.swr / sw;            // weighted avg placement, avg rank
+    const s = charStatTier(id, tier); if (!s || !s.swr) continue;
+    const sw = s.g, AP = s.avg, R = s.swr / sw;   // weighted games, avg placement, avg rank
     rows.push({
       id, AP, R,
-      num: ch.swrp - ch.swr * AP,                 // within-char Σ(w·rank·place) covariance term
-      den: ch.swr2 - ch.swr * ch.swr / sw,        // within-char Σ(w·rank²) variance term
+      num: s.swrp - s.swr * AP,                    // within-char Σ(w·rank·place) covariance term
+      den: s.swr2 - s.swr * s.swr / sw,            // within-char Σ(w·rank²) variance term
     });
-    gSwr += ch.swr; gSw += sw;
+    gSwr += s.swr; gSw += sw;
   }
   const Rbar = gSw ? gSwr / gSw : 0;
   let n = 0, dn = 0; for (const r of rows) { n += r.num; dn += r.den; }
@@ -529,23 +528,31 @@ function powerColor(p) {
 }
 const avgPlace = (place, g) => g ? place.reduce((s, n, i) => s + (i + 1) * n, 0) / g : 0;
 // Aggregate a character from its career-1..7 builds (excludes career 0 = no side-job).
-function charStat(id) {
-  let g = 0, graw = 0; const place = new Array(8).fill(0); const careers = {};
+// DaoXin tier -> which non-overlapping bands to sum (cumulative thresholds).
+function tierBands(tier) { return tier >= 6000 ? ["C"] : tier >= 4000 ? ["B", "C"] : ["A", "B", "C"]; }
+// Character stats at a DaoXin tier (sum the chosen bands across careers 1-7).
+function charStatTier(id, tier) {
+  const bands = tierBands(tier);
+  let g = 0, graw = 0, swr = 0, swr2 = 0, swrp = 0; const place = new Array(8).fill(0); const careers = {};
   for (let cr = 1; cr <= 7; cr++) {
-    const b = BS.data.builds[`${id}_${cr}`]; if (!b || !b.g) continue;
-    g += b.g; graw += b.graw;
-    for (let i = 0; i < 8; i++) place[i] += b.place[i];
-    careers[cr] = [b.g, b.graw, avgPlace(b.place, b.g)];  // [weighted games, raw games, avg placement]
+    const t = BS.data.tiers[`${id}_${cr}`]; if (!t) continue;
+    let cg = 0, cgraw = 0; const cp = new Array(8).fill(0);
+    for (const bd of bands) {
+      const e = t[bd]; if (!e) continue;
+      cg += e.g; cgraw += e.graw; for (let i = 0; i < 8; i++) cp[i] += e.place[i];
+      swr += e.swr; swr2 += e.swr2; swrp += e.swrp;
+    }
+    if (cg > 0) { g += cg; graw += cgraw; for (let i = 0; i < 8; i++) place[i] += cp[i]; careers[cr] = [cg, cgraw, avgPlace(cp, cg)]; }
   }
   if (!g) return null;
-  // g = recency-weighted games (popularity & shrinkage); graw = raw game count (display)
-  return { id, g, graw, avg: avgPlace(place, g), place, careers };
+  return { id, g, graw, avg: avgPlace(place, g), place, careers, swr, swr2, swrp };
 }
 const buildStat = (char, career) => BS.data.builds[`${char}_${career}`];
 
 function renderBuilds() {
   if (!BS.data) return;
   $("#bsort-ctl").style.display = BS.screen === "list" ? "" : "none";
+  $("#tier-ctl").style.display = BS.screen === "build" ? "none" : "";  // tier filter not on build page
   renderCrumbs();
   const host = $("#builds-content");
   if (BS.screen === "list") renderCharList(host);
@@ -561,7 +568,7 @@ function renderCrumbs() {
   if (BS.screen === "build") { sep(); add(careerName(BS.career), null, true); }
 }
 function renderCharList(host) {
-  const rows = Object.keys(BS.data.chars).map((id) => charStat(+id)).filter((r) => r && r.g > 0);
+  const rows = Object.keys(BS.data.chars).map((id) => charStatTier(+id, BS.tier)).filter((r) => r && r.g > 0);
   if (BS.sort === "place") rows.sort((a, b) => a.avg - b.avg);
   else if (BS.sort === "pop") rows.sort((a, b) => b.g - a.g);
   else rows.sort((a, b) => (BS.power[b.id] || 0) - (BS.power[a.id] || 0));
@@ -589,7 +596,7 @@ function placeBarsHTML(place, g) {
   return s + "</div>";
 }
 function renderCharDetail(host) {
-  const id = BS.char, c = charStat(id);
+  const id = BS.char, c = charStatTier(id, BS.tier);
   const careers = Object.keys(c.careers).map(Number).sort((a, b) => c.careers[b][0] - c.careers[a][0]);
   const maxg = Math.max(1, ...careers.map((cr) => c.careers[cr][0]));
   let html = `<div class="bh"><img class="av" src="${charAvatar(id)}" onerror="this.style.visibility='hidden'">
@@ -723,6 +730,7 @@ function wireBuilds() {
     else if (!CARDS_INIT) { CARDS_INIT = true; loadThreshold(4000); }
   });
   $("#bsort").addEventListener("change", (e) => { BS.sort = e.target.value; renderBuilds(); });
+  seg("tier", (v) => { BS.tier = +v; computePower(BS.tier); renderBuilds(); });
 }
 
 boot();
