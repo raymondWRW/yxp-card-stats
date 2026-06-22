@@ -28,7 +28,7 @@ const UI = {
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "round win rate by phase (% = actual, shape = relative)",
-    powerScore: "Power", powerTip: "standardized average placement, lightly shrunk for low-sample characters (50 = average)",
+    powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
   },
   zh: {
@@ -54,7 +54,7 @@ const UI = {
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段回合胜率（% 为实际，形状为相对）",
-    powerScore: "强度", powerTip: "标准化平均名次，对样本较少的角色做轻度收缩（50 = 平均）",
+    powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
   },
 };
@@ -492,23 +492,36 @@ async function loadBuilds() {
   }
   renderBuilds();
 }
-// Power = standardized average placement across characters (lower placement = stronger),
-// with a light empirical-Bayes shrinkage of each character's avg placement toward the
-// global mean by sample size: shrunk = (n*ap + K*mean)/(n+K). K=500 pseudo-games gives
-// low-sample characters a small pull toward average (~15% at n~2500, ~2% at n~25k).
-// Centered at 50, ~12 points per SD.
-const POWER_K = 500;
+// Power = standardized, SKILL-ADJUSTED average placement (recency-weighted).
+// Controls for player skill (rank score): each character's placement is re-baselined to
+// an average-skill pilot, removing the "only strong mains still play it" inflation.
+//   b   = within-character slope of placement vs rank  = Σ_c(swrp - swr·AP_c) / Σ_c(swr² - swr²/sw)
+//   adj = AP_c − b·(R_c − R̄)      (R_c = avg rank, R̄ = global avg rank)
+//   Power = 50 + 12·(mean(adj) − adj_c)/sd(adj)
 function computePower() {
-  const stats = Object.keys(BS.data.chars).map((id) => charStat(+id)).filter(Boolean);
-  const aps = stats.map((s) => s.avg);
-  const mean = aps.reduce((a, b) => a + b, 0) / aps.length;
-  const shrunk = stats.map((s) => (s.g * s.avg + POWER_K * mean) / (s.g + POWER_K));
-  const sm = shrunk.reduce((a, b) => a + b, 0) / shrunk.length;
-  const sd = Math.sqrt(shrunk.reduce((a, b) => a + (b - sm) ** 2, 0) / shrunk.length) || 1;
+  const rows = [];
+  let gSwr = 0, gSw = 0;
+  for (const id of Object.keys(BS.data.chars).map(Number)) {
+    const s = charStat(id); if (!s) continue;
+    const ch = BS.data.chars[String(id)];
+    const sw = ch.g;                              // weighted games (== Σw)
+    if (!sw || !ch.swr) continue;
+    const AP = s.avg, R = ch.swr / sw;            // weighted avg placement, avg rank
+    rows.push({
+      id, AP, R,
+      num: ch.swrp - ch.swr * AP,                 // within-char Σ(w·rank·place) covariance term
+      den: ch.swr2 - ch.swr * ch.swr / sw,        // within-char Σ(w·rank²) variance term
+    });
+    gSwr += ch.swr; gSw += sw;
+  }
+  const Rbar = gSw ? gSwr / gSw : 0;
+  let n = 0, dn = 0; for (const r of rows) { n += r.num; dn += r.den; }
+  const b = dn ? n / dn : 0;                      // skill slope (placement per rank point)
+  const adj = rows.map((r) => r.AP - b * (r.R - Rbar));   // skill-adjusted placement
+  const m = adj.reduce((a, x) => a + x, 0) / (adj.length || 1);
+  const sd = Math.sqrt(adj.reduce((a, x) => a + (x - m) ** 2, 0) / (adj.length || 1)) || 1;
   BS.power = {};
-  stats.forEach((s, i) => {
-    BS.power[s.id] = Math.max(1, Math.min(99, Math.round(50 + 12 * (sm - shrunk[i]) / sd)));
-  });
+  rows.forEach((r, i) => { BS.power[r.id] = Math.max(1, Math.min(99, Math.round(50 + 12 * (m - adj[i]) / sd))); });
 }
 function powerColor(p) {
   const x = Math.max(0, Math.min(1, (p - 35) / 30));
