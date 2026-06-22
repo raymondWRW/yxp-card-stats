@@ -545,7 +545,6 @@ const buildStat = (char, career) => BS.data.builds[`${char}_${career}`];
 
 function renderBuilds() {
   if (!BS.data) return;
-  $("#buildsNote").textContent = t("buildsNote");
   $("#bsort-ctl").style.display = BS.screen === "list" ? "" : "none";
   renderCrumbs();
   const host = $("#builds-content");
