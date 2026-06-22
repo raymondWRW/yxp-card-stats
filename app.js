@@ -27,6 +27,7 @@ const UI = {
     selectCareer: "Pick a side-job below to see its build detail.",
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
+    powerNote: "round win rate by phase (% = actual, shape = relative)",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -50,6 +51,7 @@ const UI = {
     selectCareer: "选择下方副职查看具体流派。",
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
+    powerNote: "各阶段回合胜率（% 为实际，形状为相对）",
   },
 };
 // season number -> {en,zh}
@@ -568,20 +570,24 @@ function renderCharDetail(host) {
   host.querySelectorAll(".sjrow").forEach((r) => r.onclick = () => { BS.career = +r.dataset.career; BS.screen = "build"; BS.realm = null; renderBuilds(); });
 }
 function radarSVG(b) {
-  const R = 86, cx = 120, cy = 108;
+  const R = 76, cx = 130, cy = 110;
+  // shape = percentile of this build's round WR vs all builds (relative strength)
   const vals = RADAR_AXES.map(([k]) => {
     const arr = BS.axv[k]; if (!arr || !arr.length) return 0.5;
     const v = b.radar[k]; let c = 0;
     for (let i = 0; i < arr.length; i++) if (arr[i] <= v) c++;
-    return c / arr.length;   // percentile among all builds on this axis
+    return c / arr.length;
   });
   const ang = (i) => (-90 + i * 72) * Math.PI / 180;
   const pt = (i, r) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r];
-  let svg = `<svg width="240" height="216" viewBox="0 0 240 216">`;
+  let svg = `<svg width="260" height="224" viewBox="0 0 260 224">`;
   [0.33, 0.66, 1].forEach((rr) => { svg += `<polygon points="${RADAR_AXES.map((_, i) => pt(i, rr).join(",")).join(" ")}" fill="none" stroke="#2c3445"/>`; });
   RADAR_AXES.forEach(([k, lk], i) => {
     const [x, y] = pt(i, 1); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3445"/>`;
-    const [lx, ly] = pt(i, 1.2); svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle" dominant-baseline="middle">${t(lk)}</text>`;
+    const [lx, ly] = pt(i, 1.28);
+    const wr = Math.round((b.radar[k] || 0) * 100);     // actual round win rate on this axis
+    svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle">
+      <tspan x="${lx}">${t(lk)}</tspan><tspan x="${lx}" dy="12" fill="#cfd8e6" font-weight="700">${wr}%</tspan></text>`;
   });
   svg += `<polygon points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"/>`;
   return svg + `</svg>`;
@@ -650,7 +656,7 @@ function renderBuildDetail(host) {
         <div class="kpi"><b>${b.g.toLocaleString()}</b><span>${t("games")}</span></div>
       </div></div></div>
     <div class="bcols">
-      <div><div class="bsection"><h3>${t("power")}</h3>${radarSVG(b)}</div>
+      <div><div class="bsection"><h3>${t("power")} <span class="muted" style="font-size:12px">${t("powerNote")}</span></h3>${radarSVG(b)}</div>
         <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div></div>
       <div><div class="bsection"><h3>${t("boards")}</h3><div id="boardsBox"></div></div>
         <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")}) · ${t("matchHint")}</span></h3>${matchupHTML(b)}</div></div>
