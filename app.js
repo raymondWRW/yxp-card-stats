@@ -29,6 +29,7 @@ const UI = {
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "round win rate by phase (% = actual, shape = relative)",
     powerScore: "Power", powerTip: "standardized average placement, lightly shrunk for low-sample characters (50 = average)",
+    showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -54,6 +55,7 @@ const UI = {
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段回合胜率（% 为实际，形状为相对）",
     powerScore: "强度", powerTip: "标准化平均名次，对样本较少的角色做轻度收缩（50 = 平均）",
+    showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
   },
 };
 // season number -> {en,zh}
@@ -471,7 +473,8 @@ const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.png`;
 const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.png`;
 const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
 
-const BS = { active: false, data: null, screen: "list", char: null, career: null, sort: "power", realm: null, power: {} };
+const BS = { active: false, data: null, screen: "list", char: null, career: null, sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false };
+const BOARD_MIN = 30;   // a board needs >= this many raw occurrences to show by default
 
 async function loadBuilds() {
   if (!BS.data) {
@@ -514,15 +517,16 @@ function powerColor(p) {
 const avgPlace = (place, g) => g ? place.reduce((s, n, i) => s + (i + 1) * n, 0) / g : 0;
 // Aggregate a character from its career-1..7 builds (excludes career 0 = no side-job).
 function charStat(id) {
-  let g = 0, top4 = 0; const place = new Array(8).fill(0); const careers = {};
+  let g = 0, graw = 0; const place = new Array(8).fill(0); const careers = {};
   for (let cr = 1; cr <= 7; cr++) {
     const b = BS.data.builds[`${id}_${cr}`]; if (!b || !b.g) continue;
-    g += b.g; top4 += b.top4;
+    g += b.g; graw += b.graw;
     for (let i = 0; i < 8; i++) place[i] += b.place[i];
-    careers[cr] = [b.g, b.top4];
+    careers[cr] = [b.g, b.graw, avgPlace(b.place, b.g)];  // [weighted games, raw games, avg placement]
   }
   if (!g) return null;
-  return { id, g, top4, wr: top4 / g, avg: avgPlace(place, g), place, careers };
+  // g = recency-weighted games (popularity & shrinkage); graw = raw game count (display)
+  return { id, g, graw, avg: avgPlace(place, g), place, careers };
 }
 const buildStat = (char, career) => BS.data.builds[`${char}_${career}`];
 
@@ -552,13 +556,13 @@ function renderCharList(host) {
   const grid = document.createElement("div"); grid.className = "cgrid";
   for (const r of rows) {
     const pw = BS.power[r.id] || 0;
-    const big = BS.sort === "place" ? r.avg.toFixed(2) : BS.sort === "pop" ? r.g.toLocaleString() : pw;
+    const big = BS.sort === "place" ? r.avg.toFixed(2) : BS.sort === "pop" ? r.graw.toLocaleString() : pw;
     const sub = BS.sort === "place" ? t("avgplace") : BS.sort === "pop" ? t("games") : t("powerScore");
     const el = document.createElement("div"); el.className = "cchip";
     el.innerHTML = `<img loading="lazy" src="${charAvatar(r.id)}" onerror="this.style.visibility='hidden'">
       <div class="cn">${charName(r.id)}</div><div class="cs">${sectName(+String(r.id)[0])}</div>
       <div class="big" style="color:${BS.sort === 'power' ? powerColor(pw) : 'var(--text)'}">${big}</div>
-      <div class="sub2">${sub} · n=${r.g.toLocaleString()}</div>`;
+      <div class="sub2">${sub} · n=${r.graw.toLocaleString()}</div>`;
     el.onclick = () => { BS.char = r.id; BS.screen = "char"; renderBuilds(); };
     grid.appendChild(el);
   }
@@ -581,19 +585,22 @@ function renderCharDetail(host) {
       <div class="kpis">
         <div class="kpi"><b style="color:${powerColor(BS.power[id] || 0)}">${BS.power[id] || 0}</b><span>${t("powerScore")}</span></div>
         <div class="kpi"><b>${c.avg.toFixed(2)}</b><span>${t("avgplace")}</span></div>
-        <div class="kpi"><b>${c.g.toLocaleString()}</b><span>${t("games")}</span></div>
+        <div class="kpi"><b>${c.graw.toLocaleString()}</b><span>${t("games")}</span></div>
       </div></div></div>`;
   html += `<div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(c.place, c.g)}</div>`;
   html += `<div class="bsection"><h3>${t("sidejobs")} <span style="color:var(--muted);font-size:12px">— ${t("selectCareer")}</span></h3>`;
   for (const cr of careers) {
-    const [g, top4] = c.careers[cr]; const wr = g ? top4 / g : 0;
+    const [gw, graw, avg] = c.careers[cr];
     html += `<div class="sjrow" data-career="${cr}"><img src="${sidejobBadge(cr)}" onerror="this.style.visibility='hidden'">
-      <div class="nm">${careerName(cr)}</div><div class="barwrap"><i style="width:${100 * g / maxg}%"></i></div>
-      <div class="rt">${g.toLocaleString()} ${t("games")} · <b style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</b></div></div>`;
+      <div class="nm">${careerName(cr)}</div><div class="barwrap"><i style="width:${100 * gw / maxg}%"></i></div>
+      <div class="rt">${graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${avg.toFixed(2)}</b></div></div>`;
   }
   html += `</div>`;
   host.innerHTML = html;
-  host.querySelectorAll(".sjrow").forEach((r) => r.onclick = () => { BS.career = +r.dataset.career; BS.screen = "build"; BS.realm = null; renderBuilds(); });
+  host.querySelectorAll(".sjrow").forEach((r) => r.onclick = () => {
+    BS.career = +r.dataset.career; BS.screen = "build"; BS.realm = null;
+    BS.boardsShowAll = false; BS.mShowAll = false; renderBuilds();
+  });
 }
 function radarSVG(b) {
   const R = 76, cx = 130, cy = 110;
@@ -618,57 +625,63 @@ function radarSVG(b) {
   svg += `<polygon points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"/>`;
   return svg + `</svg>`;
 }
+// Render a board list with the raw-occurrence threshold. Entry = [famlist, raw, w_count, w_wins].
+// Boards below BOARD_MIN raw occurrences are hidden unless showAll; a "show more" button
+// (and a "not enough data" note when nothing qualifies) is appended.
+function boardListHTML(list, showAll) {
+  const fam = BS.data.families;
+  const shown = showAll ? list : list.filter((x) => x[1] >= BOARD_MIN);
+  const hidden = list.length - shown.length;
+  let html = "";
+  if (!shown.length) {
+    html += `<div class="empty" style="padding:12px">${t("notEnoughBoards")}</div>`;
+  } else {
+    for (const [fidxs, raw, wc, ww] of shown) {
+      const wr = wc ? ww / wc : 0;
+      const imgs = fidxs.map((i) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; return `<img title="${nm}" loading="lazy" src="${WIKI}${f.img}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${f.img}_en.png'">`; }).join("");
+      html += `<div class="board"><div class="cards">${imgs}</div>
+        <div class="bstat"><span class="wr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span> ${t("roundWR")}<br>
+        <span class="muted">${t("usedTimes")} ${raw.toLocaleString()}×</span></div></div>`;
+    }
+  }
+  if (!showAll && hidden > 0) html += `<button class="showmore">${t("showMore")} (${hidden})</button>`;
+  return html;
+}
 function matchupHTML(b) {
   const rows = b.matchup.filter((m) => m[1] >= 8).sort((a, b) => b[1] - a[1]);
   if (!rows.length) return `<div class="empty" style="padding:14px">${t("noBuildData")}</div>`;
   let s = '<div class="mgrid">';
-  for (const [oc, rn, w] of rows) {
-    const wr = rn ? w / rn : 0;
+  for (const [oc, raw, wrnd, wwin] of rows) {
+    const wr = wrnd ? wwin / wrnd : 0;
     const has = b.mboards && b.mboards[oc] ? "" : " nob";
     s += `<div class="mcell${has}" data-opp="${oc}"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
-      <div><div class="mn">${charName(oc)}</div><div class="mwr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</div><div class="mnn">n=${rn}</div></div></div>`;
+      <div><div class="mn">${charName(oc)}</div><div class="mwr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</div><div class="mnn">n=${raw}</div></div></div>`;
   }
   return s + '</div><div id="matchupDetail" class="matchup-detail"></div>';
 }
 function renderMatchupDetail(b, oc) {
   const box = $("#matchupDetail"); if (!box) return;
   document.querySelectorAll(".mcell").forEach((c) => c.classList.toggle("on", +c.dataset.opp === oc));
-  const m = b.matchup.find((x) => x[0] === oc);
-  const wr = m && m[1] ? m[2] / m[1] : 0;
-  const mb = (b.mboards || {})[oc];
+  const m = b.matchup.find((x) => x[0] === oc);   // [oc, raw_rounds, w_rounds, w_wins]
+  const wr = m && m[2] ? m[3] / m[2] : 0;
+  const mb = (b.mboards || {})[oc] || [];
   let html = `<div class="mdh"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
     <span><b>${t("lateBoards")} ${charName(oc)}</b> · <span style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span>
     ${t("roundWR")} (n=${m ? m[1] : 0})</span></div>`;
-  if (!mb || !mb.length) {
-    html += `<div class="empty" style="padding:10px">${t("noBuildData")}</div>`;
-  } else {
-    const fam = BS.data.families;
-    for (const [fidxs, n, wins] of mb) {
-      const bwr = n ? wins / n : 0;
-      const imgs = fidxs.map((i) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; return `<img title="${nm}" loading="lazy" src="${WIKI}${f.img}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${f.img}_en.png'">`; }).join("");
-      html += `<div class="board"><div class="cards">${imgs}</div>
-        <div class="bstat"><span class="wr" style="color:${wrColor(bwr)}">${(bwr * 100).toFixed(0)}%</span> ${t("roundWR")}<br>
-        <span class="muted">${t("usedTimes")} ${n.toLocaleString()}×</span></div></div>`;
-    }
-  }
+  html += boardListHTML(mb, BS.mShowAll);
   box.innerHTML = html;
+  const sm = box.querySelector(".showmore"); if (sm) sm.onclick = () => { BS.mShowAll = true; renderMatchupDetail(b, oc); };
 }
 function renderBoards(b) {
   const box = $("#boardsBox"); if (!box) return;
   const realms = Object.keys(b.boards).filter((r) => b.boards[r].length).map(Number).sort((a, b) => a - b);
   if (!realms.length) { box.innerHTML = `<div class="empty" style="padding:14px">${t("noBuildData")}</div>`; return; }
   if (BS.realm == null || !realms.includes(BS.realm)) BS.realm = realms[realms.length - 1];
-  const fam = BS.data.families;
   let html = `<div class="realmtabs">` + realms.map((r) => `<button class="${r === BS.realm ? 'on' : ''}" data-r="${r}">${t("realm")} ${r}</button>`).join("") + `</div>`;
-  for (const [fidxs, n, wins] of b.boards[BS.realm]) {
-    const wr = n ? wins / n : 0;
-    const imgs = fidxs.map((i) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; return `<img title="${nm}" loading="lazy" src="${WIKI}${f.img}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${f.img}_en.png'">`; }).join("");
-    html += `<div class="board"><div class="cards">${imgs}</div>
-      <div class="bstat"><span class="wr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span> ${t("roundWR")}<br>
-      <span style="color:var(--muted)">${t("usedTimes")} ${n.toLocaleString()}×</span></div></div>`;
-  }
+  html += boardListHTML(b.boards[BS.realm], BS.boardsShowAll);
   box.innerHTML = html;
-  box.querySelectorAll(".realmtabs button").forEach((btn) => btn.onclick = () => { BS.realm = +btn.dataset.r; renderBoards(b); });
+  box.querySelectorAll(".realmtabs button").forEach((btn) => btn.onclick = () => { BS.realm = +btn.dataset.r; BS.boardsShowAll = false; renderBoards(b); });
+  const sm = box.querySelector(".showmore"); if (sm) sm.onclick = () => { BS.boardsShowAll = true; renderBoards(b); };
 }
 function renderBuildDetail(host) {
   const b = buildStat(BS.char, BS.career);
@@ -678,7 +691,7 @@ function renderBuildDetail(host) {
     <div class="htxt"><h2>${charName(BS.char)} · ${careerName(BS.career)}</h2><div class="meta">${sectName(+String(BS.char)[0])}</div>
       <div class="kpis">
         <div class="kpi"><b>${avg.toFixed(2)}</b><span>${t("avgplace")}</span></div>
-        <div class="kpi"><b>${b.g.toLocaleString()}</b><span>${t("games")}</span></div>
+        <div class="kpi"><b>${b.graw.toLocaleString()}</b><span>${t("games")}</span></div>
       </div></div></div>
     <div class="bcols">
       <div><div class="bsection"><h3>${t("power")} <span class="muted" style="font-size:12px">${t("powerNote")}</span></h3>${radarSVG(b)}</div>
@@ -687,7 +700,7 @@ function renderBuildDetail(host) {
         <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")}) · ${t("matchHint")}</span></h3>${matchupHTML(b)}</div></div>
     </div>`;
   renderBoards(b);
-  host.querySelectorAll(".mcell").forEach((c) => c.onclick = () => renderMatchupDetail(b, +c.dataset.opp));
+  host.querySelectorAll(".mcell").forEach((c) => c.onclick = () => { BS.mShowAll = false; renderMatchupDetail(b, +c.dataset.opp); });
 }
 function wireBuilds() {
   document.querySelectorAll("#tabbar .tab").forEach((tb) => tb.onclick = () => {
