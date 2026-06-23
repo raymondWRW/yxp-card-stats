@@ -32,6 +32,7 @@ const UI = {
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥",
     subBuilds: "Season 9 · DaoXin-ranked builds · recency-weighted (~1-week half-life)",
+    arrangements: "arrangements",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -60,6 +61,7 @@ const UI = {
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥",
     subBuilds: "第9赛季 · 道心排位流派 · 近期加权（约一周半衰期）",
+    arrangements: "种排列",
   },
 };
 // season number -> {en,zh}
@@ -655,27 +657,44 @@ function radarSVG(b) {
   svg += `<polygon points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"/>`;
   return svg + `</svg>`;
 }
-// Render a board list with the raw-occurrence threshold. Entry = [famlist, raw, w_count, w_wins].
-// Boards below BOARD_MIN raw occurrences are hidden unless showAll; a "show more" button
-// (and a "not enough data" note when nothing qualifies) is appended.
-function boardListHTML(list, showAll) {
+function cardImgs(fidxs) {
   const fam = BS.data.families;
+  return fidxs.map((i) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; return `<img title="${nm}" loading="lazy" src="${WIKI}${f.img}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${f.img}_en.png'">`; }).join("");
+}
+function boardRowHTML(fidxs, raw, wc, ww, cls, hint) {
+  const wr = wc ? ww / wc : 0;
+  return `<div class="board ${cls || ""}"><div class="cards">${cardImgs(fidxs)}</div>
+    <div class="bstat"><span class="wr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span> ${t("roundWR")}<br>
+    <span class="muted">${t("usedTimes")} ${raw.toLocaleString()}×${hint || ""}</span></div></div>`;
+}
+// Boards are merged by card-SET; entry = [reprFamlist, raw, w_count, w_wins, variations].
+// Threshold on merged raw occurrences; multi-arrangement boards expand to their variations.
+function boardListHTML(list, showAll) {
   const shown = showAll ? list : list.filter((x) => x[1] >= BOARD_MIN);
   const hidden = list.length - shown.length;
   let html = "";
   if (!shown.length) {
     html += `<div class="empty" style="padding:12px">${t("notEnoughBoards")}</div>`;
   } else {
-    for (const [fidxs, raw, wc, ww] of shown) {
-      const wr = wc ? ww / wc : 0;
-      const imgs = fidxs.map((i) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; return `<img title="${nm}" loading="lazy" src="${WIKI}${f.img}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${f.img}_en.png'">`; }).join("");
-      html += `<div class="board"><div class="cards">${imgs}</div>
-        <div class="bstat"><span class="wr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span> ${t("roundWR")}<br>
-        <span class="muted">${t("usedTimes")} ${raw.toLocaleString()}×</span></div></div>`;
+    for (const [fidxs, raw, wc, ww, vars] of shown) {
+      const multi = vars && vars.length > 1;
+      const hint = multi ? ` · <span class="varhint">▸ ${vars.length} ${t("arrangements")}</span>` : "";
+      html += boardRowHTML(fidxs, raw, wc, ww, multi ? "expandable" : "", hint);
+      if (multi) {
+        html += `<div class="board-vars" hidden>`;
+        for (const [vf, vraw, vwc, vww] of vars) html += boardRowHTML(vf, vraw, vwc, vww, "vrow");
+        html += `</div>`;
+      }
     }
   }
   if (!showAll && hidden > 0) html += `<button class="showmore">${t("showMore")} (${hidden})</button>`;
   return html;
+}
+function wireExpand(box) {
+  box.querySelectorAll(".board.expandable").forEach((el) => el.onclick = () => {
+    const v = el.nextElementSibling;
+    if (v && v.classList.contains("board-vars")) { v.hidden = !v.hidden; el.classList.toggle("open"); }
+  });
 }
 function matchupHTML(b) {
   const rows = b.matchup.filter((m) => m[1] >= 8).sort((a, b) => b[1] - a[1]);
@@ -700,6 +719,7 @@ function renderMatchupDetail(b, oc) {
     ${t("roundWR")} (n=${m ? m[1] : 0})</span></div>`;
   html += boardListHTML(mb, BS.mShowAll);
   box.innerHTML = html;
+  wireExpand(box);
   const sm = box.querySelector(".showmore"); if (sm) sm.onclick = () => { BS.mShowAll = true; renderMatchupDetail(b, oc); };
 }
 function renderBoards(b) {
@@ -710,6 +730,7 @@ function renderBoards(b) {
   let html = `<div class="realmtabs">` + realms.map((r) => `<button class="${r === BS.realm ? 'on' : ''}" data-r="${r}">${t("realm")} ${r}</button>`).join("") + `</div>`;
   html += boardListHTML(b.boards[BS.realm], BS.boardsShowAll);
   box.innerHTML = html;
+  wireExpand(box);
   box.querySelectorAll(".realmtabs button").forEach((btn) => btn.onclick = () => { BS.realm = +btn.dataset.r; BS.boardsShowAll = false; renderBoards(b); });
   const sm = box.querySelector(".showmore"); if (sm) sm.onclick = () => { BS.boardsShowAll = true; renderBoards(b); };
 }
