@@ -790,7 +790,7 @@ function fatePhaseHTML(rows, ord, isFate) {
     if (c <= 0 && of_ <= 0) continue;
     const bc = isFate ? (FBUCKET_COLOR[(N[o] || {}).bucket] || "#888") : "#5b8cff";
     pop += `<tr><td><span class="bdot" style="background:${bc}"></span>${fname(o)}</td><td>${Math.round(c)}</td>`
-      + `<td>${of_ ? Math.round(c / of_ * 100) : 0}%</td><td style="color:${wrColor(c ? w4 / c : 0)}">${c ? Math.round(w4 / c * 100) + "%" : "–"}</td></tr>`;
+      + `<td>${of_ > 0 ? Math.round(c / of_ * 100) + "%" : "–"}</td><td style="color:${wrColor(c ? w4 / c : 0)}">${c ? Math.round(w4 / c * 100) + "%" : "–"}</td></tr>`;
   }
   pop += `</table></div>`;
   return `<div class="fphase"><div class="flabel">${ord}</div>
