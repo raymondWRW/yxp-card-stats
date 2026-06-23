@@ -33,6 +33,11 @@ const UI = {
     tier2: "DaoXin ≥",
     subBuilds: "Season 9 · DaoXin-ranked builds · recency-weighted (~1-week half-life)",
     arrangements: "arrangements",
+    fates: "Fates", tianyan: "天衍 (Derivations)",
+    fatesHint: "top pick per phase by bucket · hover for all",
+    tianyanHint: "top pick per phase · hover for all",
+    fateName: "Fate", picks: "picks", pickRate: "pick %", winTop4: "top-4",
+    loading: "Loading…",
   },
   zh: {
     title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -62,6 +67,11 @@ const UI = {
     tier2: "道心 ≥",
     subBuilds: "第9赛季 · 道心排位流派 · 近期加权（约一周半衰期）",
     arrangements: "种排列",
+    fates: "天命", tianyan: "天衍",
+    fatesHint: "各阶段最高桶的热门选择 · 悬停查看全部",
+    tianyanHint: "各阶段热门选择 · 悬停查看全部",
+    fateName: "天命", picks: "次数", pickRate: "选取率", winTop4: "前四率",
+    loading: "加载中…",
   },
 };
 // season number -> {en,zh}
@@ -494,16 +504,21 @@ let BUILDS_LOADED = false;
 // Heavy file (builds + families) is fetched only when the user first opens a build detail.
 async function ensureBuilds() {
   if (BUILDS_LOADED) return;
+  // builds are required (throws -> caller catches -> can retry on next click)
   const bd = await fetch("data/season9_builds.json").then((r) => r.json());
   BS.data.builds = bd.builds; BS.data.families = bd.families;
-  // radar axis percentiles (needs all builds' radar values)
   const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
   for (const id in BS.data.builds) {
     const b = BS.data.builds[id]; if (b.g < 20) continue;
     RADAR_AXES.forEach(([k]) => axv[k].push(b.radar[k]));
   }
   RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
-  BS.axv = axv; BUILDS_LOADED = true;
+  BS.axv = axv;
+  try {                                            // fates are optional (may not be deployed yet)
+    const fd = await fetch("data/season9_fates.json").then((r) => r.json());
+    BS.data.fates = fd.fates; BS.data.derivations = fd.derivations; BS.data.fnames = fd.names;
+  } catch (e) { /* no fate data yet — the Fates/天衍 sections just won't render */ }
+  BUILDS_LOADED = true;
 }
 // Power = standardized, SKILL-ADJUSTED average placement (recency-weighted).
 // Controls for player skill (rank score): each character's placement is re-baselined to
@@ -630,8 +645,9 @@ function renderCharDetail(host) {
   host.querySelectorAll(".sjrow").forEach((r) => r.onclick = async () => {
     BS.career = +r.dataset.career; BS.realm = null;
     BS.boardsShowAll = false; BS.mShowAll = false;
-    await ensureBuilds();                 // lazy-load the heavy build data
-    BS.screen = "build"; renderBuilds();
+    BS.screen = "build"; renderBuilds();           // immediate feedback (shows "Loading…")
+    try { await ensureBuilds(); } catch (e) { console.error("build data load failed", e); }
+    renderBuilds();                                // full render once data is in
   });
 }
 function radarSVG(b) {
@@ -735,6 +751,7 @@ function renderBoards(b) {
   const sm = box.querySelector(".showmore"); if (sm) sm.onclick = () => { BS.boardsShowAll = true; renderBoards(b); };
 }
 function renderBuildDetail(host) {
+  if (!BS.data.builds) { host.innerHTML = `<div class="empty">${t("loading")}</div>`; return; }
   const b = buildStat(BS.char, BS.career);
   if (!b || b.g < 1) { host.innerHTML = `<div class="empty">${t("noBuildData")}</div>`; return; }
   const avg = avgPlace(b.place, b.g);
@@ -749,9 +766,52 @@ function renderBuildDetail(host) {
         <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div></div>
       <div><div class="bsection"><h3>${t("boards")}</h3><div id="boardsBox"></div></div>
         <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")}) · ${t("matchHint")}</span></h3>${matchupHTML(b)}</div></div>
-    </div>`;
+    </div>
+    ${fatesSectionHTML(`${BS.char}_${BS.career}`)}`;
   renderBoards(b);
   host.querySelectorAll(".mcell").forEach((c) => c.onclick = () => { BS.mShowAll = false; renderMatchupDetail(b, +c.dataset.opp); });
+}
+// ---- Fates & 天衍 -----------------------------------------------------------
+const FBUCKET_COLOR = { innate: "#c9a227", cultivation: "#5b8cff", other: "#36c46b" };
+function fname(oid) { const e = (BS.data.fnames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
+function fatePhaseHTML(rows, ord, isFate) {
+  const N = BS.data.fnames || {};
+  let pick;
+  if (isFate) {                       // highest-appeared fate of the highest-selected bucket
+    const bt = {};
+    for (const [oid, ch] of rows) { const bk = (N[oid] || {}).bucket || "other"; bt[bk] = (bt[bk] || 0) + ch; }
+    const topB = Object.keys(bt).sort((a, b) => bt[b] - bt[a])[0];
+    pick = rows.find((r) => ((N[r[0]] || {}).bucket || "other") === topB) || rows[0];
+  } else { pick = rows[0]; }          // most-chosen derivation
+  const [oid, ch, , t4] = pick; const win = ch ? t4 / ch : 0;
+  const col = isFate ? (FBUCKET_COLOR[(N[oid] || {}).bucket] || "#888") : "#5b8cff";
+  let pop = `<div class="fpop"><table><tr><th>${t("fateName")}</th><th>${t("picks")}</th><th>${t("pickRate")}</th><th>${t("winTop4")}</th></tr>`;
+  for (const [o, c, of_, w4] of rows) {
+    if (c <= 0 && of_ <= 0) continue;
+    const bc = isFate ? (FBUCKET_COLOR[(N[o] || {}).bucket] || "#888") : "#5b8cff";
+    pop += `<tr><td><span class="bdot" style="background:${bc}"></span>${fname(o)}</td><td>${Math.round(c)}</td>`
+      + `<td>${of_ ? Math.round(c / of_ * 100) : 0}%</td><td style="color:${wrColor(c ? w4 / c : 0)}">${c ? Math.round(w4 / c * 100) + "%" : "–"}</td></tr>`;
+  }
+  pop += `</table></div>`;
+  return `<div class="fphase"><div class="flabel">${ord}</div>
+    <div class="fchip" style="border-color:${col}"><span class="bdot" style="background:${col}"></span>${fname(oid)}
+      <span class="fstat">${Math.round(win * 100)}% ${t("winTop4")}</span></div>${pop}</div>`;
+}
+function fatesSectionHTML(key) {
+  const F = (BS.data.fates || {})[key], D = (BS.data.derivations || {})[key];
+  if (!F && !D) return "";
+  let h = "";
+  if (F) {
+    h += `<div class="bsection"><h3>${t("fates")} <span class="muted" style="font-size:12px">${t("fatesHint")}</span></h3><div class="fphases">`;
+    Object.keys(F).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(F[sid], i + 1, true); });
+    h += `</div></div>`;
+  }
+  if (D) {
+    h += `<div class="bsection"><h3>${t("tianyan")} <span class="muted" style="font-size:12px">${t("tianyanHint")}</span></h3><div class="fphases">`;
+    Object.keys(D).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(D[sid], i + 1, false); });
+    h += `</div></div>`;
+  }
+  return h;
 }
 function wireBuilds() {
   document.querySelectorAll("#tabbar .tab").forEach((tb) => tb.onclick = () => {
