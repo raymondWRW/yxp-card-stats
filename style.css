@@ -123,8 +123,13 @@ footer{padding:18px 24px 40px;color:var(--muted);font-size:12px;border-top:1px s
 .cchip .big{font-size:22px;font-weight:800;margin-top:8px}
 .cchip .sub2{font-size:12px;color:var(--muted)}
 
-.bh{display:flex;gap:18px;align-items:center;margin-bottom:18px}
-.bh img.av{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#0c0e12}
+.bh{display:flex;gap:18px;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap}
+.bh img.av{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#0c0e12;flex:none}
+.bh .htxt{padding-top:6px}
+.bh-sel{flex:1;min-width:340px}
+.bh-sel .bsection{margin:0 0 12px}
+.bh-sel .bsection:last-child{margin-bottom:0}
+.bh-sel h3{font-size:13px;margin-bottom:7px}
 .bh .htxt h2{margin:0;font-size:24px}
 .bh .htxt .meta{color:var(--muted);margin-top:4px}
 .bh .kpis{display:flex;gap:22px;margin-top:10px}
@@ -186,11 +191,15 @@ footer{padding:18px 24px 40px;color:var(--muted);font-size:12px;border-top:1px s
 .fphases{display:flex;flex-wrap:wrap;gap:12px}
 .fphase{position:relative}
 .flabel{font-size:11px;color:var(--muted);text-align:center;margin-bottom:3px}
-.fchip{display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);
-  border-left-width:3px;border-radius:9px;padding:8px 12px;cursor:default;font-size:14px;white-space:nowrap}
+.fchip{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
+  border-left-width:3px;border-radius:9px;padding:6px 11px 6px 8px;cursor:default;font-size:14px;white-space:nowrap}
 .fchip .fstat{color:var(--muted);font-size:12px}
+.fchip-t{font-weight:500}
 .bdot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
-.fpop{position:absolute;top:100%;left:0;margin-top:6px;z-index:40;background:var(--panel);
+.cicon{width:26px;height:26px;border-radius:6px;object-fit:cover;flex:none;background:#0c0e12}
+.ricon{width:18px;height:18px;border-radius:4px;object-fit:cover;vertical-align:middle;margin-right:6px;background:#0c0e12;display:inline-block}
+.noimg{visibility:hidden}
+.fpop{position:absolute;top:100%;left:auto;right:0;margin-top:6px;z-index:40;background:var(--panel);
   border:1px solid var(--line);border-radius:10px;padding:8px;box-shadow:0 12px 30px rgba(0,0,0,.5);
   opacity:0;pointer-events:none;transition:opacity .1s;min-width:280px}
 .fphase:hover .fpop{opacity:1;pointer-events:auto}
