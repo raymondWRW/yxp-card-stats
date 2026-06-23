@@ -516,7 +516,7 @@ async function ensureBuilds() {
   BS.axv = axv;
   try {                                            // fates are optional (may not be deployed yet)
     const fd = await fetch("data/season9_fates.json").then((r) => r.json());
-    BS.data.fates = fd.fates; BS.data.derivations = fd.derivations; BS.data.fnames = fd.names;
+    BS.data.fates = fd.fates; BS.data.derivations = fd.derivations; BS.data.fnames = fd.names; BS.data.dnames = fd.dnames;
   } catch (e) { /* no fate data yet — the Fates/天衍 sections just won't render */ }
   BUILDS_LOADED = true;
 }
@@ -774,8 +774,10 @@ function renderBuildDetail(host) {
 // ---- Fates & 天衍 -----------------------------------------------------------
 const FBUCKET_COLOR = { innate: "#c9a227", cultivation: "#5b8cff", other: "#36c46b" };
 function fname(oid) { const e = (BS.data.fnames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
+function dname(oid) { const e = (BS.data.dnames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
 function fatePhaseHTML(rows, ord, isFate) {
   const N = BS.data.fnames || {};
+  const nm = isFate ? fname : dname;     // fates use the fate map; 天衍 derivations are cards
   let pick;
   if (isFate) {                       // highest-appeared fate of the highest-selected bucket
     const bt = {};
@@ -789,12 +791,12 @@ function fatePhaseHTML(rows, ord, isFate) {
   for (const [o, c, of_, w4] of rows) {
     if (c <= 0 && of_ <= 0) continue;
     const bc = isFate ? (FBUCKET_COLOR[(N[o] || {}).bucket] || "#888") : "#5b8cff";
-    pop += `<tr><td><span class="bdot" style="background:${bc}"></span>${fname(o)}</td><td>${Math.round(c)}</td>`
+    pop += `<tr><td><span class="bdot" style="background:${bc}"></span>${nm(o)}</td><td>${Math.round(c)}</td>`
       + `<td>${of_ > 0 ? Math.round(c / of_ * 100) + "%" : "–"}</td><td style="color:${wrColor(c ? w4 / c : 0)}">${c ? Math.round(w4 / c * 100) + "%" : "–"}</td></tr>`;
   }
   pop += `</table></div>`;
   return `<div class="fphase"><div class="flabel">${ord}</div>
-    <div class="fchip" style="border-color:${col}"><span class="bdot" style="background:${col}"></span>${fname(oid)}
+    <div class="fchip" style="border-color:${col}"><span class="bdot" style="background:${col}"></span>${nm(oid)}
       <span class="fstat">${Math.round(win * 100)}% ${t("winTop4")}</span></div>${pop}</div>`;
 }
 function fatesSectionHTML(key) {
