@@ -1,0 +1,2915 @@
+{
+  "1": {
+    "name": "Bodybuilding",
+    "nameCn": "锻体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10001": {
+    "name": "Bodybuilding",
+    "nameCn": "锻体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20001": {
+    "name": "Bodybuilding",
+    "nameCn": "锻体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30001": {
+    "name": "Bodybuilding",
+    "nameCn": "锻体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "2": {
+    "name": "Integrating Knowledge",
+    "nameCn": "融会贯通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10002": {
+    "name": "Integrating Knowledge",
+    "nameCn": "融会贯通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20002": {
+    "name": "Integrating Knowledge",
+    "nameCn": "融会贯通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30002": {
+    "name": "Integrating Knowledge",
+    "nameCn": "融会贯通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "4": {
+    "name": "Mental Perception",
+    "nameCn": "感悟丛生",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10004": {
+    "name": "Mental Perception",
+    "nameCn": "感悟丛生",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20004": {
+    "name": "Mental Perception",
+    "nameCn": "感悟丛生",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30004": {
+    "name": "Mental Perception",
+    "nameCn": "感悟丛生",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "5": {
+    "name": "Tool Governor",
+    "nameCn": "善假于物",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10005": {
+    "name": "Tool Governor",
+    "nameCn": "善假于物",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20005": {
+    "name": "Tool Governor",
+    "nameCn": "善假于物",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30005": {
+    "name": "Tool Governor",
+    "nameCn": "善假于物",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "6": {
+    "name": "The Way of Adaptation",
+    "nameCn": "变换之道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10006": {
+    "name": "The Way of Adaptation",
+    "nameCn": "变换之道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20006": {
+    "name": "The Way of Adaptation",
+    "nameCn": "变换之道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30006": {
+    "name": "The Way of Adaptation",
+    "nameCn": "变换之道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "8": {
+    "name": "Recuperate",
+    "nameCn": "休养生息",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10008": {
+    "name": "Recuperate",
+    "nameCn": "休养生息",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20008": {
+    "name": "Recuperate",
+    "nameCn": "休养生息",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30008": {
+    "name": "Recuperate",
+    "nameCn": "休养生息",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "9": {
+    "name": "Thunder Tribulation",
+    "nameCn": "云巅雷劫",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10009": {
+    "name": "Thunder Tribulation",
+    "nameCn": "云巅雷劫",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20009": {
+    "name": "Thunder Tribulation",
+    "nameCn": "云巅雷劫",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30009": {
+    "name": "Thunder Tribulation",
+    "nameCn": "云巅雷劫",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10": {
+    "name": "Inheritance of the Daoist Rhyme",
+    "nameCn": "道韵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10010": {
+    "name": "Inheritance of the Daoist Rhyme",
+    "nameCn": "道韵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20010": {
+    "name": "Inheritance of the Daoist Rhyme",
+    "nameCn": "道韵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30010": {
+    "name": "Inheritance of the Daoist Rhyme",
+    "nameCn": "道韵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "12": {
+    "name": "Epiphany",
+    "nameCn": "顿悟",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10012": {
+    "name": "Epiphany",
+    "nameCn": "顿悟",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20012": {
+    "name": "Epiphany",
+    "nameCn": "顿悟",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30012": {
+    "name": "Epiphany",
+    "nameCn": "顿悟",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "13": {
+    "name": "Store Qi",
+    "nameCn": "储纳灵气",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_store_qi_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10013": {
+    "name": "Store Qi",
+    "nameCn": "储纳灵气",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_store_qi_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20013": {
+    "name": "Store Qi",
+    "nameCn": "储纳灵气",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_store_qi_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30013": {
+    "name": "Store Qi",
+    "nameCn": "储纳灵气",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_store_qi_stacks",
+    "grantedCardBaseIds": null
+  },
+  "16": {
+    "name": "Sword Rhyme Cultivate",
+    "nameCn": "剑韵修炼",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_sword_rhyme_cultivate_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10016": {
+    "name": "Sword Rhyme Cultivate",
+    "nameCn": "剑韵修炼",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_sword_rhyme_cultivate_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20016": {
+    "name": "Sword Rhyme Cultivate",
+    "nameCn": "剑韵修炼",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_sword_rhyme_cultivate_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30016": {
+    "name": "Sword Rhyme Cultivate",
+    "nameCn": "剑韵修炼",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_sword_rhyme_cultivate_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30": {
+    "name": "Divination",
+    "nameCn": "卜卦",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_divination_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10030": {
+    "name": "Divination",
+    "nameCn": "卜卦",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_divination_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20030": {
+    "name": "Divination",
+    "nameCn": "卜卦",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_divination_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30030": {
+    "name": "Divination",
+    "nameCn": "卜卦",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_divination_stacks",
+    "grantedCardBaseIds": null
+  },
+  "31": {
+    "name": "Stargaze",
+    "nameCn": "观星",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_stargaze_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10031": {
+    "name": "Stargaze",
+    "nameCn": "观星",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_stargaze_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20031": {
+    "name": "Stargaze",
+    "nameCn": "观星",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_stargaze_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30031": {
+    "name": "Stargaze",
+    "nameCn": "观星",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_stargaze_stacks",
+    "grantedCardBaseIds": null
+  },
+  "53": {
+    "name": "Fortunes and Luck",
+    "nameCn": "机缘造化",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10053": {
+    "name": "Fortunes and Luck",
+    "nameCn": "机缘造化",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20053": {
+    "name": "Fortunes and Luck",
+    "nameCn": "机缘造化",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30053": {
+    "name": "Fortunes and Luck",
+    "nameCn": "机缘造化",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "54": {
+    "name": "Inheritance of Cloud Sword",
+    "nameCn": "云剑传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10054": {
+    "name": "Inheritance of Cloud Sword",
+    "nameCn": "云剑传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20054": {
+    "name": "Inheritance of Cloud Sword",
+    "nameCn": "云剑传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30054": {
+    "name": "Inheritance of Cloud Sword",
+    "nameCn": "云剑传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "55": {
+    "name": "Inheritance of Spirit Sword",
+    "nameCn": "灵剑传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10055": {
+    "name": "Inheritance of Spirit Sword",
+    "nameCn": "灵剑传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20055": {
+    "name": "Inheritance of Spirit Sword",
+    "nameCn": "灵剑传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30055": {
+    "name": "Inheritance of Spirit Sword",
+    "nameCn": "灵剑传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "56": {
+    "name": "Shattered Dao",
+    "nameCn": "斩道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10056": {
+    "name": "Shattered Dao",
+    "nameCn": "斩道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20056": {
+    "name": "Shattered Dao",
+    "nameCn": "斩道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30056": {
+    "name": "Shattered Dao",
+    "nameCn": "斩道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "57": {
+    "name": "Sword Formation Guard",
+    "nameCn": "剑阵守护",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_sword_formation_guard_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10057": {
+    "name": "Sword Formation Guard",
+    "nameCn": "剑阵守护",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_sword_formation_guard_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20057": {
+    "name": "Sword Formation Guard",
+    "nameCn": "剑阵守护",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_sword_formation_guard_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30057": {
+    "name": "Sword Formation Guard",
+    "nameCn": "剑阵守护",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_sword_formation_guard_stacks",
+    "grantedCardBaseIds": null
+  },
+  "58": {
+    "name": "Inheritance of Astral Move",
+    "nameCn": "星弈传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10058": {
+    "name": "Inheritance of Astral Move",
+    "nameCn": "星弈传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20058": {
+    "name": "Inheritance of Astral Move",
+    "nameCn": "星弈传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30058": {
+    "name": "Inheritance of Astral Move",
+    "nameCn": "星弈传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "59": {
+    "name": "Meteor Quench",
+    "nameCn": "陨星淬体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10059": {
+    "name": "Meteor Quench",
+    "nameCn": "陨星淬体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20059": {
+    "name": "Meteor Quench",
+    "nameCn": "陨星淬体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30059": {
+    "name": "Meteor Quench",
+    "nameCn": "陨星淬体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "60": {
+    "name": "Body of Wood Spirit",
+    "nameCn": "木灵之躯",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10060": {
+    "name": "Body of Wood Spirit",
+    "nameCn": "木灵之躯",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20060": {
+    "name": "Body of Wood Spirit",
+    "nameCn": "木灵之躯",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30060": {
+    "name": "Body of Wood Spirit",
+    "nameCn": "木灵之躯",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "69": {
+    "name": "Rule Of The Cloud",
+    "nameCn": "云之道",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_rule_of_the_cloud_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10069": {
+    "name": "Rule Of The Cloud",
+    "nameCn": "云之道",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_rule_of_the_cloud_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20069": {
+    "name": "Rule Of The Cloud",
+    "nameCn": "云之道",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_rule_of_the_cloud_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30069": {
+    "name": "Rule Of The Cloud",
+    "nameCn": "云之道",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_rule_of_the_cloud_stacks",
+    "grantedCardBaseIds": null
+  },
+  "70": {
+    "name": "Mad Obsession",
+    "nameCn": "狂之执念",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mad_obsession_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10070": {
+    "name": "Mad Obsession",
+    "nameCn": "狂之执念",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mad_obsession_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20070": {
+    "name": "Mad Obsession",
+    "nameCn": "狂之执念",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mad_obsession_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30070": {
+    "name": "Mad Obsession",
+    "nameCn": "狂之执念",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mad_obsession_stacks",
+    "grantedCardBaseIds": null
+  },
+  "71": {
+    "name": "Post Strike",
+    "nameCn": "后发制人",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_post_strike_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10071": {
+    "name": "Post Strike",
+    "nameCn": "后发制人",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_post_strike_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20071": {
+    "name": "Post Strike",
+    "nameCn": "后发制人",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_post_strike_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30071": {
+    "name": "Post Strike",
+    "nameCn": "后发制人",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_post_strike_stacks",
+    "grantedCardBaseIds": null
+  },
+  "72": {
+    "name": "Changes Of Catastrophe",
+    "nameCn": "易数化劫",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10072": {
+    "name": "Changes Of Catastrophe",
+    "nameCn": "易数化劫",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20072": {
+    "name": "Changes Of Catastrophe",
+    "nameCn": "易数化劫",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30072": {
+    "name": "Changes Of Catastrophe",
+    "nameCn": "易数化劫",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "73": {
+    "name": "Inheritance of Metal Spirit",
+    "nameCn": "金灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10073": {
+    "name": "Inheritance of Metal Spirit",
+    "nameCn": "金灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20073": {
+    "name": "Inheritance of Metal Spirit",
+    "nameCn": "金灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30073": {
+    "name": "Inheritance of Metal Spirit",
+    "nameCn": "金灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "74": {
+    "name": "Inheritance of Wood Spirit",
+    "nameCn": "木灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10074": {
+    "name": "Inheritance of Wood Spirit",
+    "nameCn": "木灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20074": {
+    "name": "Inheritance of Wood Spirit",
+    "nameCn": "木灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30074": {
+    "name": "Inheritance of Wood Spirit",
+    "nameCn": "木灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "75": {
+    "name": "Inheritance of Water Spirit",
+    "nameCn": "水灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10075": {
+    "name": "Inheritance of Water Spirit",
+    "nameCn": "水灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20075": {
+    "name": "Inheritance of Water Spirit",
+    "nameCn": "水灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30075": {
+    "name": "Inheritance of Water Spirit",
+    "nameCn": "水灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "76": {
+    "name": "Inheritance of Fire Spirit",
+    "nameCn": "火灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10076": {
+    "name": "Inheritance of Fire Spirit",
+    "nameCn": "火灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20076": {
+    "name": "Inheritance of Fire Spirit",
+    "nameCn": "火灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30076": {
+    "name": "Inheritance of Fire Spirit",
+    "nameCn": "火灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "77": {
+    "name": "Inheritance of Earth Spirit",
+    "nameCn": "土灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10077": {
+    "name": "Inheritance of Earth Spirit",
+    "nameCn": "土灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20077": {
+    "name": "Inheritance of Earth Spirit",
+    "nameCn": "土灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30077": {
+    "name": "Inheritance of Earth Spirit",
+    "nameCn": "土灵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "78": {
+    "name": "Sacrificing Into Dao",
+    "nameCn": "舍身化道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10078": {
+    "name": "Sacrificing Into Dao",
+    "nameCn": "舍身化道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20078": {
+    "name": "Sacrificing Into Dao",
+    "nameCn": "舍身化道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30078": {
+    "name": "Sacrificing Into Dao",
+    "nameCn": "舍身化道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "79": {
+    "name": "In Touch Anima",
+    "nameCn": "元灵沟通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10079": {
+    "name": "In Touch Anima",
+    "nameCn": "元灵沟通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20079": {
+    "name": "In Touch Anima",
+    "nameCn": "元灵沟通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30079": {
+    "name": "In Touch Anima",
+    "nameCn": "元灵沟通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "102": {
+    "name": "Cycle Of Five Elements",
+    "nameCn": "五行循环",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_cycle_of_five_elements_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10102": {
+    "name": "Cycle Of Five Elements",
+    "nameCn": "五行循环",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_cycle_of_five_elements_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20102": {
+    "name": "Cycle Of Five Elements",
+    "nameCn": "五行循环",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_cycle_of_five_elements_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30102": {
+    "name": "Cycle Of Five Elements",
+    "nameCn": "五行循环",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_cycle_of_five_elements_stacks",
+    "grantedCardBaseIds": null
+  },
+  "103": {
+    "name": "Astral Eclipse",
+    "nameCn": "星蚀",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_astral_eclipse_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10103": {
+    "name": "Astral Eclipse",
+    "nameCn": "星蚀",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_astral_eclipse_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20103": {
+    "name": "Astral Eclipse",
+    "nameCn": "星蚀",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_astral_eclipse_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30103": {
+    "name": "Astral Eclipse",
+    "nameCn": "星蚀",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_astral_eclipse_stacks",
+    "grantedCardBaseIds": null
+  },
+  "116": {
+    "name": "Inheritance of Sword Formation",
+    "nameCn": "剑阵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10116": {
+    "name": "Inheritance of Sword Formation",
+    "nameCn": "剑阵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20116": {
+    "name": "Inheritance of Sword Formation",
+    "nameCn": "剑阵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30116": {
+    "name": "Inheritance of Sword Formation",
+    "nameCn": "剑阵传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "117": {
+    "name": "Inheritance of Thunder",
+    "nameCn": "雷霆传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10117": {
+    "name": "Inheritance of Thunder",
+    "nameCn": "雷霆传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20117": {
+    "name": "Inheritance of Thunder",
+    "nameCn": "雷霆传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30117": {
+    "name": "Inheritance of Thunder",
+    "nameCn": "雷霆传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "118": {
+    "name": "Solid Foundation",
+    "nameCn": "稳固根基",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10118": {
+    "name": "Solid Foundation",
+    "nameCn": "稳固根基",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20118": {
+    "name": "Solid Foundation",
+    "nameCn": "稳固根基",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30118": {
+    "name": "Solid Foundation",
+    "nameCn": "稳固根基",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "119": {
+    "name": "Sword Pool The Heart Ask",
+    "nameCn": "剑池问心",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10119": {
+    "name": "Sword Pool The Heart Ask",
+    "nameCn": "剑池问心",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20119": {
+    "name": "Sword Pool The Heart Ask",
+    "nameCn": "剑池问心",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30119": {
+    "name": "Sword Pool The Heart Ask",
+    "nameCn": "剑池问心",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "120": {
+    "name": "Rejuvenation",
+    "nameCn": "妙手回春",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_rejuvenation_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10120": {
+    "name": "Rejuvenation",
+    "nameCn": "妙手回春",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_rejuvenation_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20120": {
+    "name": "Rejuvenation",
+    "nameCn": "妙手回春",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_rejuvenation_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30120": {
+    "name": "Rejuvenation",
+    "nameCn": "妙手回春",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_rejuvenation_stacks",
+    "grantedCardBaseIds": null
+  },
+  "127": {
+    "name": "Mutual Growth",
+    "nameCn": "相生相成",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mutual_growth_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10127": {
+    "name": "Mutual Growth",
+    "nameCn": "相生相成",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mutual_growth_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20127": {
+    "name": "Mutual Growth",
+    "nameCn": "相生相成",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mutual_growth_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30127": {
+    "name": "Mutual Growth",
+    "nameCn": "相生相成",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mutual_growth_stacks",
+    "grantedCardBaseIds": null
+  },
+  "128": {
+    "name": "Concentrated Element",
+    "nameCn": "五行专一",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_concentrated_element_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10128": {
+    "name": "Concentrated Element",
+    "nameCn": "五行专一",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_concentrated_element_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20128": {
+    "name": "Concentrated Element",
+    "nameCn": "五行专一",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_concentrated_element_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30128": {
+    "name": "Concentrated Element",
+    "nameCn": "五行专一",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_concentrated_element_stacks",
+    "grantedCardBaseIds": null
+  },
+  "143": {
+    "name": "Inheritance of Crash Fist",
+    "nameCn": "崩拳传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10143": {
+    "name": "Inheritance of Crash Fist",
+    "nameCn": "崩拳传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20143": {
+    "name": "Inheritance of Crash Fist",
+    "nameCn": "崩拳传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30143": {
+    "name": "Inheritance of Crash Fist",
+    "nameCn": "崩拳传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "144": {
+    "name": "Inheritance of Physique Building",
+    "nameCn": "炼体传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10144": {
+    "name": "Inheritance of Physique Building",
+    "nameCn": "炼体传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20144": {
+    "name": "Inheritance of Physique Building",
+    "nameCn": "炼体传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30144": {
+    "name": "Inheritance of Physique Building",
+    "nameCn": "炼体传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "145": {
+    "name": "Full of Force",
+    "nameCn": "气势充沛",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_full_of_force_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10145": {
+    "name": "Full of Force",
+    "nameCn": "气势充沛",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_full_of_force_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20145": {
+    "name": "Full of Force",
+    "nameCn": "气势充沛",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_full_of_force_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30145": {
+    "name": "Full of Force",
+    "nameCn": "气势充沛",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_full_of_force_stacks",
+    "grantedCardBaseIds": null
+  },
+  "146": {
+    "name": "Physique Master",
+    "nameCn": "体修入道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10146": {
+    "name": "Physique Master",
+    "nameCn": "体修入道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20146": {
+    "name": "Physique Master",
+    "nameCn": "体修入道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30146": {
+    "name": "Physique Master",
+    "nameCn": "体修入道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "148": {
+    "name": "Memory of Blood Scars (Claude translation)",
+    "nameCn": "血痕记忆",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10148": {
+    "name": "Memory of Blood Scars (Claude translation)",
+    "nameCn": "血痕记忆",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20148": {
+    "name": "Memory of Blood Scars (Claude translation)",
+    "nameCn": "血痕记忆",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30148": {
+    "name": "Memory of Blood Scars (Claude translation)",
+    "nameCn": "血痕记忆",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "149": {
+    "name": "Regenerating Body",
+    "nameCn": "再生之躯",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_regenerating_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10149": {
+    "name": "Regenerating Body",
+    "nameCn": "再生之躯",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_regenerating_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20149": {
+    "name": "Regenerating Body",
+    "nameCn": "再生之躯",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_regenerating_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30149": {
+    "name": "Regenerating Body",
+    "nameCn": "再生之躯",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_regenerating_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "150": {
+    "name": "Mark of Dark Heart",
+    "nameCn": "冥心烙印",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mark_of_dark_heart_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10150": {
+    "name": "Mark of Dark Heart",
+    "nameCn": "冥心烙印",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mark_of_dark_heart_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20150": {
+    "name": "Mark of Dark Heart",
+    "nameCn": "冥心烙印",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mark_of_dark_heart_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30150": {
+    "name": "Mark of Dark Heart",
+    "nameCn": "冥心烙印",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_mark_of_dark_heart_stacks",
+    "grantedCardBaseIds": null
+  },
+  "157": {
+    "name": "Sunset Glow",
+    "nameCn": "晚霞",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10157": {
+    "name": "Sunset Glow",
+    "nameCn": "晚霞",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20157": {
+    "name": "Sunset Glow",
+    "nameCn": "晚霞",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30157": {
+    "name": "Sunset Glow",
+    "nameCn": "晚霞",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "158": {
+    "name": "Azure Dragon Sword Formation",
+    "nameCn": "青龙剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10158": {
+    "name": "Azure Dragon Sword Formation",
+    "nameCn": "青龙剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20158": {
+    "name": "Azure Dragon Sword Formation",
+    "nameCn": "青龙剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30158": {
+    "name": "Azure Dragon Sword Formation",
+    "nameCn": "青龙剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "159": {
+    "name": "Beast Spirit Sword Formation",
+    "nameCn": "百兽灵剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10159": {
+    "name": "Beast Spirit Sword Formation",
+    "nameCn": "百兽灵剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20159": {
+    "name": "Beast Spirit Sword Formation",
+    "nameCn": "百兽灵剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30159": {
+    "name": "Beast Spirit Sword Formation",
+    "nameCn": "百兽灵剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "160": {
+    "name": "Dragon Devours Clouds",
+    "nameCn": "狂龙吞云",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10160": {
+    "name": "Dragon Devours Clouds",
+    "nameCn": "狂龙吞云",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20160": {
+    "name": "Dragon Devours Clouds",
+    "nameCn": "狂龙吞云",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30160": {
+    "name": "Dragon Devours Clouds",
+    "nameCn": "狂龙吞云",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "161": {
+    "name": "Spiritual Divination",
+    "nameCn": "灵卦术",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10161": {
+    "name": "Spiritual Divination",
+    "nameCn": "灵卦术",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20161": {
+    "name": "Spiritual Divination",
+    "nameCn": "灵卦术",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30161": {
+    "name": "Spiritual Divination",
+    "nameCn": "灵卦术",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "162": {
+    "name": "Throw Petals",
+    "nameCn": "摘花飞叶",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10162": {
+    "name": "Throw Petals",
+    "nameCn": "摘花飞叶",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20162": {
+    "name": "Throw Petals",
+    "nameCn": "摘花飞叶",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30162": {
+    "name": "Throw Petals",
+    "nameCn": "摘花飞叶",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "163": {
+    "name": "Twin Swallows",
+    "nameCn": "双飞燕",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10163": {
+    "name": "Twin Swallows",
+    "nameCn": "双飞燕",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20163": {
+    "name": "Twin Swallows",
+    "nameCn": "双飞燕",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30163": {
+    "name": "Twin Swallows",
+    "nameCn": "双飞燕",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "164": {
+    "name": "Water Drop Erosion",
+    "nameCn": "滴水穿石",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10164": {
+    "name": "Water Drop Erosion",
+    "nameCn": "滴水穿石",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20164": {
+    "name": "Water Drop Erosion",
+    "nameCn": "滴水穿石",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30164": {
+    "name": "Water Drop Erosion",
+    "nameCn": "滴水穿石",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "165": {
+    "name": "Wild Crossing Seal",
+    "nameCn": "野渡之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10165": {
+    "name": "Wild Crossing Seal",
+    "nameCn": "野渡之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20165": {
+    "name": "Wild Crossing Seal",
+    "nameCn": "野渡之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30165": {
+    "name": "Wild Crossing Seal",
+    "nameCn": "野渡之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "166": {
+    "name": "Lava Seal",
+    "nameCn": "熔岩之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10166": {
+    "name": "Lava Seal",
+    "nameCn": "熔岩之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20166": {
+    "name": "Lava Seal",
+    "nameCn": "熔岩之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30166": {
+    "name": "Lava Seal",
+    "nameCn": "熔岩之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "167": {
+    "name": "Boulder Seal",
+    "nameCn": "滚石之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10167": {
+    "name": "Boulder Seal",
+    "nameCn": "滚石之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20167": {
+    "name": "Boulder Seal",
+    "nameCn": "滚石之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30167": {
+    "name": "Boulder Seal",
+    "nameCn": "滚石之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "168": {
+    "name": "Wave Cutter Seal",
+    "nameCn": "斩浪之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10168": {
+    "name": "Wave Cutter Seal",
+    "nameCn": "斩浪之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20168": {
+    "name": "Wave Cutter Seal",
+    "nameCn": "斩浪之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30168": {
+    "name": "Wave Cutter Seal",
+    "nameCn": "斩浪之印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "175": {
+    "name": "Unbowed through battle",
+    "nameCn": "历战不屈",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10175": {
+    "name": "Unbowed through battle",
+    "nameCn": "历战不屈",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20175": {
+    "name": "Unbowed through battle",
+    "nameCn": "历战不屈",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30175": {
+    "name": "Unbowed through battle",
+    "nameCn": "历战不屈",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "176": {
+    "name": "Firmness Body",
+    "nameCn": "筋骨健壮",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_firmness_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10176": {
+    "name": "Firmness Body",
+    "nameCn": "筋骨健壮",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_firmness_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20176": {
+    "name": "Firmness Body",
+    "nameCn": "筋骨健壮",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_firmness_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30176": {
+    "name": "Firmness Body",
+    "nameCn": "筋骨健壮",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_firmness_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "188": {
+    "name": "Additional Side Job",
+    "nameCn": "副职兼修",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10188": {
+    "name": "Additional Side Job",
+    "nameCn": "副职兼修",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20188": {
+    "name": "Additional Side Job",
+    "nameCn": "副职兼修",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30188": {
+    "name": "Additional Side Job",
+    "nameCn": "副职兼修",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "3": {
+    "name": "Be On Guard",
+    "nameCn": "戒备防守",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "7": {
+    "name": "Shade Of Cloud",
+    "nameCn": "云影化身",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "shade_of_cloud_stacks",
+    "grantedCardBaseIds": null
+  },
+  "11": {
+    "name": "Learn From Others",
+    "nameCn": "博采众长",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "14": {
+    "name": "Endurance As Cloud Sea",
+    "nameCn": "云海连绵",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "endurance_as_cloud_sea_stacks",
+    "grantedCardBaseIds": null
+  },
+  "15": {
+    "name": "Lithe As Cat",
+    "nameCn": "灵猫踏云",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "lithe_as_cat_stacks",
+    "grantedCardBaseIds": null
+  },
+  "17": {
+    "name": "Spring Course Tea",
+    "nameCn": "云泉道茶",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "18": {
+    "name": "Shift As Cloud",
+    "nameCn": "云雾变幻",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "19": {
+    "name": "Bloodline Potential",
+    "nameCn": "血脉潜能",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20": {
+    "name": "Diligent",
+    "nameCn": "精进",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "21": {
+    "name": "Calm",
+    "nameCn": "冷静",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "22": {
+    "name": "Flame Dance",
+    "nameCn": "炎舞",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "23": {
+    "name": "Avalanche",
+    "nameCn": "崩雪",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "24": {
+    "name": "Inheritance of Dragonling",
+    "nameCn": "龙脉传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "25": {
+    "name": "Coral Sword",
+    "nameCn": "珊瑚剑",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "coral_sword_stacks",
+    "grantedCardBaseIds": null
+  },
+  "26": {
+    "name": "Tears Bracelet",
+    "nameCn": "泪天镯",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "27": {
+    "name": "Dragon Scale",
+    "nameCn": "龙鳞",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "dragon_scale_stacks",
+    "grantedCardBaseIds": null
+  },
+  "28": {
+    "name": "Lantern Spirit Awakening",
+    "nameCn": "灯灵觉醒",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "29": {
+    "name": "Study Hard",
+    "nameCn": "勤学苦练",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "32": {
+    "name": "Vitality Blossom",
+    "nameCn": "生机绽放",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "33": {
+    "name": "Dipper Astrolabe",
+    "nameCn": "北斗星盘",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "34": {
+    "name": "Heptastar Lantern",
+    "nameCn": "七星灯",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "35": {
+    "name": "Within Reach",
+    "nameCn": "瓮中捉鳖",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "36": {
+    "name": "Spiritage Hexagram",
+    "nameCn": "聚灵卦",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "37": {
+    "name": "Innate Spirit Body",
+    "nameCn": "先天灵躯",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "38": {
+    "name": "Solid Defense",
+    "nameCn": "稳固防御",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "39": {
+    "name": "Flame Flutter",
+    "nameCn": "灯焰飞舞",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "40": {
+    "name": "Rotary Divination Hexagram",
+    "nameCn": "旋灯占卦",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "41": {
+    "name": "Revitalized",
+    "nameCn": "枯木逢春",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "42": {
+    "name": "Cut Off Mundane",
+    "nameCn": "斩断俗尘",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "43": {
+    "name": "Curiosity",
+    "nameCn": "好奇心",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "44": {
+    "name": "Cat Paw",
+    "nameCn": "猫爪",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "45": {
+    "name": "Cat Soul Bless",
+    "nameCn": "猫魂庇佑",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "cat_soul_bless_stacks",
+    "grantedCardBaseIds": null
+  },
+  "46": {
+    "name": "Spirit Cat Chaos Sword",
+    "nameCn": "灵猫乱剑",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "47": {
+    "name": "Sword Spirit Shadow",
+    "nameCn": "剑灵极影",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "48": {
+    "name": "Strategize",
+    "nameCn": "运筹帷幄",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "50": {
+    "name": "Starburst",
+    "nameCn": "星爆术",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "51": {
+    "name": "Astral Eclipse",
+    "nameCn": "星蚀",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "p{n}_astral_eclipse_stacks",
+    "grantedCardBaseIds": null
+  },
+  "52": {
+    "name": "Heptastar Soulstat",
+    "nameCn": "七星定魂",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "heptastar_soulstat_stacks",
+    "grantedCardBaseIds": null
+  },
+  "61": {
+    "name": "Astrology",
+    "nameCn": "占星",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "astrology_stacks",
+    "grantedCardBaseIds": null
+  },
+  "62": {
+    "name": "Astral Divination Hexagram",
+    "nameCn": "布星问卦",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "astral_divination_hexagram_stacks",
+    "grantedCardBaseIds": null
+  },
+  "63": {
+    "name": "Only Traces",
+    "nameCn": "飞鸿踏雪",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "64": {
+    "name": "Birdie Wind",
+    "nameCn": "雪羽清风",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "birdie_wind_stacks",
+    "grantedCardBaseIds": null
+  },
+  "65": {
+    "name": "Avatar of Bird Shade",
+    "nameCn": "雁影化身",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "avatar_of_bird_shade_stacks",
+    "grantedCardBaseIds": null
+  },
+  "66": {
+    "name": "Sword In Sheathed",
+    "nameCn": "剑不出鞘",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "sword_in_sheathed_stacks",
+    "grantedCardBaseIds": null
+  },
+  "67": {
+    "name": "Fire Flame Blade",
+    "nameCn": "炽火炎刃",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "fire_flame_blade_stacks",
+    "grantedCardBaseIds": null
+  },
+  "68": {
+    "name": "Drift Ice Blade",
+    "nameCn": "流冰寒刃",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "drift_ice_blade_stacks",
+    "grantedCardBaseIds": null
+  },
+  "80": {
+    "name": "Battle Experience",
+    "nameCn": "战斗历练",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "81": {
+    "name": "Gourd Of Leisurely",
+    "nameCn": "悠然葫芦",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "82": {
+    "name": "Mark Of Five Elements",
+    "nameCn": "五行印记",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "mark_of_five_elements_stacks",
+    "grantedCardBaseIds": null
+  },
+  "83": {
+    "name": "Avater Of Five Elements",
+    "nameCn": "五行化身",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "84": {
+    "name": "Combine Of Five Elements",
+    "nameCn": "五行凝炼",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "85": {
+    "name": "Pray Rain",
+    "nameCn": "唤雨",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "86": {
+    "name": "Sky Delicate Bracelet",
+    "nameCn": "九霄玲珑镯",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "87": {
+    "name": "Spirit Formation Mastered",
+    "nameCn": "灵阵精通",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "88": {
+    "name": "Mark Of Earth Spirit",
+    "nameCn": "土灵印记",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "89": {
+    "name": "Quench Of Wood Spirit",
+    "nameCn": "木灵炼体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "90": {
+    "name": "Spring Rain",
+    "nameCn": "春雨",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "91": {
+    "name": "Vigorous",
+    "nameCn": "刚劲",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "92": {
+    "name": "Swordsmith",
+    "nameCn": "铸剑师",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "swordsmith_stacks",
+    "grantedCardBaseIds": null
+  },
+  "93": {
+    "name": "Blade Forging",
+    "nameCn": "剑锋锻造",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "94": {
+    "name": "Sword Pattern Carving",
+    "nameCn": "剑纹雕琢",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "95": {
+    "name": "Qi Forging",
+    "nameCn": "灵气凝铸",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "96": {
+    "name": "Quench Of Sword Heart",
+    "nameCn": "剑心淬炼",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "97": {
+    "name": "Seed Of Vitality",
+    "nameCn": "生机之种",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "98": {
+    "name": "Peach Blossom Seal",
+    "nameCn": "桃花印",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "99": {
+    "name": "Mark Of Water Spirit",
+    "nameCn": "水灵印记",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "mark_of_water_spirit_stacks",
+    "grantedCardBaseIds": null
+  },
+  "100": {
+    "name": "Landslide",
+    "nameCn": "山崩",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "101": {
+    "name": "Blossom Dance",
+    "nameCn": "花舞",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "blossom_dance_stacks",
+    "grantedCardBaseIds": null
+  },
+  "104": {
+    "name": "Perfectly Planned",
+    "nameCn": "算无遗策",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "105": {
+    "name": "Crimson Yarn Guard",
+    "nameCn": "绛纱守护",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "106": {
+    "name": "Star Moon Folding Fan",
+    "nameCn": "星月折扇",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "star_moon_folding_fan_stacks",
+    "grantedCardBaseIds": null
+  },
+  "107": {
+    "name": "Out Of Nothing",
+    "nameCn": "无中生有",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "108": {
+    "name": "Act Underhand",
+    "nameCn": "瞒天过海",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "act_underhand_stacks",
+    "grantedCardBaseIds": null
+  },
+  "109": {
+    "name": "Innate Element",
+    "nameCn": "先天五行",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "110": {
+    "name": "Innate Mark",
+    "nameCn": "先天印记",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "innate_mark_stacks",
+    "grantedCardBaseIds": null
+  },
+  "111": {
+    "name": "Innate Spirit Formation",
+    "nameCn": "先天灵阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "112": {
+    "name": "Five Elements Anima",
+    "nameCn": "五行元灵",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "five_elements_anima_stacks",
+    "grantedCardBaseIds": null
+  },
+  "114": {
+    "name": "Bloodline Power",
+    "nameCn": "血脉威能",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "115": {
+    "name": "Flame of life",
+    "nameCn": "燃命之焰",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "flame_of_life_stacks",
+    "grantedCardBaseIds": null
+  },
+  "121": {
+    "name": "Ultimate Hexagram Base",
+    "nameCn": "无极卦盘",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "122": {
+    "name": "Fury Thunder",
+    "nameCn": "狂雷电闪",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "123": {
+    "name": "Inheritance of Five Elements",
+    "nameCn": "五行传承",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "124": {
+    "name": "Overcome with each other",
+    "nameCn": "双鸳逆克",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "125": {
+    "name": "The Body of Fierce Tiger",
+    "nameCn": "猛虎之躯",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "the_body_of_fierce_tiger_stacks",
+    "grantedCardBaseIds": null
+  },
+  "126": {
+    "name": "Quench Of Fire Spirit",
+    "nameCn": "火灵炼体",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "129": {
+    "name": "Curiosity",
+    "nameCn": "好奇心",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "130": {
+    "name": "Five Elements Generating Spirit Formation",
+    "nameCn": "相生五灵阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "131": {
+    "name": "无中生有",
+    "nameCn": "无中生有",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "132": {
+    "name": "Kun Wu Metal Ring",
+    "nameCn": "锟铻金环",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "133": {
+    "name": "Five Elements Infuse",
+    "nameCn": "五行润养",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "134": {
+    "name": "Peach Branch Ruyi",
+    "nameCn": "桃枝如意",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "peach_branch_ruyi_stacks",
+    "grantedCardBaseIds": null
+  },
+  "135": {
+    "name": "Vitality Hexagram",
+    "nameCn": "生机卦诀",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "136": {
+    "name": "Secret Seal Affinity",
+    "nameCn": "秘印亲和",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "137": {
+    "name": "Fire Spirit Generation",
+    "nameCn": "相生之火",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "fire_spirit_generation_stacks",
+    "grantedCardBaseIds": null
+  },
+  "138": {
+    "name": "Five Elements Explosion",
+    "nameCn": "五行爆炎",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "five_elements_explosion_stacks",
+    "grantedCardBaseIds": null
+  },
+  "139": {
+    "name": "Flame Soul Rebirth",
+    "nameCn": "焰魂归复",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "flame_soul_rebirth_stacks",
+    "grantedCardBaseIds": null
+  },
+  "140": {
+    "name": "Swift Burning Seal",
+    "nameCn": "疾燃咒印",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "swift_burning_seal_stacks",
+    "grantedCardBaseIds": null
+  },
+  "141": {
+    "name": "Best Choice",
+    "nameCn": "计出万全",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "142": {
+    "name": "Rest and Outwit",
+    "nameCn": "以逸待劳",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "rest_and_outwit_stacks",
+    "grantedCardBaseIds": null
+  },
+  "147": {
+    "name": "Light as a Swallow (Claude translation)",
+    "nameCn": "身轻如燕",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "151": {
+    "name": "Unyielding Learning",
+    "nameCn": "磨砺不止",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "152": {
+    "name": "Unceasing Exercising",
+    "nameCn": "锻体不息",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "153": {
+    "name": "Unbounded Qi",
+    "nameCn": "灵涌不竭",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "unbounded_qi_stacks",
+    "grantedCardBaseIds": null
+  },
+  "154": {
+    "name": "Undying Body",
+    "nameCn": "生机不灭",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "undying_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "155": {
+    "name": "Unyielding in Adversity (Claude translation)",
+    "nameCn": "逆境不弃",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "156": {
+    "name": "Tireless Sprint (Claude translation)",
+    "nameCn": "疾驰不休",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "169": {
+    "name": "Endless Inheritance (Claude translation)",
+    "nameCn": "传承不绝",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "170": {
+    "name": "Forge Body",
+    "nameCn": "锻躯之道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "171": {
+    "name": "Courage to Fight",
+    "nameCn": "搏命之勇",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "courage_to_fight_stacks",
+    "grantedCardBaseIds": null
+  },
+  "172": {
+    "name": "Overwhelming Power",
+    "nameCn": "盛气凌人",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "173": {
+    "name": "Stance of Fierce Attack",
+    "nameCn": "猛攻之姿",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "stance_of_fierce_attack_stacks",
+    "grantedCardBaseIds": null
+  },
+  "174": {
+    "name": "Cracking Fist",
+    "nameCn": "崩裂之拳",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "cracking_fist_stacks",
+    "grantedCardBaseIds": null
+  },
+  "177": {
+    "name": "Unwavering Soul",
+    "nameCn": "修玄不泯",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "unwavering_soul_stacks",
+    "grantedCardBaseIds": null
+  },
+  "178": {
+    "name": "The moon waxes and wanes",
+    "nameCn": "阴晴圆缺",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "179": {
+    "name": "Entering Styx",
+    "nameCn": "入冥",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "entering_styx_stacks",
+    "grantedCardBaseIds": null
+  },
+  "180": {
+    "name": "Gone Crazy",
+    "nameCn": "疯魔",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "181": {
+    "name": "Styx Night",
+    "nameCn": "冥夜",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "182": {
+    "name": "Styx Moon's Glow",
+    "nameCn": "冥月蟾光",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "183": {
+    "name": "Zen Mind Forging Body",
+    "nameCn": "禅心锻身",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "zen_mind_forging_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "184": {
+    "name": "Mind-Body Resonance",
+    "nameCn": "心体共鸣",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "mind_body_resonance_stacks",
+    "grantedCardBaseIds": null
+  },
+  "185": {
+    "name": "Meditation of Xuan",
+    "nameCn": "冥心入玄",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "meditation_of_xuan_stacks",
+    "grantedCardBaseIds": null
+  },
+  "186": {
+    "name": "Memory Fragment",
+    "nameCn": "记忆碎片",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "187": {
+    "name": "Wan Xuan Demon Breaking Palm",
+    "nameCn": "万玄破魔掌",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "189": {
+    "name": "Swordplay Talent",
+    "nameCn": "悟剑天赋",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "190": {
+    "name": "Dao of Ruiying",
+    "nameCn": "观壁悟道",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "191": {
+    "name": "Wind Rose",
+    "nameCn": "八方来风",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "192": {
+    "name": "Chengyun's Fusion Style",
+    "nameCn": "剑招融汇",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "chengyuns_fusion_style_stacks",
+    "grantedCardBaseIds": null
+  },
+  "193": {
+    "name": "Yeying Sword Formation",
+    "nameCn": "曳影剑阵",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "194": {
+    "name": "Wind in Sky",
+    "nameCn": "风行天上",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "195": {
+    "name": "Spirit Hexagram Evolves",
+    "nameCn": "灵卦自衍",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "spirit_hexagram_evolves_stacks",
+    "grantedCardBaseIds": null
+  },
+  "196": {
+    "name": "Jade Scroll of Yin Symbol",
+    "nameCn": "阴符玉简",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "jade_scroll_of_yin_symbol_stacks",
+    "grantedCardBaseIds": [
+      214
+    ]
+  },
+  "197": {
+    "name": "Hexagrams Explain",
+    "nameCn": "易卦自解",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "hexagrams_explain_stacks",
+    "grantedCardBaseIds": null
+  },
+  "198": {
+    "name": "Solitary Void Golden Scroll",
+    "nameCn": "孤虚金书",
+    "simulationKind": "transform",
+    "runtimeKey": null,
+    "grantedCardBaseIds": [
+      215
+    ]
+  },
+  "199": {
+    "name": "Five Elements Pure Vase",
+    "nameCn": "五行玉瓶",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "five_elements_pure_vase_stacks",
+    "grantedCardBaseIds": null
+  },
+  "200": {
+    "name": "Herbs Flourish",
+    "nameCn": "百草生息",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "herbs_flourish_stacks",
+    "grantedCardBaseIds": null
+  },
+  "201": {
+    "name": "Heavenly Rain",
+    "nameCn": "天降甘霖",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "202": {
+    "name": "Five Elements Gather Qi",
+    "nameCn": "五行聚灵",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "five_elements_gather_qi_stacks",
+    "grantedCardBaseIds": null
+  },
+  "203": {
+    "name": "Forget Worries",
+    "nameCn": "忘忧",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "forget_worries_fate_stacks",
+    "grantedCardBaseIds": null
+  },
+  "204": {
+    "name": "Mortal Body",
+    "nameCn": "凡躯",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "mortal_body_stacks",
+    "grantedCardBaseIds": null
+  },
+  "205": {
+    "name": "Counter Move",
+    "nameCn": "拆招",
+    "simulationKind": "card-grant",
+    "runtimeKey": null,
+    "grantedCardBaseIds": [
+      221
+    ]
+  },
+  "206": {
+    "name": "Indomitable Will",
+    "nameCn": "志坚",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "indomitable_will_stacks",
+    "grantedCardBaseIds": null
+  },
+  "207": {
+    "name": "Shift Stance",
+    "nameCn": "转势",
+    "simulationKind": "card-grant",
+    "runtimeKey": null,
+    "grantedCardBaseIds": [
+      222
+    ]
+  },
+  "208": {
+    "name": "Attain Qi",
+    "nameCn": "得炁",
+    "simulationKind": "transform",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "209": {
+    "name": "Surge of Qi",
+    "nameCn": "灵炁奔涌",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "surge_of_qi_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10093": {
+    "name": "Sharp Blade",
+    "nameCn": "锐利剑锋",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "blade_forging_sharpness_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10094": {
+    "name": "Chain Sword Pattern",
+    "nameCn": "追击剑纹",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "sword_pattern_carving_chain_attack_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10095": {
+    "name": "Spiritage Forging",
+    "nameCn": "聚灵凝铸",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "qi_forging_spiritage_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10096": {
+    "name": "Unrestrained Sword Heart",
+    "nameCn": "狂剑之心",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "quench_of_sword_heart_unrestrained_stacks",
+    "grantedCardBaseIds": null
+  },
+  "10109": {
+    "name": "Innate Element - Metal",
+    "nameCn": "先天五行•金",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20093": {
+    "name": "Stable Blade",
+    "nameCn": "稳固剑锋",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "blade_forging_stable_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20094": {
+    "name": "Charge Sword Pattern",
+    "nameCn": "蓄攻剑纹",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "sword_pattern_carving_charge_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20095": {
+    "name": "Spiritstat Forging",
+    "nameCn": "御灵凝铸",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "qi_forging_spiritstat_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20096": {
+    "name": "Cloud Sword Heart",
+    "nameCn": "云剑之心",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "quench_of_sword_heart_cloud_stacks",
+    "grantedCardBaseIds": null
+  },
+  "20109": {
+    "name": "Innate Element - Water",
+    "nameCn": "先天五行•水",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30094": {
+    "name": "Intense Sword Pattern",
+    "nameCn": "锐意剑纹",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "sword_pattern_carving_intense_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30095": {
+    "name": "Spiritual Power Forging",
+    "nameCn": "灵威凝铸",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "qi_forging_spiritual_power_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30096": {
+    "name": "Ultimate Heart",
+    "nameCn": "无极之心",
+    "simulationKind": "runtime-stack",
+    "runtimeKey": "quench_of_sword_heart_ultimate_stacks",
+    "grantedCardBaseIds": null
+  },
+  "30109": {
+    "name": "Innate Element - Wood",
+    "nameCn": "先天五行•木",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "40109": {
+    "name": "Innate Element - Fire",
+    "nameCn": "先天五行•火",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "50109": {
+    "name": "Innate Element - Earth",
+    "nameCn": "先天五行•土",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "10104": {
+    "name": "Perfectly Planned",
+    "nameCn": "算无遗策",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "20104": {
+    "name": "Perfectly Planned",
+    "nameCn": "算无遗策",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  },
+  "30104": {
+    "name": "Perfectly Planned",
+    "nameCn": "算无遗策",
+    "simulationKind": "non-combat-or-unsupported",
+    "runtimeKey": null,
+    "grantedCardBaseIds": null
+  }
+}
