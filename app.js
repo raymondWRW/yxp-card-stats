@@ -297,6 +297,11 @@ function wrColor(wr) {
   const x = Math.max(0, Math.min(1, (wr - 0.4) / 0.2));
   return `rgb(${Math.round(232 + (54 - 232) * x)},${Math.round(85 + (196 - 85) * x)},${Math.round(78 + (107 - 78) * x)})`;
 }
+// avg placement color: lower is better (3.0 green → 4.5 red), 1st place = 1, 8th = 8.
+function placeColorF(p) {
+  const x = Math.max(0, Math.min(1, (p - 3.0) / 1.5));
+  return `rgb(${Math.round(54 + (232 - 54) * x)},${Math.round(196 + (85 - 196) * x)},${Math.round(107 + (78 - 107) * x)})`;
+}
 function cardName(c) { return (S.lang === "zh" && c.cn) ? c.cn : (c.en || c.cn || "#" + c.img); }
 function sectLabel(code) { return (SECT_CODE[code] || { en: code, zh: code })[S.lang]; }
 
@@ -795,19 +800,19 @@ function fatePhaseHTML(rows, ord, isFate) {
     const topB = Object.keys(bt).sort((a, b) => bt[b] - bt[a])[0];
     pick = rows.find((r) => ((N[r[0]] || {}).bucket || "other") === topB) || rows[0];
   } else { pick = rows[0]; }          // most-chosen derivation
-  const [oid, ch, , t4] = pick; const win = ch ? t4 / ch : 0;
+  const [oid, ch, , pw] = pick; const avgPl = ch ? pw / ch : 0;
   const col = isFate ? (FBUCKET_COLOR[(N[oid] || {}).bucket] || "#888") : "#5b8cff";
-  let pop = `<div class="fpop"><table><tr><th>${t("fateName")}</th><th>${t("picks")}</th><th>${t("pickRate")}</th><th>${t("winTop4")}</th></tr>`;
-  for (const [o, c, of_, w4] of rows) {
+  let pop = `<div class="fpop"><table><tr><th>${t("fateName")}</th><th>${t("picks")}</th><th>${t("pickRate")}</th><th>${t("avgplace")}</th></tr>`;
+  for (const [o, c, of_, pw2] of rows) {
     if (c <= 0 && of_ <= 0) continue;
     const bc = isFate ? (FBUCKET_COLOR[(N[o] || {}).bucket] || "#888") : "#5b8cff";
     pop += `<tr><td>${selIcon(o, isFate, "ricon")}<span class="bdot" style="background:${bc}"></span>${nm(o)}</td><td>${Math.round(c)}</td>`
-      + `<td>${of_ > 0 ? Math.round(c / of_ * 100) + "%" : "–"}</td><td style="color:${wrColor(c ? w4 / c : 0)}">${c ? Math.round(w4 / c * 100) + "%" : "–"}</td></tr>`;
+      + `<td>${of_ > 0 ? Math.round(c / of_ * 100) + "%" : "–"}</td><td style="color:${placeColorF(c ? pw2 / c : 0)}">${c ? (pw2 / c).toFixed(2) : "–"}</td></tr>`;
   }
   pop += `</table></div>`;
   return `<div class="fphase"><div class="flabel">${ord}</div>
     <div class="fchip" style="border-color:${col}">${selIcon(oid, isFate, "cicon")}<span class="fchip-t">${nm(oid)}</span>
-      <span class="fstat">${Math.round(win * 100)}% ${t("winTop4")}</span></div>${pop}</div>`;
+      <span class="fstat" style="color:${placeColorF(avgPl)}">${avgPl.toFixed(2)}</span></div>${pop}</div>`;
 }
 function fatesSectionHTML(key) {
   const F = (BS.data.fates || {})[key], D = (BS.data.derivations || {})[key];
