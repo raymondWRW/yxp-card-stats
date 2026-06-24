@@ -130,7 +130,8 @@ def new_build():
     return {
         "gw": 0.0, "graw": 0, "place": [0.0] * 8,      # weighted games, raw games, weighted placement
         "radar": {k: [0.0, 0.0] for k in ("e", "m", "l", "f", "s")},  # [w_wins, w_rounds]
-        "matchup": defaultdict(lambda: [0.0, 0.0, 0]),  # oppChar -> [w_rounds, w_wins, raw_rounds]
+        # oppChar -> [w_rounds, w_wins, raw_rounds, w_destinyDealt, w_destinyReceived]
+        "matchup": defaultdict(lambda: [0.0, 0.0, 0, 0.0, 0.0]),
         "boards": defaultdict(lambda: defaultdict(lambda: [0, 0.0, 0.0])),  # realm->bkey->[raw, w_count, w_wins]
         "mboards": defaultdict(lambda: defaultdict(lambda: [0, 0.0, 0.0])),  # oppChar->bkey->[raw, w_count, w_wins]
     }
@@ -196,10 +197,10 @@ def process_record(d):
     opp_uids, bot_uids = set(), set()     # distinct opponents this game (for bot-exposure diag)
     last_side = None
     for rs in d.get("roundStats", []):
-        side = None; opp = None
+        side = None; opp = None; selfp = None
         for sp in ("p1", "p2"):
             if rs[sp]["publicData"]["uid"] == uid:
-                side = rs[sp]; opp = rs["p2" if sp == "p1" else "p1"]
+                side = rs[sp]; opp = rs["p2" if sp == "p1" else "p1"]; selfp = sp
                 break
         if side is None:
             continue
@@ -208,6 +209,10 @@ def process_record(d):
         first = rs.get("firstPlayerId") == uid
         rnd = rs.get("round") or 0
         wwin = w if won else 0.0
+        # destiny (命) damage: round lifeDamage is signed from p1's view; flip for p2 so
+        # positive = self DEALT it (won the round), negative = self RECEIVED it (lost).
+        ld = rs.get("lifeDamage") or 0
+        wdd = w * (ld if selfp == "p1" else -ld)
         # radar axes = recency-weighted round win rate per phase and turn-order slot
         rad = b["radar"]
         phase = "e" if rnd <= 7 else ("m" if rnd <= 13 else "l")
@@ -235,7 +240,7 @@ def process_record(d):
             opp_uids.add(ouid)
             och = oppub.get("characterId")
             if och:
-                STATE["mu_pending"].append((char, career, och, sys.intern(ouid), w, wwin))
+                STATE["mu_pending"].append((char, career, och, sys.intern(ouid), w, wwin, wdd))
                 # late-game board played vs this opponent character
                 if rnd >= LATE_ROUND and fams:
                     mr = b["mboards"][och][bkey]; mr[0] += 1; mr[1] += w; mr[2] += wwin
@@ -330,10 +335,14 @@ def resolve_matchups():
     """Fold buffered matchup events into builds, keeping only skill-matched opponents
     (opponent uid is itself a >=DAOXIN_MIN self-record). Bots were already excluded."""
     ok = STATE["self_uids"]; kept = dropped = 0
-    for char, career, och, ouid, w, wwin in STATE["mu_pending"]:
+    for char, career, och, ouid, w, wwin, wdd in STATE["mu_pending"]:
         if ouid in ok:
             m = STATE["builds"][(char, career)]["matchup"][och]
             m[0] += w; m[1] += wwin; m[2] += 1; kept += 1
+            if wdd >= 0:
+                m[3] += wdd          # destiny dealt (won rounds)
+            else:
+                m[4] += -wdd         # destiny received (lost rounds)
         else:
             dropped += 1
     print(f"matchups: kept {kept} skill-matched, dropped {dropped} "
@@ -368,8 +377,8 @@ def write_output():
     builds_out = {}
     for (char, career), b in STATE["builds"].items():
         rad = {k: (round(v[0] / v[1], 3) if v[1] else 0.0) for k, v in b["radar"].items()}
-        # matchup: [oppChar, raw_rounds, w_rounds, w_wins], ordered by raw sample
-        matchup = sorted(([oc, m[2], r2(m[0]), r2(m[1])] for oc, m in b["matchup"].items()),
+        # matchup: [oppChar, raw_rounds, w_rounds, w_wins, w_destinyDealt, w_destinyRecv]
+        matchup = sorted(([oc, m[2], r2(m[0]), r2(m[1]), r2(m[3]), r2(m[4])] for oc, m in b["matchup"].items()),
                          key=lambda x: -x[1])
         boards = {realm: merge_boards(bd, TOP_BOARDS) for realm, bd in b["boards"].items()}
         mboards = {}

@@ -18,7 +18,8 @@ const UI = {
     notEnough: "Not enough data to calculate win rate at this Min games.",
     tabCards: "Cards · S7–8", tabBuilds: "Builds · S9", top4rate: "Top-4 win rate",
     avgplace: "Avg placement", sidejobs: "Side-jobs played", power: "Power profile",
-    boards: "Popular boards", matchup: "Matchup vs character", realm: "Realm",
+    boards: "Popular boards", matchup: "Destiny dmg vs character", realm: "Realm",
+    destinyNet: "net/round", dealt: "dealt", received: "received",
     games: "Games", topFinish: "Top-4 rate", placement: "Placement distribution",
     characters: "Characters", axisEarly: "Early", axisMid: "Mid", axisLate: "Late",
     axisFirst: "First", axisSecond: "Second", roundWR: "round WR",
@@ -52,7 +53,8 @@ const UI = {
     notEnough: "当前最少场次下数据不足，无法计算胜率。",
     tabCards: "卡牌 · S7–8", tabBuilds: "流派 · S9", top4rate: "前四胜率",
     avgplace: "平均名次", sidejobs: "搭配副职", power: "强度雷达",
-    boards: "热门卡组", matchup: "对位胜率", realm: "境界",
+    boards: "热门卡组", matchup: "对位命运伤害", realm: "境界",
+    destinyNet: "每回合净值", dealt: "造成", received: "承受",
     games: "场次", topFinish: "前四率", placement: "名次分布",
     characters: "角色", axisEarly: "前期", axisMid: "中期", axisLate: "后期",
     axisFirst: "先手", axisSecond: "后手", roundWR: "回合胜率",
@@ -302,6 +304,12 @@ function placeColorF(p) {
   const x = Math.max(0, Math.min(1, (p - 3.0) / 1.5));
   return `rgb(${Math.round(54 + (232 - 54) * x)},${Math.round(196 + (85 - 196) * x)},${Math.round(107 + (78 - 107) * x)})`;
 }
+// net destiny per round color: diverging around 0 (−3 red → +3 green).
+function destinyColor(net) {
+  const x = Math.max(0, Math.min(1, (net + 3) / 6));
+  return `rgb(${Math.round(232 + (54 - 232) * x)},${Math.round(85 + (196 - 85) * x)},${Math.round(78 + (107 - 78) * x)})`;
+}
+const sgn = (n) => (n >= 0 ? "+" : "") + n.toFixed(1);
 function cardName(c) { return (S.lang === "zh" && c.cn) ? c.cn : (c.en || c.cn || "#" + c.img); }
 function sectLabel(code) { return (SECT_CODE[code] || { en: code, zh: code })[S.lang]; }
 
@@ -722,23 +730,25 @@ function matchupHTML(b) {
   const rows = b.matchup.filter((m) => m[1] >= 8).sort((a, b) => b[1] - a[1]);
   if (!rows.length) return `<div class="empty" style="padding:14px">${t("noBuildData")}</div>`;
   let s = '<div class="mgrid">';
-  for (const [oc, raw, wrnd, wwin] of rows) {
-    const wr = wrnd ? wwin / wrnd : 0;
+  for (const [oc, raw, wrnd, wwin, dealt, recv] of rows) {
+    const dl = wrnd ? dealt / wrnd : 0, rc = wrnd ? recv / wrnd : 0, net = dl - rc;
     const has = b.mboards && b.mboards[oc] ? "" : " nob";
-    s += `<div class="mcell${has}" data-opp="${oc}"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
-      <div><div class="mn">${charName(oc)}</div><div class="mwr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</div><div class="mnn">n=${raw}</div></div></div>`;
+    s += `<div class="mcell${has}" data-opp="${oc}" title="${t("dealt")} ${dl.toFixed(1)} · ${t("received")} ${rc.toFixed(1)} /${t("roundWR")}">
+      <img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
+      <div><div class="mn">${charName(oc)}</div><div class="mwr" style="color:${destinyColor(net)}">${sgn(net)}</div>
+      <div class="mnn">${dl.toFixed(1)}/${rc.toFixed(1)} · n=${raw}</div></div></div>`;
   }
   return s + '</div><div id="matchupDetail" class="matchup-detail"></div>';
 }
 function renderMatchupDetail(b, oc) {
   const box = $("#matchupDetail"); if (!box) return;
   document.querySelectorAll(".mcell").forEach((c) => c.classList.toggle("on", +c.dataset.opp === oc));
-  const m = b.matchup.find((x) => x[0] === oc);   // [oc, raw_rounds, w_rounds, w_wins]
-  const wr = m && m[2] ? m[3] / m[2] : 0;
+  const m = b.matchup.find((x) => x[0] === oc);   // [oc, raw, w_rounds, w_wins, dealt, recv]
+  const wrnd = m ? m[2] : 0, dl = wrnd ? m[4] / wrnd : 0, rc = wrnd ? m[5] / wrnd : 0, net = dl - rc;
   const mb = (b.mboards || {})[oc] || [];
   let html = `<div class="mdh"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
-    <span><b>${t("lateBoards")} ${charName(oc)}</b> · <span style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span>
-    ${t("roundWR")} (n=${m ? m[1] : 0})</span></div>`;
+    <span><b>${t("lateBoards")} ${charName(oc)}</b> · <span style="color:${destinyColor(net)}">${t("destinyNet")} ${sgn(net)}</span>
+    · ${t("dealt")} ${dl.toFixed(1)} / ${t("received")} ${rc.toFixed(1)} (n=${m ? m[1] : 0})</span></div>`;
   html += boardListHTML(mb, BS.mShowAll);
   box.innerHTML = html;
   wireExpand(box);
