@@ -5,7 +5,7 @@ const STRIDE = 8; // [seasonIdx, charIdx, career, fam, level, round, wins, losse
 // ---- i18n ------------------------------------------------------------------
 const UI = {
   en: {
-    title: "Yi Xian Card Explorer", subPre: "Win rate & popularity from",
+    title: "Yi Xian Stats", subPre: "Win rate & popularity from",
     subMid: "card-battles ·", subPost: "cards shown", tier: "DaoXin tier",
     language: "Language", season: "Season", career: "Career", character: "Character",
     rounds: "Rounds", sortby: "Sort by", popularity: "Popularity", winrate: "Win rate",
@@ -16,7 +16,7 @@ const UI = {
     all: "All", none: "None", allSel: "All", nSel: "selected", searchPh: "card name…",
     sect: "Sect", baseLevel: "base", overall: "overall",
     notEnough: "Not enough data to calculate win rate at this Min games.",
-    tabCards: "Cards · S7–8", tabBuilds: "Builds · S9", top4rate: "Top-4 win rate",
+    tabCards: "Cards · Tianji Sigil / Dream Weave", tabBuilds: "Builds · Heavenly Derivation", top4rate: "Top-4 win rate",
     avgplace: "Avg placement", sidejobs: "Side-jobs played", power: "Power profile",
     boards: "Popular boards", matchup: "Destiny dmg vs character", realm: "Realm",
     destinyNet: "net/round", dealt: "dealt", received: "received",
@@ -32,7 +32,7 @@ const UI = {
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥",
-    subBuilds: "Season 9 · DaoXin-ranked builds · recency-weighted (~1-week half-life)",
+    subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~1-week half-life)",
     arrangements: "arrangements",
     fates: "Fates", tianyan: "天衍 (Derivations)",
     fatesHint: "top pick per phase by bucket · hover for all",
@@ -41,7 +41,7 @@ const UI = {
     loading: "Loading…",
   },
   zh: {
-    title: "弈仙牌 卡牌数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
+    title: "弈仙牌 数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
     tier: "道心段位", language: "语言", season: "赛季", career: "副职", character: "角色",
     rounds: "回合", sortby: "排序", popularity: "使用率", winrate: "胜率", cardname: "名称",
     mingames: "最少场次", search: "搜索", nomatch: "没有符合条件的卡牌。",
@@ -51,7 +51,7 @@ const UI = {
     all: "全部", none: "清空", allSel: "全部", nSel: "项已选", searchPh: "卡牌名称…",
     sect: "门派", baseLevel: "基础", overall: "总体",
     notEnough: "当前最少场次下数据不足，无法计算胜率。",
-    tabCards: "卡牌 · S7–8", tabBuilds: "流派 · S9", top4rate: "前四胜率",
+    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabBuilds: "流派 · 天衍万象", top4rate: "前四胜率",
     avgplace: "平均名次", sidejobs: "搭配副职", power: "强度雷达",
     boards: "热门卡组", matchup: "对位命运伤害", realm: "境界",
     destinyNet: "每回合净值", dealt: "造成", received: "承受",
@@ -67,7 +67,7 @@ const UI = {
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥",
-    subBuilds: "第9赛季 · 道心排位流派 · 近期加权（约一周半衰期）",
+    subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约一周半衰期）",
     arrangements: "种排列",
     fates: "天命", tianyan: "天衍",
     fatesHint: "各阶段最高桶的热门选择 · 悬停查看全部",
@@ -80,6 +80,7 @@ const UI = {
 const SEASON_NAMES = {
   7: { en: "Tianji Sigil", zh: "天机刻印" },
   8: { en: "Dream Weave", zh: "临渊织梦" },
+  9: { en: "Heavenly Derivation", zh: "天衍万象" },
 };
 // card sect_code -> character sect (charId leading digit) for normalization denom
 const SECT_TO_LEAD = { sw: 1, he: 2, fe: 3, dx: 4 };
@@ -99,7 +100,7 @@ const t = (k) => (UI[S.lang][k] ?? UI.en[k] ?? k);
 
 // ---- state -----------------------------------------------------------------
 const S = {
-  th: 4000, lang: "en",
+  th: 4000, lang: "zh",
   seasons: new Set(), careers: new Set(), chars: new Set(),
   rlo: 1, rhi: 27, sort: "pop", minGames: 30, q: "",
   modalFam: null, modalLevels: new Set(),
