@@ -613,11 +613,15 @@ function renderCharList(host) {
   if (BS.sort === "place") rows.sort((a, b) => a.avg - b.avg);
   else if (BS.sort === "pop") rows.sort((a, b) => b.g - a.g);
   else rows.sort((a, b) => (BS.power[b.id] || 0) - (BS.power[a.id] || 0));
+  // 使用率 = recency-weighted share of the field at this tier (sums to 100% across characters),
+  // so the displayed popularity matches the recency-weighted ordering instead of a raw count.
+  const totG = rows.reduce((s, r) => s + r.g, 0) || 1;
   const grid = document.createElement("div"); grid.className = "cgrid";
   for (const r of rows) {
     const pw = BS.power[r.id] || 0;
-    const big = BS.sort === "place" ? r.avg.toFixed(2) : BS.sort === "pop" ? r.graw.toLocaleString() : pw;
-    const sub = BS.sort === "place" ? t("avgplace") : BS.sort === "pop" ? t("games") : t("powerScore");
+    const pct = r.g / totG * 100;
+    const big = BS.sort === "place" ? r.avg.toFixed(2) : BS.sort === "pop" ? pct.toFixed(1) + "%" : pw;
+    const sub = BS.sort === "place" ? t("avgplace") : BS.sort === "pop" ? t("popularity") : t("powerScore");
     const el = document.createElement("div"); el.className = "cchip";
     el.innerHTML = `<img loading="lazy" src="${charAvatar(r.id)}" onerror="this.style.visibility='hidden'">
       <div class="cn">${charName(r.id)}</div><div class="cs">${sectName(+String(r.id)[0])}</div>
