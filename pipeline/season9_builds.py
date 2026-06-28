@@ -52,7 +52,7 @@ DL_WORKERS = 10
 TOP_BOARDS = 20
 TOP_MBOARDS = 8        # top boards kept per (build, opponent character)
 LATE_ROUND = 14        # "late game" = round >= 14 (matches radar 'late' axis)
-HALF_LIFE_MS = 7 * 86400 * 1000   # recency half-life = 1 week
+HALF_LIFE_MS = 4 * 86400 * 1000   # recency half-life = 4 days
 T_REF = None           # reference time (newest game endTs); set before processing
 
 RX_DAOXIN = re.compile(rb'"beginDaoXinRankScore":(\d+)')
@@ -402,7 +402,7 @@ def write_output():
     # Split into a light file (drives the character leaderboard, loads instantly) and a
     # heavy file (build detail: boards/matchups/families, lazy-loaded on first build open).
     light = {
-        "meta": {"season": 9, "mode": 3, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 7,
+        "meta": {"season": 9, "mode": 3, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
                  "selfRecords": STATE["self"], "shards": STATE["shards"]},
         "chars": char_out, "tiers": tiers_out,
     }
@@ -442,7 +442,7 @@ def write_output():
         dnames[k] = {"cn": DERIV_CN.get(k, ""), "en": DERIV_EN.get(k, ""),
                      "sect": DERIV_SECT.get(k, ""), "icon": DERIV_ICON.get(k, "")}
     fates_file = {
-        "meta": {"season": 9, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 7,
+        "meta": {"season": 9, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
                  "selfRecords": STATE["self"], "iconBase": ICON_BASE},
         "fates": fates_out, "derivations": derivs_out, "names": names, "dnames": dnames,
     }
