@@ -29,7 +29,7 @@ const UI = {
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "round win rate by phase (% = actual, shape = relative)",
-    powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character)",
+    powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥",
     subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
@@ -64,7 +64,7 @@ const UI = {
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段回合胜率（% 为实际，形状为相对）",
-    powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平）",
+    powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥",
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
@@ -540,7 +540,7 @@ async function ensureBuilds() {
 // an average-skill pilot, removing the "only strong mains still play it" inflation.
 //   b   = within-character slope of placement vs rank  = Σ_c(swrp - swr·AP_c) / Σ_c(swr² - swr²/sw)
 //   adj = AP_c − b·(R_c − R̄)      (R_c = avg rank, R̄ = global avg rank)
-//   Power = 50 + 12·(mean(adj) − adj_c)/sd(adj)
+//   Power = 50 + 12·k·(mean(adj) − adj_c)/sd(adj),  k = g/(g+K)  (small-sample shrinkage)
 function computePower(tier) {
   const rows = [];
   let gSwr = 0, gSw = 0;
@@ -548,7 +548,7 @@ function computePower(tier) {
     const s = charStatTier(id, tier); if (!s || !s.swr) continue;
     const sw = s.g, AP = s.avg, R = s.swr / sw;   // weighted games, avg placement, avg rank
     rows.push({
-      id, AP, R,
+      id, AP, R, g: sw,
       num: s.swrp - s.swr * AP,                    // within-char Σ(w·rank·place) covariance term
       den: s.swr2 - s.swr * s.swr / sw,            // within-char Σ(w·rank²) variance term
     });
@@ -561,7 +561,16 @@ function computePower(tier) {
   const m = adj.reduce((a, x) => a + x, 0) / (adj.length || 1);
   const sd = Math.sqrt(adj.reduce((a, x) => a + (x - m) ** 2, 0) / (adj.length || 1)) || 1;
   BS.power = {};
-  rows.forEach((r, i) => { BS.power[r.id] = Math.max(1, Math.min(99, Math.round(50 + 12 * (m - adj[i]) / sd))); });
+  // Sample-size shrinkage: pull each character's Power toward 50 (the average) by
+  // k = g/(g+K). A thin sample (e.g. a ~20-weighted-game character at the 6k tier) collapses
+  // to ~50 instead of topping the list on noise; well-sampled characters are barely touched.
+  // K=410 weighted games = empirical-Bayes σ²/τ² (per-game placement variance over the
+  // between-character signal variance), estimated from the data-rich 3k/4k tiers.
+  const K = 410;
+  rows.forEach((r, i) => {
+    const k = r.g / (r.g + K);
+    BS.power[r.id] = Math.max(1, Math.min(99, Math.round(50 + 12 * k * (m - adj[i]) / sd)));
+  });
 }
 function powerColor(p) {
   const x = Math.max(0, Math.min(1, (p - 35) / 30));
