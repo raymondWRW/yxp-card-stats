@@ -31,7 +31,7 @@ const UI = {
     powerNote: "destiny dmg taken per round by phase (number = actual, larger shape = takes less)",
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
-    tier2: "DaoXin ≥",
+    tier2: "DaoXin ≥", notAtTier: "This build doesn't exist at this DaoXin tier (no games).",
     subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
     arrangements: "arrangements",
     fates: "Fates", tianyan: "天衍 (Derivations)", daoyun: "道韵 (Dao Rhyme)",
@@ -67,7 +67,7 @@ const UI = {
     powerNote: "各阶段每回合承受命元伤害（数字为实际，形状越大承伤越低）",
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
-    tier2: "道心 ≥",
+    tier2: "道心 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
     arrangements: "种排列",
     fates: "天命", tianyan: "天衍", daoyun: "道韵",
@@ -518,19 +518,24 @@ async function ensureBuilds() {
   const bd = await fetch("data/season9_builds.json").then((r) => r.json());
   BS.data.builds = bd.builds; BS.data.families = bd.families;
   // v2 data: radar = destiny received (lower = better), matchup = placement head-to-head.
-  // Until the daily pipeline republishes in the new format, gate the new renderings.
+  // v3 data: build stats split by DaoXin band -> the build page gets a tier filter.
+  // Until the daily pipeline republishes in the newest format, gate the new renderings.
   BS.v2 = (bd.v || 1) >= 2;
-  const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
-  for (const id in BS.data.builds) {
-    const b = BS.data.builds[id]; if (b.g < 20) continue;
-    RADAR_AXES.forEach(([k]) => axv[k].push(b.radar[k]));
+  BS.v3 = (bd.v || 1) >= 3;
+  if (!BS.v3) {                          // v3 percentile pools are built per-tier on demand
+    const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
+    for (const id in BS.data.builds) {
+      const b = BS.data.builds[id]; if (b.g < 20) continue;
+      RADAR_AXES.forEach(([k]) => axv[k].push(b.radar[k]));
+    }
+    RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
+    BS.axv = axv;
   }
-  RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
-  BS.axv = axv;
   try {                                            // fates are optional (may not be deployed yet)
     const fd = await fetch("data/season9_fates.json").then((r) => r.json());
     BS.data.fates = fd.fates; BS.data.derivations = fd.derivations; BS.data.fnames = fd.names; BS.data.dnames = fd.dnames;
     BS.data.daoyun = fd.daoyun; BS.data.ynames = fd.ynames;
+    BS.fv3 = (fd.v || 1) >= 3;           // selection rows are per-DaoXin-band since v3
     BS.iconBase = (fd.meta && fd.meta.iconBase) || "https://sharpobject.github.io/yxp_wiki/assets/fates/";
   } catch (e) { /* no fate data yet — the Fates/天衍 sections just won't render */ }
   BUILDS_LOADED = true;
@@ -599,10 +604,68 @@ function charStatTier(id, tier) {
 }
 const buildStat = (char, career) => BS.data.builds[`${char}_${career}`];
 
+// ---- v3 band-split helpers -------------------------------------------------
+// v3 build data splits every stat by DaoXin band (0/1/2 = 3000-3999 / 4000-5999 / 6000+).
+const BAND_IDX = { 3000: [0, 1, 2], 4000: [1, 2], 6000: [2] };
+function sumBands(s3, idxs) {
+  const n = s3[0].length, o = new Array(n).fill(0);
+  for (const i of idxs) for (let j = 0; j < n; j++) o[j] += s3[i][j];
+  return o;
+}
+// Collapse a v3 band-split build into the flat shape the renderers consume, keeping only
+// the bands covered by the selected tier. v2 data is already flat and returned as-is.
+function collapseBuild(b, char, career) {
+  if (!BS.v3) return b;
+  const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
+  const radar = {}; RADAR_AXES.forEach(([k]) => { const [recv, w] = sumBands(b.radar[k], idxs); radar[k] = w ? recv / w : 0; });
+  const cb = (lst) => lst.map(([fidxs, s3, vars, imgs]) => {
+    const [raw, w, ww] = sumBands(s3, idxs);
+    const cvars = vars.map(([vf, vs3, vimgs]) => { const [vr, vw, vww] = sumBands(vs3, idxs); return [vf, vr, vw, vww, vimgs]; }).filter((v) => v[1] > 0);
+    return [fidxs, raw, w, ww, cvars, imgs];
+  }).filter((e) => e[1] > 0);
+  const boards = {}; for (const r in b.boards) boards[r] = cb(b.boards[r]);
+  const mboards = {}; for (const oc in b.mboards || {}) { const l = cb(b.mboards[oc]); if (l.length) mboards[oc] = l; }
+  const matchup = b.matchup.map(([oc, s3]) => { const [raw, wg, wh, myS, oppS] = sumBands(s3, idxs); return [oc, raw, wg, wh, myS, oppS]; })
+    .filter((m) => m[1] > 0).sort((x, y) => y[1] - x[1]);
+  // games / placement distribution at this tier come from the light file's band split
+  const tk = BS.data.tiers[`${char}_${career}`] || {};
+  let g = 0, graw = 0; const place = new Array(8).fill(0);
+  for (const bd of tierBands(BS.tier)) {
+    const e = tk[bd]; if (!e) continue;
+    g += e.g; graw += e.graw; for (let i = 0; i < 8; i++) place[i] += e.place[i];
+  }
+  return { g, graw, place, radar, matchup, boards, mboards };
+}
+// selection rows: v3 [oid, perBand [sel, off, placew]] -> flat [oid, sel, off, placew]
+function collapseSelRows(rows) {
+  if (!BS.fv3) return rows;
+  const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
+  return rows.map(([oid, s3]) => { const [sel, off, pw] = sumBands(s3, idxs); return [oid, sel, off, pw]; })
+    .filter((r) => r[1] > 0 || r[2] > 0).sort((x, y) => y[1] - x[1]);
+}
+// radar percentile pool for the current tier (v3: built on demand and cached per tier)
+function getAxv() {
+  if (!BS.v3) return BS.axv;
+  BS.axvCache = BS.axvCache || {};
+  if (BS.axvCache[BS.tier]) return BS.axvCache[BS.tier];
+  const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
+  const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
+  for (const id in BS.data.builds) {
+    const tk = BS.data.tiers[id]; if (!tk) continue;
+    let g = 0; for (const bd of tierBands(BS.tier)) if (tk[bd]) g += tk[bd].g;
+    if (g < 20) continue;
+    const b = BS.data.builds[id];
+    RADAR_AXES.forEach(([k]) => { const [recv, w] = sumBands(b.radar[k], idxs); if (w) axv[k].push(recv / w); });
+  }
+  RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
+  return BS.axvCache[BS.tier] = axv;
+}
+
 function renderBuilds() {
   if (!BS.data) return;
   $("#bsort-ctl").style.display = BS.screen === "list" ? "" : "none";
-  $("#tier-ctl").style.display = BS.screen === "build" ? "none" : "";  // tier filter not on build page
+  // the build page supports the tier filter only with v3 (band-split) data
+  $("#tier-ctl").style.display = (BS.screen === "build" && !BS.v3) ? "none" : "";
   renderCrumbs();
   const host = $("#builds-content");
   if (BS.screen === "list") renderCharList(host);
@@ -683,8 +746,9 @@ function radarSVG(b) {
   // shape = percentile of this build vs all builds (relative strength). v2 axes are
   // destiny dmg RECEIVED per round — lower is better, so the percentile is inverted
   // (a build that takes little damage gets a big shape).
+  const axv = getAxv();
   const vals = RADAR_AXES.map(([k]) => {
-    const arr = BS.axv[k]; if (!arr || !arr.length) return 0.5;
+    const arr = axv[k]; if (!arr || !arr.length) return 0.5;
     const v = b.radar[k]; let c = 0;
     for (let i = 0; i < arr.length; i++) if (arr[i] <= v) c++;
     return BS.v2 ? 1 - c / arr.length : c / arr.length;
@@ -790,8 +854,10 @@ function renderBoards(b) {
 }
 function renderBuildDetail(host) {
   if (!BS.data.builds) { host.innerHTML = `<div class="empty">${t("loading")}</div>`; return; }
-  const b = buildStat(BS.char, BS.career);
+  let b = buildStat(BS.char, BS.career);
   if (!b || b.g < 1) { host.innerHTML = `<div class="empty">${t("noBuildData")}</div>`; return; }
+  b = collapseBuild(b, BS.char, BS.career);
+  if (!b.graw) { host.innerHTML = `<div class="empty">${t("notAtTier")}</div>`; return; }
   const avg = avgPlace(b.place, b.g);
   host.innerHTML = `<div class="bh"><img class="av" src="${charAvatar(BS.char)}" onerror="this.style.visibility='hidden'">
     <div class="htxt"><h2>${charName(BS.char)} · ${careerName(BS.career)}</h2><div class="meta">${sectName(+String(BS.char)[0])}</div>
@@ -827,6 +893,8 @@ function selIcon(oid, kind, cls) {
 }
 // kind: "fate" (天命) | "deriv" (天衍) | "daoyun" (道韵)
 function fatePhaseHTML(rows, ord, kind) {
+  rows = collapseSelRows(rows);
+  if (!rows.length) return "";
   const N = BS.data.fnames || {};
   const nm = kind === "fate" ? fname : kind === "deriv" ? dname : yname;
   let pick;

@@ -131,13 +131,15 @@ def new_build():
     # weighted = recency-weighted sum; raw = unweighted count (for sample thresholds)
     return {
         "gw": 0.0, "graw": 0, "place": [0.0] * 8,      # weighted games, raw games, weighted placement
-        "radar": {k: [0.0, 0.0] for k in ("e", "m", "l", "f", "s")},  # [w_destinyRecv, w_rounds]
-        # oppChar -> [w_games, w_finishHigher, raw_games, w_selfPlaceSum, w_oppPlaceSum]
-        "matchup": defaultdict(lambda: [0.0, 0.0, 0, 0.0, 0.0]),
+        # Everything below is split by the player's DaoXin band (index 0/1/2 =
+        # A 3000-3999 / B 4000-5999 / C 6000+) so the build page can tier-filter.
+        "radar": {k: [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]] for k in ("e", "m", "l", "f", "s")},  # per band [w_destinyRecv, w_rounds]
+        # oppChar -> per band [w_games, w_finishHigher, raw_games, w_selfPlaceSum, w_oppPlaceSum]
+        "matchup": defaultdict(lambda: [[0.0, 0.0, 0, 0.0, 0.0] for _ in range(3)]),
         # board keys are the positional tuple of raw card IDS (level-specific) so the
         # display can show each slot's most common level; families are derived on output.
-        "boards": defaultdict(lambda: defaultdict(lambda: [0, 0.0, 0.0])),  # realm->cids->[raw, w_count, w_wins]
-        "mboards": defaultdict(lambda: defaultdict(lambda: [0, 0.0, 0.0])),  # oppChar->cids->[raw, w_count, w_wins]
+        "boards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # realm->cids->per band [raw, w_count, w_wins]
+        "mboards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # oppChar->cids->per band [raw, w_count, w_wins]
     }
 
 
@@ -150,10 +152,10 @@ STATE = {
                                  "swr": 0.0, "swr2": 0.0, "swrp": 0.0}),
     "fam_idx": {}, "fam_meta": [],        # family registry
     "fam_pop": defaultdict(float),        # famIdx -> weighted board appearances (for card ordering)
-    # (char,career,selectionId,optionId) -> [selected_w, offered_w, selected_place_w]
-    "fates": defaultdict(lambda: [0.0, 0.0, 0.0]),   # fate picks (talentSelectionDatas)
-    "derivs": defaultdict(lambda: [0.0, 0.0, 0.0]),  # 天衍 picks (fateStrategyData.strategies)
-    "daoyun": defaultdict(lambda: [0.0, 0.0, 0.0]),  # 道韵 picks (daoYunSelectionDatas)
+    # (char,career,selectionId,optionId) -> per DaoXin band [selected_w, offered_w, selected_place_w]
+    "fates": defaultdict(lambda: [[0.0, 0.0, 0.0] for _ in range(3)]),   # fate picks (talentSelectionDatas)
+    "derivs": defaultdict(lambda: [[0.0, 0.0, 0.0] for _ in range(3)]),  # 天衍 picks (fateStrategyData.strategies)
+    "daoyun": defaultdict(lambda: [[0.0, 0.0, 0.0] for _ in range(3)]),  # 道韵 picks (daoYunSelectionDatas)
     # skill-matched matchups: every >=3000 player appears as a self-record, so we map
     # (gameId, uid) -> final placement, buffer per-game matchup events, then keep only
     # those where the opponent's own record of the SAME game confirms them >=3000 —
@@ -196,6 +198,7 @@ def process_record(d):
     # DaoXin band (A=3000-3999, B=4000-5999, C=6000+) for the tier filter
     dx = d.get("beginDaoXinRankScore", 0)
     band = "A" if dx < 4000 else ("B" if dx < 6000 else "C")
+    bi = "ABC".index(band)                # band index for the band-split build stats
     tk = STATE["tier"][(char, career, band)]
     tk["gw"] += w; tk["graw"] += 1; tk["place"][rank] += w
     tk["swr"] += w * r; tk["swr2"] += w * r * r; tk["swrp"] += w * r * p
@@ -227,9 +230,9 @@ def process_record(d):
         # radar axes = recency-weighted destiny received per round, per phase / turn-order slot
         rad = b["radar"]
         phase = "e" if rnd <= 7 else ("m" if rnd <= 13 else "l")
-        rad[phase][1] += w; rad[phase][0] += w * recv
+        rad[phase][bi][1] += w; rad[phase][bi][0] += w * recv
         slot = "f" if first else "s"
-        rad[slot][1] += w; rad[slot][0] += w * recv
+        rad[slot][bi][1] += w; rad[slot][bi][0] += w * recv
 
         # board this round — keep the real board layout: slot order + duplicates + levels
         realm = side["publicData"].get("level") or 0
@@ -238,7 +241,7 @@ def process_record(d):
         if cids:
             for x in cids:
                 STATE["fam_pop"][fam_index(x)] += w
-            rec = b["boards"][realm][cids]; rec[0] += 1; rec[1] += w; rec[2] += wwin
+            rec = b["boards"][realm][cids][bi]; rec[0] += 1; rec[1] += w; rec[2] += wwin
 
         # opponents: bots excluded; real ones buffered per-game for the placement matchup
         oppub = opp["publicData"]
@@ -251,12 +254,12 @@ def process_record(d):
                 opp_chars[ouid] = och
                 # late-game board played vs this opponent character
                 if rnd >= LATE_ROUND and cids:
-                    mr = b["mboards"][och][cids]; mr[0] += 1; mr[1] += w; mr[2] += wwin
+                    mr = b["mboards"][och][cids][bi]; mr[0] += 1; mr[1] += w; mr[2] += wwin
 
     # one matchup event per distinct real opponent per game; resolved after all shards
     # (we need the opponent's own record to confirm >=3000 and get their placement).
     for ouid, och in opp_chars.items():
-        STATE["mu_pending"].append((char, career, och, sys.intern(ouid), gid, w, rank))
+        STATE["mu_pending"].append((char, career, och, sys.intern(ouid), gid, w, rank, bi))
 
     be = STATE["botexp"][char]; be[0] += 1; be[1] += len(bot_uids); be[2] += len(opp_chars)
 
@@ -267,27 +270,27 @@ def process_record(d):
         priv = last_side.get("privateData", {})
         placew = w * (rank + 1)
         for s in priv.get("talentSelectionDatas") or []:
-            record_selection(STATE["fates"], char, career, s, w, placew)
+            record_selection(STATE["fates"], char, career, s, w, placew, bi)
         for s in (priv.get("fateStrategyData") or {}).get("strategies") or []:
-            record_selection(STATE["derivs"], char, career, s, w, placew)
+            record_selection(STATE["derivs"], char, career, s, w, placew, bi)
         # 道韵: two picks per game. The first is always selection id 4; the second's id
         # varies with game pace (10-21, usually 15) — bucket them into slots 1 and 2.
         for s in priv.get("daoYunSelectionDatas") or []:
             slot = 1 if (s.get("id") or 0) <= 9 else 2
-            record_selection(STATE["daoyun"], char, career, s, w, placew, sid=slot)
+            record_selection(STATE["daoyun"], char, career, s, w, placew, bi, sid=slot)
 
 
-def record_selection(acc, char, career, s, w, placew, sid=None):
+def record_selection(acc, char, career, s, w, placew, bi, sid=None):
     if sid is None:
         sid = s.get("id")
     sel = s.get("selected")
     if sid is None or not sel:
         return
-    e = acc[(char, career, sid, sel)]
+    e = acc[(char, career, sid, sel)][bi]
     e[0] += w; e[2] += placew                        # chosen weight, placement-weight when chosen
     for o in s.get("pendings") or []:
         if o:
-            acc[(char, career, sid, o)][1] += w      # offered
+            acc[(char, career, sid, o)][bi][1] += w  # offered
 
 
 # ---- shard streaming -------------------------------------------------------
@@ -356,12 +359,12 @@ def resolve_matchups():
     opponent has their own >=DAOXIN_MIN self-record of the SAME game (skill-matched, no
     bots) — that record also gives their final placement for the head-to-head compare."""
     ranks = STATE["self_ranks"]; kept = dropped = 0
-    for char, career, och, ouid, gid, w, myrank in STATE["mu_pending"]:
+    for char, career, och, ouid, gid, w, myrank, bi in STATE["mu_pending"]:
         orank = ranks.get((gid, ouid))
         if orank is None:
             dropped += 1
             continue
-        m = STATE["builds"][(char, career)]["matchup"][och]
+        m = STATE["builds"][(char, career)]["matchup"][och][bi]
         m[0] += w; m[2] += 1; kept += 1
         if myrank < orank:
             m[1] += w                          # finished above this opponent
@@ -378,40 +381,49 @@ def write_output():
     r2 = lambda x: round(x, 2)
 
     def merge_boards(bd, top_n, top_var=6):
-        # bd keys are positional CARD-ID tuples (level-specific). Group by card-family
-        # SET (sorted multiset) for the top list; within a set, group by positional
-        # family layout for the variations; per slot, keep the most common LEVEL (cid).
-        # entry -> [famlist, raw, w_count, w_wins, [[famlist, raw, w, ww, imgs], ...], imgs]
+        # bd keys are positional CARD-ID tuples (level-specific); values are per-DaoXin-band
+        # [raw, w, ww] triplets. Group by card-family SET (sorted multiset) for the top
+        # list; within a set, group by positional family layout for the variations; per
+        # slot, keep the most common LEVEL (cid). Grouping/ordering use all-band totals;
+        # stats stay band-split so the frontend can tier-filter.
+        # entry -> [famlist, [[raw,w,ww] xA/B/C], [[famlist, bands, imgs], ...], imgs]
+        zero3 = lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]]
+        wtot = lambda s3: s3[0][1] + s3[1][1] + s3[2][1]
+        rb = lambda s3: [[s[0], r2(s[1]), r2(s[2])] for s in s3]
         groups = {}
         for ckey, v in bd.items():
             fams = tuple(fam_index(c) for c in ckey)
             cs = tuple(sorted(fams))
             g = groups.get(cs)
             if g is None:
-                g = groups[cs] = [0, 0.0, 0.0, {}]
-            g[0] += v[0]; g[1] += v[1]; g[2] += v[2]
-            vv = g[3].get(fams)
+                g = groups[cs] = [zero3(), {}]
+            vv = g[1].get(fams)
             if vv is None:
-                vv = g[3][fams] = [0, 0.0, 0.0, [Counter() for _ in fams]]
-            vv[0] += v[0]; vv[1] += v[1]; vv[2] += v[2]
+                vv = g[1][fams] = [zero3(), [Counter() for _ in fams]]
+            for b3 in range(3):
+                for j in range(3):
+                    g[0][b3][j] += v[b3][j]; vv[0][b3][j] += v[b3][j]
+            raw_all = v[0][0] + v[1][0] + v[2][0]
             for i, c in enumerate(ckey):
-                vv[3][i][c] += v[0]              # level popularity per slot (raw count)
+                vv[1][i][c] += raw_all           # level popularity per slot (raw count)
         out = []
-        for cs, g in sorted(groups.items(), key=lambda kv: -kv[1][1])[:top_n]:
-            vs = sorted(g[3].items(), key=lambda kv: -kv[1][1])
-            variations = [[list(fams), vv[0], r2(vv[1]), r2(vv[2]),
-                           [c.most_common(1)[0][0] for c in vv[3]]]
+        for cs, g in sorted(groups.items(), key=lambda kv: -wtot(kv[1][0]))[:top_n]:
+            vs = sorted(g[1].items(), key=lambda kv: -wtot(kv[1][0]))
+            variations = [[list(fams), rb(vv[0]), [c.most_common(1)[0][0] for c in vv[1]]]
                           for fams, vv in vs[:top_var]]
             top = variations[0]
-            out.append([top[0], g[0], r2(g[1]), r2(g[2]), variations, top[4]])
+            out.append([top[0], rb(g[0]), variations, top[2]])
         return out
 
     builds_out = {}
     for (char, career), b in STATE["builds"].items():
-        rad = {k: (round(v[0] / v[1], 3) if v[1] else 0.0) for k, v in b["radar"].items()}
-        # matchup: [oppChar, raw_games, w_games, w_finishHigher, w_selfPlaceSum, w_oppPlaceSum]
-        matchup = sorted(([oc, m[2], r2(m[0]), r2(m[1]), r2(m[3]), r2(m[4])] for oc, m in b["matchup"].items()),
-                         key=lambda x: -x[1])
+        # radar: per band [w_destinyRecvSum, w_roundSum] — the frontend divides after
+        # summing its selected bands.
+        rad = {k: [[r2(bb[0]), r2(bb[1])] for bb in v] for k, v in b["radar"].items()}
+        # matchup: [oppChar, per band [raw_games, w_games, w_finishHigher, w_selfPlaceSum, w_oppPlaceSum]]
+        matchup = sorted(([oc, [[m[2], r2(m[0]), r2(m[1]), r2(m[3]), r2(m[4])] for m in bands]]
+                          for oc, bands in b["matchup"].items()),
+                         key=lambda x: -(x[1][0][0] + x[1][1][0] + x[1][2][0]))
         boards = {realm: merge_boards(bd, TOP_BOARDS) for realm, bd in b["boards"].items()}
         mboards = {}
         for oc, bd in b["mboards"].items():
@@ -439,20 +451,23 @@ def write_output():
         "chars": char_out, "tiers": tiers_out,
     }
     # v2: radar = destiny received (not round WR), matchup = placement head-to-head,
-    # boards carry per-slot modal card levels. The frontend gates rendering on this.
+    # boards carry per-slot modal card levels. v3: all build stats split by DaoXin band
+    # (A/B/C) for the build-page tier filter. The frontend gates rendering on this.
     heavy = {
-        "v": 2,
+        "v": 3,
         "builds": builds_out,
         "families": [{**m, "pop": r2(STATE["fam_pop"].get(m["i"], 0))} for m in STATE["fam_meta"]],
     }
-    # fate / 天衍 selections: {char_career: {selectionId: [[optionId, chosen_w, offered_w, place_w], ...]}}
+    # fate / 天衍 / 道韵 selections:
+    # {char_career: {selectionId: [[optionId, per band [chosen_w, offered_w, place_w]], ...]}}
     def emit_sel(acc):
         grp = defaultdict(lambda: defaultdict(list))
         ids = set()
         for (char, career, sid, oid), v in acc.items():
-            grp[f"{char}_{career}"][sid].append([oid, r2(v[0]), r2(v[1]), r2(v[2])])
+            grp[f"{char}_{career}"][sid].append([oid, [[r2(x) for x in bb] for bb in v]])
             ids.add(oid)
-        out = {k: {str(sid): sorted(lst, key=lambda x: -x[1]) for sid, lst in sids.items()}
+        sel_tot = lambda row: row[1][0][0] + row[1][1][0] + row[1][2][0]
+        out = {k: {str(sid): sorted(lst, key=lambda x: -sel_tot(x)) for sid, lst in sids.items()}
                for k, sids in grp.items()}
         return out, ids
     fates_out, ids1 = emit_sel(STATE["fates"])
@@ -486,6 +501,7 @@ def write_output():
         ynames[str(i)] = {"cn": cn, "en": CN2EN.get(cn, ""),
                           "free": 1 if (i == 27 or cn == "自在随心") else 0}
     fates_file = {
+        "v": 3,                                       # rows are per-DaoXin-band since v3
         "meta": {"season": 9, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
                  "selfRecords": STATE["self"], "iconBase": ICON_BASE},
         "fates": fates_out, "derivations": derivs_out, "daoyun": daoyun_out,
