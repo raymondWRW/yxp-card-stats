@@ -18,8 +18,8 @@ const UI = {
     notEnough: "Not enough data to calculate win rate at this Min games.",
     tabCards: "Cards · Tianji Sigil / Dream Weave", tabBuilds: "Builds · Heavenly Derivation", top4rate: "Top-4 win rate",
     avgplace: "Avg placement", sidejobs: "Side-jobs played", power: "Power profile",
-    boards: "Popular boards", matchup: "Destiny dmg vs character", realm: "Realm",
-    destinyNet: "net/round", dealt: "dealt", received: "received",
+    boards: "Popular boards", matchup: "Placement vs character", realm: "Realm",
+    hhHigher: "finishes higher", youAbbr: "you", oppAbbr: "opp",
     games: "Games", topFinish: "Top-4 rate", placement: "Placement distribution",
     characters: "Characters", axisEarly: "Early", axisMid: "Mid", axisLate: "Late",
     axisFirst: "First", axisSecond: "Second", roundWR: "round WR",
@@ -28,17 +28,18 @@ const UI = {
     selectCareer: "Pick a side-job below to see its build detail.",
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
-    powerNote: "round win rate by phase (% = actual, shape = relative)",
+    powerNote: "destiny dmg taken per round by phase (number = actual, larger shape = takes less)",
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥",
     subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
     arrangements: "arrangements",
-    fates: "Fates", tianyan: "天衍 (Derivations)",
+    fates: "Fates", tianyan: "天衍 (Derivations)", daoyun: "道韵 (Dao Rhyme)",
     fatesHint: "top pick per phase by bucket · hover for all",
     tianyanHint: "top pick per phase · hover for all",
+    daoyunHint: "most common pick (free pick ignored) · hover for all",
     fateName: "Fate", picks: "picks", pickRate: "pick %", winTop4: "top-4",
-    loading: "Loading…",
+    loading: "Loading…", updating: "Matchup data is refreshing — check back shortly.",
   },
   zh: {
     title: "弈仙牌 数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
@@ -53,8 +54,8 @@ const UI = {
     notEnough: "当前最少场次下数据不足，无法计算胜率。",
     tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabBuilds: "流派 · 天衍万象", top4rate: "前四胜率",
     avgplace: "平均名次", sidejobs: "搭配副职", power: "强度雷达",
-    boards: "热门卡组", matchup: "对位命运伤害", realm: "境界",
-    destinyNet: "每回合净值", dealt: "造成", received: "承受",
+    boards: "热门卡组", matchup: "对位名次", realm: "境界",
+    hhHigher: "名次高于对方", youAbbr: "我", oppAbbr: "对方",
     games: "场次", topFinish: "前四率", placement: "名次分布",
     characters: "角色", axisEarly: "前期", axisMid: "中期", axisLate: "后期",
     axisFirst: "先手", axisSecond: "后手", roundWR: "回合胜率",
@@ -63,17 +64,18 @@ const UI = {
     selectCareer: "选择下方副职查看具体流派。",
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
-    powerNote: "各阶段回合胜率（% 为实际，形状为相对）",
+    powerNote: "各阶段每回合承受命元伤害（数字为实际，形状越大承伤越低）",
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥",
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
     arrangements: "种排列",
-    fates: "天命", tianyan: "天衍",
+    fates: "天命", tianyan: "天衍", daoyun: "道韵",
     fatesHint: "各阶段最高桶的热门选择 · 悬停查看全部",
     tianyanHint: "各阶段热门选择 · 悬停查看全部",
+    daoyunHint: "最常见选择（忽略自在随心）· 悬停查看全部",
     fateName: "天命", picks: "次数", pickRate: "选取率", winTop4: "前四率",
-    loading: "加载中…",
+    loading: "加载中…", updating: "对位数据更新中，请稍后刷新查看。",
   },
 };
 // season number -> {en,zh}
@@ -305,12 +307,6 @@ function placeColorF(p) {
   const x = Math.max(0, Math.min(1, (p - 3.0) / 1.5));
   return `rgb(${Math.round(54 + (232 - 54) * x)},${Math.round(196 + (85 - 196) * x)},${Math.round(107 + (78 - 107) * x)})`;
 }
-// net destiny per round color: diverging around 0 (−3 red → +3 green).
-function destinyColor(net) {
-  const x = Math.max(0, Math.min(1, (net + 3) / 6));
-  return `rgb(${Math.round(232 + (54 - 232) * x)},${Math.round(85 + (196 - 85) * x)},${Math.round(78 + (107 - 78) * x)})`;
-}
-const sgn = (n) => (n >= 0 ? "+" : "") + n.toFixed(1);
 function cardName(c) { return (S.lang === "zh" && c.cn) ? c.cn : (c.en || c.cn || "#" + c.img); }
 function sectLabel(code) { return (SECT_CODE[code] || { en: code, zh: code })[S.lang]; }
 
@@ -521,6 +517,9 @@ async function ensureBuilds() {
   // builds are required (throws -> caller catches -> can retry on next click)
   const bd = await fetch("data/season9_builds.json").then((r) => r.json());
   BS.data.builds = bd.builds; BS.data.families = bd.families;
+  // v2 data: radar = destiny received (lower = better), matchup = placement head-to-head.
+  // Until the daily pipeline republishes in the new format, gate the new renderings.
+  BS.v2 = (bd.v || 1) >= 2;
   const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
   for (const id in BS.data.builds) {
     const b = BS.data.builds[id]; if (b.g < 20) continue;
@@ -531,6 +530,7 @@ async function ensureBuilds() {
   try {                                            // fates are optional (may not be deployed yet)
     const fd = await fetch("data/season9_fates.json").then((r) => r.json());
     BS.data.fates = fd.fates; BS.data.derivations = fd.derivations; BS.data.fnames = fd.names; BS.data.dnames = fd.dnames;
+    BS.data.daoyun = fd.daoyun; BS.data.ynames = fd.ynames;
     BS.iconBase = (fd.meta && fd.meta.iconBase) || "https://sharpobject.github.io/yxp_wiki/assets/fates/";
   } catch (e) { /* no fate data yet — the Fates/天衍 sections just won't render */ }
   BUILDS_LOADED = true;
@@ -680,12 +680,14 @@ function renderCharDetail(host) {
 }
 function radarSVG(b) {
   const R = 76, cx = 130, cy = 110;
-  // shape = percentile of this build's round WR vs all builds (relative strength)
+  // shape = percentile of this build vs all builds (relative strength). v2 axes are
+  // destiny dmg RECEIVED per round — lower is better, so the percentile is inverted
+  // (a build that takes little damage gets a big shape).
   const vals = RADAR_AXES.map(([k]) => {
     const arr = BS.axv[k]; if (!arr || !arr.length) return 0.5;
     const v = b.radar[k]; let c = 0;
     for (let i = 0; i < arr.length; i++) if (arr[i] <= v) c++;
-    return c / arr.length;
+    return BS.v2 ? 1 - c / arr.length : c / arr.length;
   });
   const ang = (i) => (-90 + i * 72) * Math.PI / 180;
   const pt = (i, r) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r];
@@ -694,24 +696,27 @@ function radarSVG(b) {
   RADAR_AXES.forEach(([k, lk], i) => {
     const [x, y] = pt(i, 1); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3445"/>`;
     const [lx, ly] = pt(i, 1.28);
-    const wr = Math.round((b.radar[k] || 0) * 100);     // actual round win rate on this axis
+    // v2: actual destiny dmg received per round; v1 (legacy data): round win rate %
+    const lab = BS.v2 ? (b.radar[k] || 0).toFixed(1) : Math.round((b.radar[k] || 0) * 100) + "%";
     svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle">
-      <tspan x="${lx}">${t(lk)}</tspan><tspan x="${lx}" dy="12" fill="#cfd8e6" font-weight="700">${wr}%</tspan></text>`;
+      <tspan x="${lx}">${t(lk)}</tspan><tspan x="${lx}" dy="12" fill="#cfd8e6" font-weight="700">${lab}</tspan></text>`;
   });
   svg += `<polygon points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"/>`;
   return svg + `</svg>`;
 }
-function cardImgs(fidxs) {
+function cardImgs(fidxs, imgs) {
   const fam = BS.data.families;
-  return fidxs.map((i) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; return `<img title="${nm}" loading="lazy" src="${WIKI}${f.img}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${f.img}_en.png'">`; }).join("");
+  // imgs (v2) = per-slot most common card LEVEL id for this board; fall back to the
+  // family's representative art on older data.
+  return fidxs.map((i, j) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; const im = (imgs && imgs[j]) || f.img; return `<img title="${nm}" loading="lazy" src="${WIKI}${im}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${im}_en.png'">`; }).join("");
 }
-function boardRowHTML(fidxs, raw, wc, ww, cls, hint) {
+function boardRowHTML(fidxs, raw, wc, ww, cls, hint, imgs) {
   const wr = wc ? ww / wc : 0;
-  return `<div class="board ${cls || ""}"><div class="cards">${cardImgs(fidxs)}</div>
+  return `<div class="board ${cls || ""}"><div class="cards">${cardImgs(fidxs, imgs)}</div>
     <div class="bstat"><span class="wr" style="color:${wrColor(wr)}">${(wr * 100).toFixed(0)}%</span> ${t("roundWR")}<br>
     <span class="muted">${t("usedTimes")} ${raw.toLocaleString()}×${hint || ""}</span></div></div>`;
 }
-// Boards are merged by card-SET; entry = [reprFamlist, raw, w_count, w_wins, variations].
+// Boards are merged by card-SET; entry = [reprFamlist, raw, w_count, w_wins, variations, imgs].
 // Threshold on merged raw occurrences; multi-arrangement boards expand to their variations.
 function boardListHTML(list, showAll) {
   const shown = showAll ? list : list.filter((x) => x[1] >= BOARD_MIN);
@@ -720,13 +725,13 @@ function boardListHTML(list, showAll) {
   if (!shown.length) {
     html += `<div class="empty" style="padding:12px">${t("notEnoughBoards")}</div>`;
   } else {
-    for (const [fidxs, raw, wc, ww, vars] of shown) {
+    for (const [fidxs, raw, wc, ww, vars, imgs] of shown) {
       const multi = vars && vars.length > 1;
       const hint = multi ? ` · <span class="varhint">▸ ${vars.length} ${t("arrangements")}</span>` : "";
-      html += boardRowHTML(fidxs, raw, wc, ww, multi ? "expandable" : "", hint);
+      html += boardRowHTML(fidxs, raw, wc, ww, multi ? "expandable" : "", hint, imgs);
       if (multi) {
         html += `<div class="board-vars" hidden>`;
-        for (const [vf, vraw, vwc, vww] of vars) html += boardRowHTML(vf, vraw, vwc, vww, "vrow");
+        for (const [vf, vraw, vwc, vww, vimgs] of vars) html += boardRowHTML(vf, vraw, vwc, vww, "vrow", "", vimgs);
         html += `</div>`;
       }
     }
@@ -741,28 +746,31 @@ function wireExpand(box) {
   });
 }
 function matchupHTML(b) {
+  // v2: matchup = head-to-head FINAL PLACEMENT vs each character (same lobby, real
+  // >=3000 opponents). % = share of games this build finished above that character.
+  if (!BS.v2) return `<div class="empty" style="padding:14px">${t("updating")}</div>`;
   const rows = b.matchup.filter((m) => m[1] >= 8).sort((a, b) => b[1] - a[1]);
   if (!rows.length) return `<div class="empty" style="padding:14px">${t("noBuildData")}</div>`;
   let s = '<div class="mgrid">';
-  for (const [oc, raw, wrnd, wwin, dealt, recv] of rows) {
-    const dl = wrnd ? dealt / wrnd : 0, rc = wrnd ? recv / wrnd : 0, net = dl - rc;
+  for (const [oc, raw, wg, whigh, myS, oppS] of rows) {
+    const rate = wg ? whigh / wg : 0, my = wg ? myS / wg : 0, op = wg ? oppS / wg : 0;
     const has = b.mboards && b.mboards[oc] ? "" : " nob";
-    s += `<div class="mcell${has}" data-opp="${oc}" title="${t("dealt")} ${dl.toFixed(1)} · ${t("received")} ${rc.toFixed(1)} /${t("roundWR")}">
+    s += `<div class="mcell${has}" data-opp="${oc}" title="${t("avgplace")}: ${t("youAbbr")} ${my.toFixed(2)} · ${t("oppAbbr")} ${op.toFixed(2)}">
       <img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
-      <div><div class="mn">${charName(oc)}</div><div class="mwr" style="color:${destinyColor(net)}">${sgn(net)}</div>
-      <div class="mnn">${dl.toFixed(1)}/${rc.toFixed(1)} · n=${raw}</div></div></div>`;
+      <div><div class="mn">${charName(oc)}</div><div class="mwr" style="color:${wrColor(rate)}">${(rate * 100).toFixed(0)}%</div>
+      <div class="mnn">${my.toFixed(2)}/${op.toFixed(2)} · n=${raw}</div></div></div>`;
   }
   return s + '</div><div id="matchupDetail" class="matchup-detail"></div>';
 }
 function renderMatchupDetail(b, oc) {
   const box = $("#matchupDetail"); if (!box) return;
   document.querySelectorAll(".mcell").forEach((c) => c.classList.toggle("on", +c.dataset.opp === oc));
-  const m = b.matchup.find((x) => x[0] === oc);   // [oc, raw, w_rounds, w_wins, dealt, recv]
-  const wrnd = m ? m[2] : 0, dl = wrnd ? m[4] / wrnd : 0, rc = wrnd ? m[5] / wrnd : 0, net = dl - rc;
+  const m = b.matchup.find((x) => x[0] === oc);   // [oc, raw, w_games, w_higher, w_selfPlace, w_oppPlace]
+  const wg = m ? m[2] : 0, rate = wg ? m[3] / wg : 0, my = wg ? m[4] / wg : 0, op = wg ? m[5] / wg : 0;
   const mb = (b.mboards || {})[oc] || [];
   let html = `<div class="mdh"><img src="${charAvatar(oc)}" onerror="this.style.visibility='hidden'">
-    <span><b>${t("lateBoards")} ${charName(oc)}</b> · <span style="color:${destinyColor(net)}">${t("destinyNet")} ${sgn(net)}</span>
-    · ${t("dealt")} ${dl.toFixed(1)} / ${t("received")} ${rc.toFixed(1)} (n=${m ? m[1] : 0})</span></div>`;
+    <span><b>${t("lateBoards")} ${charName(oc)}</b> · <span style="color:${wrColor(rate)}">${(rate * 100).toFixed(0)}% ${t("hhHigher")}</span>
+    · ${t("avgplace")} ${t("youAbbr")} ${my.toFixed(2)} / ${t("oppAbbr")} ${op.toFixed(2)} (n=${m ? m[1] : 0})</span></div>`;
   html += boardListHTML(mb, BS.mShowAll);
   box.innerHTML = html;
   wireExpand(box);
@@ -796,60 +804,72 @@ function renderBuildDetail(host) {
       <div><div class="bsection"><h3>${t("power")} <span class="muted" style="font-size:12px">${t("powerNote")}</span></h3>${radarSVG(b)}</div>
         <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div></div>
       <div><div class="bsection"><h3>${t("boards")}</h3><div id="boardsBox"></div></div>
-        <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")}) · ${t("matchHint")}</span></h3>${matchupHTML(b)}</div></div>
+        <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")}) · % = ${t("hhHigher")} · ${t("matchHint")}</span></h3>${matchupHTML(b)}</div></div>
     </div>`;
   renderBoards(b);
   host.querySelectorAll(".mcell").forEach((c) => c.onclick = () => { BS.mShowAll = false; renderMatchupDetail(b, +c.dataset.opp); });
 }
 // ---- Fates & 天衍 -----------------------------------------------------------
 const FBUCKET_COLOR = { innate: "#c9a227", cultivation: "#5b8cff", other: "#36c46b" };
+const KIND_COLOR = { deriv: "#5b8cff", daoyun: "#b06fd8" };
 function fname(oid) { const e = (BS.data.fnames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
 function dname(oid) { const e = (BS.data.dnames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
-function selIconURL(oid, isFate) {
-  const e = ((isFate ? BS.data.fnames : BS.data.dnames) || {})[oid] || {};
+function yname(oid) { const e = (BS.data.ynames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
+function selIconURL(oid, kind) {
+  if (kind === "daoyun") return `${WIKI}${oid}_${S.lang}.png`;   // 道韵 options are cards -> card art
+  const e = ((kind === "fate" ? BS.data.fnames : BS.data.dnames) || {})[oid] || {};
   return e.icon ? (BS.iconBase + e.icon) : "";
 }
-function selIcon(oid, isFate, cls) {
-  const u = selIconURL(oid, isFate);
+function selIcon(oid, kind, cls) {
+  const u = selIconURL(oid, kind);
   return u ? `<img class="${cls}" src="${u}" loading="lazy" onerror="this.style.visibility='hidden'">`
     : `<span class="${cls} noimg"></span>`;
 }
-function fatePhaseHTML(rows, ord, isFate) {
+// kind: "fate" (天命) | "deriv" (天衍) | "daoyun" (道韵)
+function fatePhaseHTML(rows, ord, kind) {
   const N = BS.data.fnames || {};
-  const nm = isFate ? fname : dname;     // fates use the fate map; 天衍 derivations use the FateStrategy registry
+  const nm = kind === "fate" ? fname : kind === "deriv" ? dname : yname;
   let pick;
-  if (isFate) {                       // highest-appeared fate of the highest-selected bucket
+  if (kind === "fate") {              // highest-appeared fate of the highest-selected bucket
     const bt = {};
     for (const [oid, ch] of rows) { const bk = (N[oid] || {}).bucket || "other"; bt[bk] = (bt[bk] || 0) + ch; }
     const topB = Object.keys(bt).sort((a, b) => bt[b] - bt[a])[0];
     pick = rows.find((r) => ((N[r[0]] || {}).bucket || "other") === topB) || rows[0];
+  } else if (kind === "daoyun") {     // most-chosen real pick — the free 自在随心 is skipped
+    const Y = BS.data.ynames || {};
+    pick = rows.find((r) => r[1] > 0 && !(Y[r[0]] || {}).free) || rows[0];
   } else { pick = rows[0]; }          // most-chosen derivation
   const [oid, ch, , pw] = pick; const avgPl = ch ? pw / ch : 0;
-  const col = isFate ? (FBUCKET_COLOR[(N[oid] || {}).bucket] || "#888") : "#5b8cff";
-  let pop = `<div class="fpop"><table><tr><th>${t("fateName")}</th><th>${t("picks")}</th><th>${t("pickRate")}</th><th>${t("avgplace")}</th></tr>`;
+  const col = kind === "fate" ? (FBUCKET_COLOR[(N[oid] || {}).bucket] || "#888") : KIND_COLOR[kind];
+  let pop = `<div class="fpop"><table><tr><th>${t(kind === "daoyun" ? "daoyun" : "fateName")}</th><th>${t("picks")}</th><th>${t("pickRate")}</th><th>${t("avgplace")}</th></tr>`;
   for (const [o, c, of_, pw2] of rows) {
     if (c <= 0 && of_ <= 0) continue;
-    const bc = isFate ? (FBUCKET_COLOR[(N[o] || {}).bucket] || "#888") : "#5b8cff";
-    pop += `<tr><td>${selIcon(o, isFate, "ricon")}<span class="bdot" style="background:${bc}"></span>${nm(o)}</td><td>${Math.round(c)}</td>`
+    const bc = kind === "fate" ? (FBUCKET_COLOR[(N[o] || {}).bucket] || "#888") : KIND_COLOR[kind];
+    pop += `<tr><td>${selIcon(o, kind, "ricon")}<span class="bdot" style="background:${bc}"></span>${nm(o)}</td><td>${Math.round(c)}</td>`
       + `<td>${of_ > 0 ? Math.round(c / of_ * 100) + "%" : "–"}</td><td style="color:${placeColorF(c ? pw2 / c : 0)}">${c ? (pw2 / c).toFixed(2) : "–"}</td></tr>`;
   }
   pop += `</table></div>`;
   return `<div class="fphase"><div class="flabel">${ord}</div>
-    <div class="fchip" style="border-color:${col}">${selIcon(oid, isFate, "cicon")}<span class="fchip-t">${nm(oid)}</span>
+    <div class="fchip" style="border-color:${col}">${selIcon(oid, kind, "cicon")}<span class="fchip-t">${nm(oid)}</span>
       <span class="fstat" style="color:${placeColorF(avgPl)}">${avgPl.toFixed(2)}</span></div>${pop}</div>`;
 }
 function fatesSectionHTML(key) {
-  const F = (BS.data.fates || {})[key], D = (BS.data.derivations || {})[key];
-  if (!F && !D) return "";
+  const F = (BS.data.fates || {})[key], D = (BS.data.derivations || {})[key], Y = (BS.data.daoyun || {})[key];
+  if (!F && !D && !Y) return "";
   let h = "";
   if (F) {
     h += `<div class="bsection"><h3>${t("fates")} <span class="muted" style="font-size:12px">${t("fatesHint")}</span></h3><div class="fphases">`;
-    Object.keys(F).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(F[sid], i + 1, true); });
+    Object.keys(F).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(F[sid], i + 1, "fate"); });
     h += `</div></div>`;
   }
   if (D) {
     h += `<div class="bsection"><h3>${t("tianyan")} <span class="muted" style="font-size:12px">${t("tianyanHint")}</span></h3><div class="fphases">`;
-    Object.keys(D).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(D[sid], i + 1, false); });
+    Object.keys(D).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(D[sid], i + 1, "deriv"); });
+    h += `</div></div>`;
+  }
+  if (Y) {
+    h += `<div class="bsection"><h3>${t("daoyun")} <span class="muted" style="font-size:12px">${t("daoyunHint")}</span></h3><div class="fphases">`;
+    Object.keys(Y).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(Y[sid], i + 1, "daoyun"); });
     h += `</div></div>`;
   }
   return h;
