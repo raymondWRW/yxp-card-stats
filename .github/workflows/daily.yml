@@ -44,5 +44,8 @@ jobs:
             echo "No data changes today."
           else
             git commit -m "Daily data refresh ($(date -u +%Y-%m-%d))"
+            # main may have moved during the ~1h extraction; rebase so the push
+            # isn't rejected as non-fast-forward (only this job writes data/*.json)
+            git pull --rebase origin main
             git push
           fi
