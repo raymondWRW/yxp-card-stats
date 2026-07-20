@@ -32,7 +32,8 @@ const UI = {
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥", notAtTier: "This build doesn't exist at this DaoXin tier (no games).",
-    wheelchair: "Wheelchair index",
+    wheelchair: "Wheelchair index", strategies: "strategies",
+    rerollsByRound: "Avg rerolls held by round", realmByRound: "Avg realm by round",
     wheelchairNote: "character+side-job builds that place well while always playing the same board from R12 on — combines avg final placement, effective card-pool size, and per-slot variety (all recency-weighted)",
     wcPool: "eff. cards", wcSlot: "slot choices", wcWR: "R12+ WR",
     subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
@@ -71,7 +72,8 @@ const UI = {
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
-    wheelchair: "轮椅指数",
+    wheelchair: "轮椅指数", strategies: "策略",
+    rerollsByRound: "每回合平均持有换牌数", realmByRound: "每回合平均境界",
     wheelchairNote: "名次好且12回合后卡组固定的角色+副职流派——综合平均名次、有效卡池大小、各槽位选择多样性（均近期加权）",
     wcPool: "有效卡池", wcSlot: "槽位选择", wcWR: "12+回合胜率",
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
@@ -505,13 +507,22 @@ const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.png`;
 const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.png`;
 const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
 
-const BS = { active: false, data: null, screen: "list", char: null, career: null, sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false, tier: 3000 };
+const BS = { active: false, data: null, screen: "list", char: null, career: null, variant: "", sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false, tier: 3000 };
 const BOARD_MIN = 30;   // a board needs >= this many raw occurrences to show by default
 
 async function loadBuilds() {
   if (!BS.data) {
     // light file: meta + chars + tiers — drives the leaderboard, loads instantly
     BS.data = await fetch("data/season9.json").then((r) => r.json());
+    // strategy-split combos: "char_career|variant" tier keys -> combo -> [variants]
+    BS.variants = {};
+    for (const key in BS.data.tiers) {
+      const i = key.indexOf("|");
+      if (i < 0) continue;
+      const combo = key.slice(0, i);
+      (BS.variants[combo] = BS.variants[combo] || []).push(key.slice(i + 1));
+    }
+    for (const combo in BS.variants) BS.variants[combo].sort((a, b) => (a === "其他") - (b === "其他"));
     computePower(BS.tier);
   }
   renderBuilds();
@@ -608,7 +619,8 @@ function charStatTier(id, tier) {
   if (!g) return null;
   return { id, g, graw, avg: avgPlace(place, g), place, careers, swr, swr2, swrp };
 }
-const buildStat = (char, career) => BS.data.builds[`${char}_${career}`];
+const buildKey = (char, career, v) => `${char}_${career}` + (v ? `|${v}` : "");
+const buildStat = (char, career, v) => BS.data.builds[buildKey(char, career, v)];
 // Power per character+side-job build: same skill-adjusted placement idea as the
 // character Power (see computePower), but each build is its own row, and both the
 // shrinkage prior K and the display scale are ESTIMATED PER TIER from the data:
@@ -626,6 +638,8 @@ function computeBuildPower(tier) {
   let gSwr = 0, gSw = 0;
   for (const key in BS.data.tiers) {
     if (key.endsWith("_0")) continue;              // skip no-side-job records
+    // for strategy-split combos use the variant rows, not the double-counting aggregate
+    if (!key.includes("|") && BS.variants && BS.variants[key]) continue;
     const tk = BS.data.tiers[key];
     let g = 0, swr = 0, swr2 = 0, swrp = 0; const place = new Array(8).fill(0);
     for (const bd of bands) {
@@ -669,7 +683,8 @@ function sumBands(s3, idxs) {
 }
 // Collapse a v3 band-split build into the flat shape the renderers consume, keeping only
 // the bands covered by the selected tier. v2 data is already flat and returned as-is.
-function collapseBuild(b, char, career) {
+// `key` is the full build key incl. strategy variant (e.g. "4000003_1|玄奶").
+function collapseBuild(b, key) {
   if (!BS.v3) return b;
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
   const radar = {}; RADAR_AXES.forEach(([k]) => { const [recv, w] = sumBands(b.radar[k], idxs); radar[k] = w ? recv / w : 0; });
@@ -683,13 +698,22 @@ function collapseBuild(b, char, career) {
   const matchup = b.matchup.map(([oc, s3]) => { const [raw, wg, wh, myS, oppS] = sumBands(s3, idxs); return [oc, raw, wg, wh, myS, oppS]; })
     .filter((m) => m[1] > 0).sort((x, y) => y[1] - x[1]);
   // games / placement distribution at this tier come from the light file's band split
-  const tk = BS.data.tiers[`${char}_${career}`] || {};
+  const tk = BS.data.tiers[key] || {};
   let g = 0, graw = 0; const place = new Array(8).fill(0);
   for (const bd of tierBands(BS.tier)) {
     const e = tk[bd]; if (!e) continue;
     g += e.g; graw += e.graw; for (let i = 0; i < 8; i++) place[i] += e.place[i];
   }
-  return { g, graw, place, radar, matchup, boards, mboards };
+  // per-round curves (v4): sum the selected bands per round -> [w, w*rerolls, w*realm]
+  let curve = null;
+  if (b.curve) {
+    curve = b.curve[0].map((_, ri) => {
+      const o = [0, 0, 0];
+      for (const i of idxs) for (let j = 0; j < 3; j++) o[j] += b.curve[i][ri][j];
+      return o;
+    });
+  }
+  return { g, graw, place, radar, matchup, boards, mboards, curve };
 }
 // selection rows: v3 [oid, perBand [sel, off, placew]] -> flat [oid, sel, off, placew]
 function collapseSelRows(rows) {
@@ -752,7 +776,7 @@ function renderWheelchairList(host) {
   let html = `<div class="wcnote">${t("wheelchairNote")}</div><div class="cgrid">`;
   rows.forEach((r, i) => {
     const vtag = r.variant ? ` <span class="wcvar">${wcVarLabel(r.variant)}</span>` : "";
-    html += `<div class="cchip wc" data-ch="${r.ch}" data-cr="${r.cr}"
+    html += `<div class="cchip wc" data-ch="${r.ch}" data-cr="${r.cr}" data-v="${r.variant}"
         title="${t("avgplace")} ${r.avgPl.toFixed(2)} · ${t("wcWR")} ${(r.wr * 100).toFixed(1)}% · ${t("wcPool")} ${r.pool.toFixed(1)} · ${t("wcSlot")} ${r.slot.toFixed(2)} · n=${r.raw.toLocaleString()}">
       <span class="rank">#${i + 1}</span>
       <img loading="lazy" src="${charAvatar(r.ch)}" onerror="this.style.visibility='hidden'">
@@ -763,7 +787,7 @@ function renderWheelchairList(host) {
   });
   host.innerHTML = html + `</div>`;
   host.querySelectorAll(".cchip.wc").forEach((el) => el.onclick = async () => {
-    BS.char = +el.dataset.ch; BS.career = +el.dataset.cr; BS.realm = null;
+    BS.char = +el.dataset.ch; BS.career = +el.dataset.cr; BS.variant = el.dataset.v || ""; BS.realm = null;
     BS.boardsShowAll = false; BS.mShowAll = false;
     BS.screen = "build"; renderBuilds();
     try { await ensureBuilds(); } catch (e) { console.error("build data load failed", e); }
@@ -791,7 +815,7 @@ function renderCrumbs() {
   const sep = () => { const s = document.createElement("span"); s.className = "sep"; s.textContent = "›"; c.appendChild(s); };
   add(t("characters"), BS.screen !== "list" ? () => { BS.screen = "list"; renderBuilds(); } : null, BS.screen === "list");
   if (BS.char != null && BS.screen !== "list") { sep(); add(charName(BS.char), BS.screen === "build" ? () => { BS.screen = "char"; renderBuilds(); } : null, BS.screen === "char"); }
-  if (BS.screen === "build") { sep(); add(careerName(BS.career), null, true); }
+  if (BS.screen === "build") { sep(); add(careerName(BS.career) + (BS.variant ? ` · ${wcVarLabel(BS.variant)}` : ""), null, true); }
 }
 function renderCharList(host) {
   const rows = Object.keys(BS.data.chars).map((id) => charStatTier(+id, BS.tier)).filter((r) => r && r.g > 0);
@@ -839,17 +863,46 @@ function renderCharDetail(host) {
   html += `<div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(c.place, c.g)}</div>`;
   html += `<div class="bsection"><h3>${t("sidejobs")} <span style="color:var(--muted);font-size:12px">— ${t("selectCareer")}</span></h3>`;
   const bpow = computeBuildPower(BS.tier);
+  // per-variant stats at the current tier, straight from the light file's band split
+  const variantStat = (vkey) => {
+    const tk = BS.data.tiers[vkey] || {};
+    let g = 0, graw = 0; const place = new Array(8).fill(0);
+    for (const bd of tierBands(BS.tier)) {
+      const e = tk[bd]; if (!e) continue;
+      g += e.g; graw += e.graw; for (let i = 0; i < 8; i++) place[i] += e.place[i];
+    }
+    return { g, graw, avg: avgPlace(place, g) };
+  };
   for (const cr of careers) {
     const [gw, graw, avg] = c.careers[cr];
-    const bp = bpow[`${id}_${cr}`] || 0;
-    html += `<div class="sjrow" data-career="${cr}"><img src="${sidejobBadge(cr)}" onerror="this.style.visibility='hidden'">
-      <div class="nm">${careerName(cr)}</div><div class="barwrap"><i style="width:${100 * gw / maxg}%"></i></div>
-      <div class="rt" title="${t("powerTip")}">${t("powerScore")} <b style="color:${powerColor(bp)}">${bp}</b> · ${graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${avg.toFixed(2)}</b></div></div>`;
+    const combo = `${id}_${cr}`;
+    const vars = (BS.variants || {})[combo];
+    const bp = bpow[combo] || 0;
+    html += `<div class="sjrow${vars ? " split" : ""}" data-career="${cr}"><img src="${sidejobBadge(cr)}" onerror="this.style.visibility='hidden'">
+      <div class="nm">${careerName(cr)}${vars ? ` <span class="wcvar">${t("strategies")} ▾</span>` : ""}</div><div class="barwrap"><i style="width:${100 * gw / maxg}%"></i></div>
+      <div class="rt" title="${t("powerTip")}">${vars ? "" : `${t("powerScore")} <b style="color:${powerColor(bp)}">${bp}</b> · `}${graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${avg.toFixed(2)}</b></div></div>`;
+    if (vars) {
+      const vstats = vars.map((v) => ({ v, ...variantStat(`${combo}|${v}`) })).filter((s) => s.graw > 0);
+      const maxvg = Math.max(1, ...vstats.map((s) => s.g));
+      html += `<div class="sjvars" hidden>`;
+      for (const s of vstats) {
+        const vp = bpow[`${combo}|${s.v}`] || 0;
+        html += `<div class="sjrow vchild" data-career="${cr}" data-variant="${s.v}">
+          <span class="wcvar">${wcVarLabel(s.v)}</span><div class="barwrap"><i style="width:${100 * s.g / maxvg}%"></i></div>
+          <div class="rt" title="${t("powerTip")}">${t("powerScore")} <b style="color:${powerColor(vp)}">${vp}</b> · ${s.graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${s.avg.toFixed(2)}</b></div></div>`;
+      }
+      html += `</div>`;
+    }
   }
   html += `</div>`;
   host.innerHTML = html;
   host.querySelectorAll(".sjrow").forEach((r) => r.onclick = async () => {
-    BS.career = +r.dataset.career; BS.realm = null;
+    if (r.classList.contains("split")) {           // parent row of a split combo -> toggle its strategies
+      const v = r.nextElementSibling;
+      if (v && v.classList.contains("sjvars")) v.hidden = !v.hidden;
+      return;
+    }
+    BS.career = +r.dataset.career; BS.variant = r.dataset.variant || ""; BS.realm = null;
     BS.boardsShowAll = false; BS.mShowAll = false;
     BS.screen = "build"; renderBuilds();           // immediate feedback (shows "Loading…")
     try { await ensureBuilds(); } catch (e) { console.error("build data load failed", e); }
@@ -969,28 +1022,50 @@ function renderBoards(b) {
 }
 function renderBuildDetail(host) {
   if (!BS.data.builds) { host.innerHTML = `<div class="empty">${t("loading")}</div>`; return; }
-  let b = buildStat(BS.char, BS.career);
+  const key = buildKey(BS.char, BS.career, BS.variant);
+  let b = buildStat(BS.char, BS.career, BS.variant);
   if (!b || b.g < 1) { host.innerHTML = `<div class="empty">${t("noBuildData")}</div>`; return; }
-  b = collapseBuild(b, BS.char, BS.career);
+  b = collapseBuild(b, key);
   if (!b.graw) { host.innerHTML = `<div class="empty">${t("notAtTier")}</div>`; return; }
   const avg = avgPlace(b.place, b.g);
-  const bp = computeBuildPower(BS.tier)[`${BS.char}_${BS.career}`] || 0;
+  const bp = computeBuildPower(BS.tier)[key] || 0;
+  const vtag = BS.variant ? ` <span class="wcvar" style="font-size:14px">${wcVarLabel(BS.variant)}</span>` : "";
   host.innerHTML = `<div class="bh"><img class="av" src="${charAvatar(BS.char)}" onerror="this.style.visibility='hidden'">
-    <div class="htxt"><h2>${charName(BS.char)} · ${careerName(BS.career)}</h2><div class="meta">${sectName(+String(BS.char)[0])}</div>
+    <div class="htxt"><h2>${charName(BS.char)} · ${careerName(BS.career)}${vtag}</h2><div class="meta">${sectName(+String(BS.char)[0])}</div>
       <div class="kpis">
         <div class="kpi" title="${t("powerTip")}"><b style="color:${powerColor(bp)}">${bp}</b><span>${t("powerScore")}</span></div>
         <div class="kpi"><b>${avg.toFixed(2)}</b><span>${t("avgplace")}</span></div>
         <div class="kpi"><b>${b.graw.toLocaleString()}</b><span>${t("games")}</span></div>
       </div></div>
-      <div class="bh-sel">${fatesSectionHTML(`${BS.char}_${BS.career}`)}</div></div>
+      <div class="bh-sel">${fatesSectionHTML(key)}</div></div>
     <div class="bcols">
       <div><div class="bsection"><h3>${t("power")} <span class="muted" style="font-size:12px">${t("powerNote")}</span></h3>${radarSVG(b)}</div>
-        <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div></div>
+        <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div>
+        ${b.curve ? `<div class="bsection"><h3>${t("rerollsByRound")}</h3><div id="chartRC" class="chart"></div></div>
+        <div class="bsection"><h3>${t("realmByRound")}</h3><div id="chartLV" class="chart"></div></div>` : ""}</div>
       <div><div class="bsection"><h3>${t("boards")}</h3><div id="boardsBox"></div></div>
         <div class="bsection"><h3>${t("matchup")} <span style="color:var(--muted);font-size:12px">(${t("vsReal")}) · % = ${t("hhHigher")} · ${t("matchHint")}</span></h3>${matchupHTML(b)}</div></div>
     </div>`;
   renderBoards(b);
+  if (b.curve) renderCurves(b);
   host.querySelectorAll(".mcell").forEach((c) => c.onclick = () => { BS.mShowAll = false; renderMatchupDetail(b, +c.dataset.opp); });
+}
+// per-round curves on the build page: avg rerolls held + avg realm level (recency-weighted)
+function renderCurves(b) {
+  let last = 0;
+  b.curve.forEach((c, i) => { if (c[0] > 0.001) last = i + 1; });
+  const rounds = []; for (let r = 1; r <= last; r++) rounds.push(r);
+  if (!rounds.length) return;
+  const val = (r, j) => { const c = b.curve[r - 1]; return c[0] ? c[j] / c[0] : 0; };
+  const maxRC = Math.max(1, ...rounds.map((r) => val(r, 1)));
+  drawChart($("#chartRC"), rounds, (r) => {
+    const v = val(r, 1);
+    return { h: v / maxRC, label: r, tip: `R${r}: ${v.toFixed(1)}`, color: "#5b8cff", faded: !b.curve[r - 1][0] };
+  }, false);
+  drawChart($("#chartLV"), rounds, (r) => {
+    const v = val(r, 2);
+    return { h: v / 5, label: r, tip: `R${r}: ${v.toFixed(2)}`, color: "#36c46b", faded: !b.curve[r - 1][0] };
+  }, false);
 }
 // ---- Fates & 天衍 -----------------------------------------------------------
 const FBUCKET_COLOR = { innate: "#c9a227", cultivation: "#5b8cff", other: "#36c46b" };

@@ -57,6 +57,7 @@ TOP_MBOARDS = 8        # top boards kept per (build, opponent character)
 LATE_ROUND = 14        # "late game" = round >= 14 (matches radar 'late' axis)
 WC_ROUND = 12          # 轮椅指数 (wheelchair index) looks at boards from this round on
 WC_MIN_RAW = 50        # min raw R12+ rounds for a build/tier to get a wheelchair entry
+CURVE_ROUNDS = 30      # per-round curves (rerolls held / realm level) track rounds 1..30
 HALF_LIFE_MS = 4 * 86400 * 1000   # recency half-life = 4 days
 T_REF = None           # reference time (newest game endTs); set before processing
 
@@ -143,13 +144,16 @@ def new_build():
         # display can show each slot's most common level; families are derived on output.
         "boards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # realm->cids->per band [raw, w_count, w_wins]
         "mboards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # oppChar->cids->per band [raw, w_count, w_wins]
+        # per-round curves: per band, per round 1..CURVE_ROUNDS: [w, w*rerollsHeld, w*realmLevel]
+        "curve": [[[0.0, 0.0, 0.0] for _ in range(CURVE_ROUNDS)] for _ in range(3)],
     }
 
 
-# ---- 轮椅指数 archetype splits ----------------------------------------------
-# Some combos look "diverse" only because they blend distinct fixed archetypes;
-# split them into labeled variants by the defining fate pick (publicData.talents,
-# which may carry +10000/20000/30000 upgrade offsets) or a defining board card.
+# ---- strategy (archetype) splits --------------------------------------------
+# Some combos blend distinct fixed archetypes; classify each GAME's strategy and key
+# all build stats by (char, career, variant). Defining fates are read from the final
+# talents (publicData.talents, which may carry +10000/20000/30000 upgrade offsets);
+# defining board cards (e.g. 玄灵愈体 -> 玄奶) count if played in ANY round.
 def _fate_tiers(base):
     return {base, base + 10000, base + 20000, base + 30000}
 WC_MENGGONG = _fate_tiers(173)   # 屠馗 天命 猛攻之姿 -> 百杀 archetype
@@ -159,8 +163,8 @@ CHAR_TUKUI, CHAR_XIAOBU, CHAR_YEMM, CHAR_LICHY = 4000002, 4000001, 4000003, 1000
 CAREER_EL, CAREER_PM = 1, 6      # 炼丹师, 灵植师
 
 
-def wc_variant(char, career, talents, cids):
-    """Variant label for the wheelchair split ('' = this combo is not split)."""
+def classify_variant(char, career, talents, has_xly):
+    """Per-game strategy label ('' = this combo is not split)."""
     if char == CHAR_TUKUI and career in (CAREER_EL, CAREER_PM):
         ts = set(talents)
         if ts & WC_MENGGONG:
@@ -169,7 +173,7 @@ def wc_variant(char, career, talents, cids):
             return "崩拳"
         return "其他"
     if char in (CHAR_XIAOBU, CHAR_YEMM) and career == CAREER_EL:
-        return "玄奶" if any(CN_NAME.get(str(x)) == "玄灵愈体" for x in cids) else "其他"
+        return "玄奶" if has_xly else "其他"
     if char == CHAR_LICHY:
         return "融剑" if set(talents) & WC_RONGHUI else "其他"
     return ""
@@ -187,11 +191,11 @@ def new_wc():
 
 
 STATE = {
-    "builds": defaultdict(new_build),     # (char,career) -> build
-    "wc": defaultdict(new_wc),            # (char,career,variantLabel) -> 轮椅指数 accumulators
+    "builds": defaultdict(new_build),     # (char,career,strategyVariant) -> build
+    "wc": defaultdict(new_wc),            # (char,career,strategyVariant) -> 轮椅指数 accumulators
     # char -> weighted/raw games + rank-score sufficient stats (for skill-adjusted Power)
     "char": defaultdict(lambda: {"gw": 0.0, "graw": 0, "swr": 0.0, "swr2": 0.0, "swrp": 0.0}),
-    # (char,career,daoxin-band) -> placement+rank stats, for the tier filter on char/sidejob pages
+    # (char,career,variant,daoxin-band) -> placement+rank stats for the tier filters
     "tier": defaultdict(lambda: {"gw": 0.0, "graw": 0, "place": [0.0] * 8,
                                  "swr": 0.0, "swr2": 0.0, "swrp": 0.0}),
     "fam_idx": {}, "fam_meta": [],        # family registry
@@ -232,7 +236,27 @@ def process_record(d):
         return
     endTs = d.get("endTs") or d.get("beginTs") or T_REF
     w = 0.5 ** (max(0, T_REF - endTs) / HALF_LIFE_MS)   # recency weight (newest ~1)
-    b = STATE["builds"][(char, career)]
+
+    # --- pre-pass: collect the player's side of every round, then classify the GAME's
+    # strategy variant (final talents; defining board card counts from any round).
+    sides = []
+    for rs in d.get("roundStats", []):
+        for sp in ("p1", "p2"):
+            if rs[sp]["publicData"]["uid"] == uid:
+                sides.append((rs, rs[sp], rs["p2" if sp == "p1" else "p1"], sp))
+                break
+    if not sides:
+        return
+    last_side = sides[-1][1]
+    has_xly = False
+    if char in (CHAR_XIAOBU, CHAR_YEMM) and career == CAREER_EL:
+        for _, side, _, _ in sides:
+            if any(x and CN_NAME.get(str(x)) == "玄灵愈体" for x in side["privateData"].get("usedCards") or []):
+                has_xly = True
+                break
+    var = classify_variant(char, career, last_side["publicData"].get("talents") or [], has_xly)
+
+    b = STATE["builds"][(char, career, var)]
     c = STATE["char"][char]
     b["gw"] += w; b["graw"] += 1; c["gw"] += w; c["graw"] += 1
     b["place"][rank] += w
@@ -243,24 +267,19 @@ def process_record(d):
     dx = d.get("beginDaoXinRankScore", 0)
     band = "A" if dx < 4000 else ("B" if dx < 6000 else "C")
     bi = "ABC".index(band)                # band index for the band-split build stats
-    tk = STATE["tier"][(char, career, band)]
+    tk = STATE["tier"][(char, career, var, band)]
     tk["gw"] += w; tk["graw"] += 1; tk["place"][rank] += w
     tk["swr"] += w * r; tk["swr2"] += w * r * r; tk["swrp"] += w * r * p
 
     gid = sys.intern(str(d.get("gameId", "")))
     STATE["self_ranks"][(gid, uid)] = rank
+    # 轮椅指数 placement for this game's variant
+    wk = STATE["wc"][(char, career, var)]
+    wpl = wk["pl"][bi]
+    wpl[0] += w; wpl[1] += 1; wpl[2] += w * (rank + 1)
     opp_chars = {}                        # real opponents this game: uid -> characterId
     bot_uids = set()                      # distinct bot opponents (for bot-exposure diag)
-    last_side = None
-    for rs in d.get("roundStats", []):
-        side = None; opp = None; selfp = None
-        for sp in ("p1", "p2"):
-            if rs[sp]["publicData"]["uid"] == uid:
-                side = rs[sp]; opp = rs["p2" if sp == "p1" else "p1"]; selfp = sp
-                break
-        if side is None:
-            continue
-        last_side = side
+    for rs, side, opp, selfp in sides:
         won = rs.get("winerId") == uid
         first = rs.get("firstPlayerId") == uid
         rnd = rs.get("round") or 0
@@ -278,6 +297,13 @@ def process_record(d):
         slot = "f" if first else "s"
         rad[slot][bi][1] += w; rad[slot][bi][0] += w * recv
 
+        # per-round curves: rerolls held (replaceCardChance snapshot) + realm level
+        if rnd >= 1:
+            cv = b["curve"][bi][min(rnd, CURVE_ROUNDS) - 1]
+            cv[0] += w
+            cv[1] += w * (side["privateData"].get("replaceCardChance") or 0)
+            cv[2] += w * (side["publicData"].get("level") or 0)
+
         # board this round — keep the real board layout: slot order + duplicates + levels
         realm = side["publicData"].get("level") or 0
         cards = side["privateData"].get("usedCards") or []
@@ -289,8 +315,6 @@ def process_record(d):
             rec = b["boards"][realm][cids][bi]; rec[0] += 1; rec[1] += w; rec[2] += wwin
             # 轮椅指数 raw material: from round WC_ROUND on, what does this build keep playing?
             if rnd >= WC_ROUND:
-                var = wc_variant(char, career, side["publicData"].get("talents") or [], cids)
-                wk = STATE["wc"][(char, career, var)]
                 wcb = wk["n"][bi]; wcb[0] += w; wcb[1] += 1; wcb[2] += wwin
                 pool = wk["pool"][bi]; slots = wk["slot"][bi]
                 for i, fi in enumerate(fams):
@@ -312,44 +336,36 @@ def process_record(d):
     # one matchup event per distinct real opponent per game; resolved after all shards
     # (we need the opponent's own record to confirm >=3000 and get their placement).
     for ouid, och in opp_chars.items():
-        STATE["mu_pending"].append((char, career, och, sys.intern(ouid), gid, w, rank, bi))
+        STATE["mu_pending"].append((char, career, var, och, sys.intern(ouid), gid, w, rank, bi))
 
     be = STATE["botexp"][char]; be[0] += 1; be[1] += len(bot_uids); be[2] += len(opp_chars)
 
-    # fate & 天衍 selections — cumulative, read from the player's last present round.
-    # Each selection = {id: phase, pendings: options offered, selected: chosen}.
-    # 4th stat = recency-weighted placement (rank+1) when chosen -> avg placement on display.
-    if last_side is not None:
-        # 轮椅指数 placement: attribute this game's final placement to the variant the
-        # game ENDED as (final board + talents), so split variants get their own strength.
-        lcids = tuple(x for x in (last_side["privateData"].get("usedCards") or []) if x)
-        var_g = wc_variant(char, career, last_side["publicData"].get("talents") or [], lcids)
-        pl = STATE["wc"][(char, career, var_g)]["pl"][bi]
-        pl[0] += w; pl[1] += 1; pl[2] += w * (rank + 1)
-        priv = last_side.get("privateData", {})
-        placew = w * (rank + 1)
-        for s in priv.get("talentSelectionDatas") or []:
-            record_selection(STATE["fates"], char, career, s, w, placew, bi)
-        for s in (priv.get("fateStrategyData") or {}).get("strategies") or []:
-            record_selection(STATE["derivs"], char, career, s, w, placew, bi)
-        # 道韵: two picks per game. The first is always selection id 4; the second's id
-        # varies with game pace (10-21, usually 15) — bucket them into slots 1 and 2.
-        for s in priv.get("daoYunSelectionDatas") or []:
-            slot = 1 if (s.get("id") or 0) <= 9 else 2
-            record_selection(STATE["daoyun"], char, career, s, w, placew, bi, sid=slot)
+    # fate & 天衍 & 道韵 selections — cumulative, read from the player's last present
+    # round, keyed with the game's strategy variant.
+    priv = last_side.get("privateData", {})
+    placew = w * (rank + 1)
+    for s in priv.get("talentSelectionDatas") or []:
+        record_selection(STATE["fates"], char, career, var, s, w, placew, bi)
+    for s in (priv.get("fateStrategyData") or {}).get("strategies") or []:
+        record_selection(STATE["derivs"], char, career, var, s, w, placew, bi)
+    # 道韵: two picks per game. The first is always selection id 4; the second's id
+    # varies with game pace (10-21, usually 15) — bucket them into slots 1 and 2.
+    for s in priv.get("daoYunSelectionDatas") or []:
+        slot = 1 if (s.get("id") or 0) <= 9 else 2
+        record_selection(STATE["daoyun"], char, career, var, s, w, placew, bi, sid=slot)
 
 
-def record_selection(acc, char, career, s, w, placew, bi, sid=None):
+def record_selection(acc, char, career, var, s, w, placew, bi, sid=None):
     if sid is None:
         sid = s.get("id")
     sel = s.get("selected")
     if sid is None or not sel:
         return
-    e = acc[(char, career, sid, sel)][bi]
+    e = acc[(char, career, var, sid, sel)][bi]
     e[0] += w; e[2] += placew                        # chosen weight, placement-weight when chosen
     for o in s.get("pendings") or []:
         if o:
-            acc[(char, career, sid, o)][bi][1] += w  # offered
+            acc[(char, career, var, sid, o)][bi][1] += w  # offered
 
 
 # ---- shard streaming -------------------------------------------------------
@@ -418,12 +434,12 @@ def resolve_matchups():
     opponent has their own >=DAOXIN_MIN self-record of the SAME game (skill-matched, no
     bots) — that record also gives their final placement for the head-to-head compare."""
     ranks = STATE["self_ranks"]; kept = dropped = 0
-    for char, career, och, ouid, gid, w, myrank, bi in STATE["mu_pending"]:
+    for char, career, var, och, ouid, gid, w, myrank, bi in STATE["mu_pending"]:
         orank = ranks.get((gid, ouid))
         if orank is None:
             dropped += 1
             continue
-        m = STATE["builds"][(char, career)]["matchup"][och][bi]
+        m = STATE["builds"][(char, career, var)]["matchup"][och][bi]
         m[0] += w; m[2] += 1; kept += 1
         if myrank < orank:
             m[1] += w                          # finished above this opponent
@@ -475,7 +491,7 @@ def write_output():
         return out
 
     builds_out = {}
-    for (char, career), b in STATE["builds"].items():
+    for (char, career, var), b in STATE["builds"].items():
         # radar: per band [w_destinyRecvSum, w_roundSum] — the frontend divides after
         # summing its selected bands.
         rad = {k: [[r2(bb[0]), r2(bb[1])] for bb in v] for k, v in b["radar"].items()}
@@ -489,19 +505,36 @@ def write_output():
             mb = merge_boards(bd, TOP_MBOARDS)
             if mb:
                 mboards[str(oc)] = mb
-        builds_out[f"{char}_{career}"] = {
+        # split combos live ONLY under their variant keys ("char_career|variant")
+        builds_out[f"{char}_{career}" + (f"|{var}" if var else "")] = {
             "g": r2(b["gw"]), "graw": b["graw"], "place": [r2(p) for p in b["place"]],
             "radar": rad, "matchup": matchup, "boards": boards, "mboards": mboards,
+            "curve": [[[r2(x) for x in cv] for cv in bandrows] for bandrows in b["curve"]],
         }
     char_out = {str(char): {"g": r2(c["gw"]), "graw": c["graw"],
                             "swr": round(c["swr"]), "swr2": round(c["swr2"]), "swrp": round(c["swrp"])}
                 for char, c in STATE["char"].items()}
-    # tiers[char_career][band] = {graw, g, place[8], swr, swr2, swrp}
+    # tiers[key][band] = {graw, g, place[8], swr, swr2, swrp}; split combos get BOTH
+    # per-variant keys ("char_career|variant") and an aggregate plain key summed across
+    # variants, so character-level views keep working unchanged.
     tiers_out = {}
-    for (char, career, band), tk in STATE["tier"].items():
-        tiers_out.setdefault(f"{char}_{career}", {})[band] = {
+    agg = {}
+    for (char, career, var, band), tk in STATE["tier"].items():
+        key = f"{char}_{career}" + (f"|{var}" if var else "")
+        tiers_out.setdefault(key, {})[band] = {
             "graw": tk["graw"], "g": r2(tk["gw"]), "place": [r2(p) for p in tk["place"]],
             "swr": round(tk["swr"]), "swr2": round(tk["swr2"]), "swrp": round(tk["swrp"])}
+        if var:
+            a = agg.setdefault(f"{char}_{career}", {}).setdefault(band, [0, 0.0, [0.0] * 8, 0.0, 0.0, 0.0])
+            a[0] += tk["graw"]; a[1] += tk["gw"]
+            for i in range(8):
+                a[2][i] += tk["place"][i]
+            a[3] += tk["swr"]; a[4] += tk["swr2"]; a[5] += tk["swrp"]
+    for key, bands in agg.items():
+        for band, a in bands.items():
+            tiers_out.setdefault(key, {})[band] = {
+                "graw": a[0], "g": r2(a[1]), "place": [r2(p) for p in a[2]],
+                "swr": round(a[3]), "swr2": round(a[4]), "swrp": round(a[5])}
     # 轮椅指数 components per build per tier (cumulative bands, like the tier filter).
     # Diversity is the ENTROPY-based effective count, so frequency matters: a card played
     # once in 100 games barely moves it, while an always-played 8-card core reads as ~8.
@@ -559,9 +592,10 @@ def write_output():
     }
     # v2: radar = destiny received (not round WR), matchup = placement head-to-head,
     # boards carry per-slot modal card levels. v3: all build stats split by DaoXin band
-    # (A/B/C) for the build-page tier filter. The frontend gates rendering on this.
+    # (A/B/C) for the build-page tier filter. v4: split combos keyed per strategy
+    # variant + per-round curves (rerolls held / realm). Frontend gates on this.
     heavy = {
-        "v": 3,
+        "v": 4,
         "builds": builds_out,
         "families": [{**m, "pop": r2(STATE["fam_pop"].get(m["i"], 0))} for m in STATE["fam_meta"]],
     }
@@ -570,8 +604,9 @@ def write_output():
     def emit_sel(acc):
         grp = defaultdict(lambda: defaultdict(list))
         ids = set()
-        for (char, career, sid, oid), v in acc.items():
-            grp[f"{char}_{career}"][sid].append([oid, [[r2(x) for x in bb] for bb in v]])
+        for (char, career, var, sid, oid), v in acc.items():
+            key = f"{char}_{career}" + (f"|{var}" if var else "")
+            grp[key][sid].append([oid, [[r2(x) for x in bb] for bb in v]])
             ids.add(oid)
         sel_tot = lambda row: row[1][0][0] + row[1][1][0] + row[1][2][0]
         out = {k: {str(sid): sorted(lst, key=lambda x: -sel_tot(x)) for sid, lst in sids.items()}
@@ -582,7 +617,7 @@ def write_output():
     daoyun_out, ids3 = emit_sel(STATE["daoyun"])
     # fate bucket: innate if the fate is offered to only one character, else its wiki category
     char_of = defaultdict(set)
-    for (char, career, sid, oid) in STATE["fates"]:
+    for (char, career, var, sid, oid) in STATE["fates"]:
         char_of[oid].add(char)
     def fate_bucket(oid):
         if len(char_of.get(oid, ())) <= 1:
@@ -608,7 +643,7 @@ def write_output():
         ynames[str(i)] = {"cn": cn, "en": CN2EN.get(cn, ""),
                           "free": 1 if (i == 27 or cn == "自在随心") else 0}
     fates_file = {
-        "v": 3,                                       # rows are per-DaoXin-band since v3
+        "v": 4,                    # v3: per-DaoXin-band rows; v4: strategy-variant keys
         "meta": {"season": 9, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
                  "selfRecords": STATE["self"], "iconBase": ICON_BASE},
         "fates": fates_out, "derivations": derivs_out, "daoyun": daoyun_out,
@@ -618,7 +653,7 @@ def write_output():
     # bot-exposure diagnostic: do some characters appear in bot-heavier lobbies (which
     # inflates placement, since bots fill the bottom seats)? Pair it with avg placement.
     place_sum, place_g = defaultdict(float), defaultdict(float)
-    for (char, career), b in STATE["builds"].items():
+    for (char, career, var), b in STATE["builds"].items():
         for i, p in enumerate(b["place"]):
             place_sum[char] += (i + 1) * p; place_g[char] += p
     diag = {}

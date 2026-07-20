@@ -148,7 +148,12 @@ footer{padding:18px 24px 40px;color:var(--muted);font-size:12px;border-top:1px s
 .sjrow .nm{width:150px;font-weight:600}
 .sjrow .barwrap{flex:1;height:18px;background:var(--panel2);border-radius:9px;overflow:hidden}
 .sjrow .barwrap>i{display:block;height:100%;background:var(--accent)}
-.sjrow .rt{width:150px;text-align:right;color:var(--muted);font-size:13px}
+.sjrow .rt{width:280px;text-align:right;color:var(--muted);font-size:13px}
+/* strategy dropdown under a split side-job row */
+.sjrow.split .wcvar{cursor:pointer}
+.sjvars{margin:-4px 0 10px 46px;display:flex;flex-direction:column;gap:6px}
+.sjrow.vchild{padding:6px 12px}
+.sjrow.vchild .wcvar{width:64px;text-align:center;flex:none}
 
 .bsection{margin:26px 0}
 .bsection h3{font-size:15px;margin:0 0 10px;color:var(--text)}
