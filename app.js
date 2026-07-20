@@ -609,9 +609,15 @@ function charStatTier(id, tier) {
   return { id, g, graw, avg: avgPlace(place, g), place, careers, swr, swr2, swrp };
 }
 const buildStat = (char, career) => BS.data.builds[`${char}_${career}`];
-// Power per character+side-job build: same skill-adjusted standardized placement as the
-// character Power (see computePower), but each build is its own row in the regression.
-// Uses the light file's per-band tiers stats, so it works at every DaoXin tier.
+// Power per character+side-job build: same skill-adjusted placement idea as the
+// character Power (see computePower), but each build is its own row, and both the
+// shrinkage prior K and the display scale are ESTIMATED PER TIER from the data:
+//   σ² = weighted mean within-build per-game placement variance (noise per game)
+//   τ² = g-weighted between-build variance of adjusted placement, minus its expected
+//        sampling noise (method of moments) -> true skill spread
+//   K = σ²/τ²,  score = 50 + 12·k·(m − adj)/√τ²,  k = g/(g+K)
+// Scaling by √τ² (true spread) instead of the noise-inflated observed spread keeps
+// thin tiers (6000+) readable instead of compressing everything to ~50.
 function computeBuildPower(tier) {
   BS.bpowerCache = BS.bpowerCache || {};
   if (BS.bpowerCache[tier]) return BS.bpowerCache[tier];
@@ -629,16 +635,23 @@ function computeBuildPower(tier) {
     }
     if (!g || !swr) continue;
     const AP = avgPlace(place, g), R = swr / g;
-    rows.push({ key, AP, R, g, num: swrp - swr * AP, den: swr2 - swr * swr / g });
+    const v = place.reduce((s, p, i) => s + p * ((i + 1) - AP) ** 2, 0) / g;  // within-build per-game variance
+    rows.push({ key, AP, R, g, v, num: swrp - swr * AP, den: swr2 - swr * swr / g });
     gSwr += swr; gSw += g;
   }
   const Rbar = gSw ? gSwr / gSw : 0;
   let n = 0, dn = 0; for (const r of rows) { n += r.num; dn += r.den; }
   const b = dn ? n / dn : 0;
   const adj = rows.map((r) => r.AP - b * (r.R - Rbar));
-  const m = adj.reduce((a, x) => a + x, 0) / (adj.length || 1);
-  const sd = Math.sqrt(adj.reduce((a, x) => a + (x - m) ** 2, 0) / (adj.length || 1)) || 1;
-  const K = 410, out = {};                         // same shrinkage prior as character Power
+  const G = rows.reduce((s, r) => s + r.g, 0), B = rows.length;
+  const m = rows.reduce((s, r, i) => s + adj[i] * r.g, 0) / (G || 1);          // g-weighted mean
+  const varW = rows.reduce((s, r, i) => s + r.g * (adj[i] - m) ** 2, 0) / (G || 1);
+  const sigma2 = rows.reduce((s, r) => s + r.v * r.g, 0) / (G || 1);
+  const denom = Math.max(0.1, 1 - rows.reduce((s, r) => s + r.g * r.g, 0) / ((G || 1) ** 2));
+  const tau2 = Math.max((varW - sigma2 * (B - 1) / (G || 1)) / denom, 0.005);
+  const K = Math.min(2000, Math.max(10, sigma2 / tau2));
+  const sd = Math.sqrt(tau2);
+  const out = {};
   rows.forEach((r, i) => {
     const k = r.g / (r.g + K);
     out[r.key] = Math.max(1, Math.min(99, Math.round(50 + 12 * k * (m - adj[i]) / sd)));
