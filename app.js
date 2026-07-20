@@ -33,7 +33,7 @@ const UI = {
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥", notAtTier: "This build doesn't exist at this DaoXin tier (no games).",
     wheelchair: "Wheelchair index",
-    wheelchairNote: "character+side-job builds that are strong from R12 on while always playing the same board — combines R12+ strength, effective card-pool size, and per-slot variety (all recency-weighted)",
+    wheelchairNote: "character+side-job builds that place well while always playing the same board from R12 on — combines avg final placement, effective card-pool size, and per-slot variety (all recency-weighted)",
     wcPool: "eff. cards", wcSlot: "slot choices", wcWR: "R12+ WR",
     subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
     arrangements: "arrangements",
@@ -72,7 +72,7 @@ const UI = {
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
     wheelchair: "轮椅指数",
-    wheelchairNote: "12回合后又强又固定的角色+副职流派——综合12回合后强度、有效卡池大小、各槽位选择多样性（均近期加权）",
+    wheelchairNote: "名次好且12回合后卡组固定的角色+副职流派——综合平均名次、有效卡池大小、各槽位选择多样性（均近期加权）",
     wcPool: "有效卡池", wcSlot: "槽位选择", wcWR: "12+回合胜率",
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
     arrangements: "种排列",
@@ -669,29 +669,30 @@ function getAxv() {
 
 // ---- 轮椅指数 (wheelchair index) --------------------------------------------
 // Ranks character+side-job builds by "strong AND repetitive from round 12 on".
-// Data per build/tier: [w_rounds, raw_rounds, wr, poolEff, slotEff] (entropy-based
-// effective counts, recency-weighted). Score = mean of three percentiles across
-// builds: high R12+ win rate, small effective card pool, few choices per slot.
+// Data per build/tier: [w_rounds, raw_rounds, wr, poolEff, slotEff, avgPlace, games]
+// (entropy-based effective counts, recency-weighted). Score = mean of three
+// percentiles: good FINAL PLACEMENT, small effective card pool, few choices per slot.
 function wheelchairRows() {
   const wc = BS.data.wc; if (!wc) return null;
   const tier = String(BS.tier);
   const rows = [];
   for (const key in wc) {
     const e = wc[key][tier]; if (!e) continue;
-    const [, raw, wr, pool, slot] = e;
-    if (raw < 1000) continue;                      // sample gate on raw R12+ rounds
+    const [, raw, wr, pool, slot, avgPl] = e;
+    if (e.length < 7 || raw < 1000 || !avgPl) continue;  // sample gate + needs placement data
     // split combos are keyed "char_career|variant" (e.g. 屠馗's 百杀/崩拳/其他)
     const [combo, variant] = key.split("|");
     const [ch, cr] = combo.split("_").map(Number);
     if (!cr) continue;                             // skip the rare no-side-job records
-    rows.push({ ch, cr, variant: variant || "", wr, pool, slot, raw });
+    rows.push({ ch, cr, variant: variant || "", wr, pool, slot, avgPl, raw });
   }
+  if (!rows.length) return null;                   // old data without placement -> "updating"
   const pct = (arr, v) => { let c = 0; for (const x of arr) if (x <= v) c++; return c / arr.length; };
-  const wrs = rows.map((r) => r.wr).sort((a, b) => a - b);
+  const pls = rows.map((r) => r.avgPl).sort((a, b) => a - b);
   const pools = rows.map((r) => r.pool).sort((a, b) => a - b);
   const slots = rows.map((r) => r.slot).sort((a, b) => a - b);
   for (const r of rows) {
-    r.score = Math.round(100 * (pct(wrs, r.wr) + (1 - pct(pools, r.pool)) + (1 - pct(slots, r.slot))) / 3);
+    r.score = Math.round(100 * ((1 - pct(pls, r.avgPl)) + (1 - pct(pools, r.pool)) + (1 - pct(slots, r.slot))) / 3);
   }
   return rows.sort((a, b) => b.score - a.score || b.raw - a.raw);
 }
@@ -703,13 +704,13 @@ function renderWheelchairList(host) {
   rows.forEach((r, i) => {
     const vtag = r.variant ? ` <span class="wcvar">${wcVarLabel(r.variant)}</span>` : "";
     html += `<div class="cchip wc" data-ch="${r.ch}" data-cr="${r.cr}"
-        title="${t("wcWR")} ${(r.wr * 100).toFixed(1)}% · ${t("wcPool")} ${r.pool.toFixed(1)} · ${t("wcSlot")} ${r.slot.toFixed(2)} · n=${r.raw.toLocaleString()}">
+        title="${t("avgplace")} ${r.avgPl.toFixed(2)} · ${t("wcWR")} ${(r.wr * 100).toFixed(1)}% · ${t("wcPool")} ${r.pool.toFixed(1)} · ${t("wcSlot")} ${r.slot.toFixed(2)} · n=${r.raw.toLocaleString()}">
       <span class="rank">#${i + 1}</span>
       <img loading="lazy" src="${charAvatar(r.ch)}" onerror="this.style.visibility='hidden'">
       <img class="sjbadge" src="${sidejobBadge(r.cr)}" onerror="this.style.visibility='hidden'">
       <div class="cn">${charName(r.ch)}${vtag}</div><div class="cs">${careerName(r.cr)}</div>
       <div class="big" style="color:${powerColor(r.score)}">${r.score}</div>
-      <div class="sub2">${(r.wr * 100).toFixed(0)}% · ${t("wcPool")} ${r.pool.toFixed(0)} · ${t("wcSlot")} ${r.slot.toFixed(1)}</div></div>`;
+      <div class="sub2">${t("avgplace")} ${r.avgPl.toFixed(2)} · ${t("wcPool")} ${r.pool.toFixed(0)} · ${t("wcSlot")} ${r.slot.toFixed(1)}</div></div>`;
   });
   host.innerHTML = html + `</div>`;
   host.querySelectorAll(".cchip.wc").forEach((el) => el.onclick = async () => {

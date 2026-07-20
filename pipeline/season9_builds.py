@@ -177,10 +177,13 @@ def wc_variant(char, career, talents, cids):
 
 def new_wc():
     # 轮椅指数 raw material (rounds >= WC_ROUND), per band:
-    # n = [w_rounds, raw_rounds, w_wins]; pool = famIdx -> w; slot -> famIdx -> w
+    # n = [w_rounds, raw_rounds, w_wins]; pool = famIdx -> w; slot -> famIdx -> w;
+    # pl = [w_games, raw_games, w*placement] — per GAME, variant judged from the
+    # game's final board/talents, so split variants get their own placement.
     return {"n": [[0.0, 0, 0.0] for _ in range(3)],
             "pool": [defaultdict(float) for _ in range(3)],
-            "slot": [defaultdict(lambda: defaultdict(float)) for _ in range(3)]}
+            "slot": [defaultdict(lambda: defaultdict(float)) for _ in range(3)],
+            "pl": [[0.0, 0, 0.0] for _ in range(3)]}
 
 
 STATE = {
@@ -317,6 +320,12 @@ def process_record(d):
     # Each selection = {id: phase, pendings: options offered, selected: chosen}.
     # 4th stat = recency-weighted placement (rank+1) when chosen -> avg placement on display.
     if last_side is not None:
+        # 轮椅指数 placement: attribute this game's final placement to the variant the
+        # game ENDED as (final board + talents), so split variants get their own strength.
+        lcids = tuple(x for x in (last_side["privateData"].get("usedCards") or []) if x)
+        var_g = wc_variant(char, career, last_side["publicData"].get("talents") or [], lcids)
+        pl = STATE["wc"][(char, career, var_g)]["pl"][bi]
+        pl[0] += w; pl[1] += 1; pl[2] += w * (rank + 1)
         priv = last_side.get("privateData", {})
         placew = w * (rank + 1)
         for s in priv.get("talentSelectionDatas") or []:
@@ -531,8 +540,12 @@ def write_output():
                         slots[si][f] += v
             tot = sum(sum(c.values()) for c in slots.values())
             slot_eff = sum(eff(c) * (sum(c.values()) / tot) for c in slots.values()) if tot else 0.0
+            pl_w = sum(wk["pl"][i][0] for i in idxs)
+            pl_raw = sum(wk["pl"][i][1] for i in idxs)
+            pl_sum = sum(wk["pl"][i][2] for i in idxs)
             ent[tier] = [r2(wr_w), raw, round(wins / wr_w, 4) if wr_w else 0,
-                         round(eff(pool), 2), round(slot_eff, 2)]
+                         round(eff(pool), 2), round(slot_eff, 2),
+                         round(pl_sum / pl_w, 3) if pl_w else 0, pl_raw]
         if ent:
             # split combos carry their archetype label after "|" (e.g. "4000002_6|百杀")
             wc_out[f"{char}_{career}" + (f"|{var}" if var else "")] = ent
