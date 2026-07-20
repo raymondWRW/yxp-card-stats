@@ -715,11 +715,12 @@ function collapseBuild(b, key) {
   }
   return { g, graw, place, radar, matchup, boards, mboards, curve };
 }
-// selection rows: v3 [oid, perBand [sel, off, placew]] -> flat [oid, sel, off, placew]
+// selection rows: v3+ [oid, perBand [sel, off, placew, selRaw?, offRaw?]] ->
+// flat [oid, sel, off, placew, selRaw?, offRaw?] (raw fields exist since v5)
 function collapseSelRows(rows) {
   if (!BS.fv3) return rows;
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
-  return rows.map(([oid, s3]) => { const [sel, off, pw] = sumBands(s3, idxs); return [oid, sel, off, pw]; })
+  return rows.map(([oid, s3]) => [oid, ...sumBands(s3, idxs)])
     .filter((r) => r[1] > 0 || r[2] > 0).sort((x, y) => y[1] - x[1]);
 }
 // radar percentile pool for the current tier (v3: built on demand and cached per tier)
@@ -1104,11 +1105,15 @@ function fatePhaseHTML(rows, ord, kind) {
   const [oid, ch, , pw] = pick; const avgPl = ch ? pw / ch : 0;
   const col = kind === "fate" ? (FBUCKET_COLOR[(N[oid] || {}).bucket] || "#888") : KIND_COLOR[kind];
   let pop = `<div class="fpop"><table><tr><th>${t(kind === "daoyun" ? "daoyun" : "fateName")}</th><th>${t("picks")}</th><th>${t("pickRate")}</th><th>${t("avgplace")}</th></tr>`;
-  for (const [o, c, of_, pw2] of rows) {
+  for (const [o, c, of_, pw2, craw, ofraw] of rows) {
     if (c <= 0 && of_ <= 0) continue;
     const bc = kind === "fate" ? (FBUCKET_COLOR[(N[o] || {}).bucket] || "#888") : KIND_COLOR[kind];
-    pop += `<tr><td>${selIcon(o, kind, "ricon")}<span class="bdot" style="background:${bc}"></span>${nm(o)}</td><td>${Math.round(c)}</td>`
-      + `<td>${of_ > 0 ? Math.round(c / of_ * 100) + "%" : "–"}</td><td style="color:${placeColorF(c ? pw2 / c : 0)}">${c ? (pw2 / c).toFixed(2) : "–"}</td></tr>`;
+    // counts & pick-rate are RAW (fall back to weighted on pre-v5 data); placement stays weighted
+    const cnt = craw != null ? craw : Math.round(c);
+    const rate = craw != null ? (ofraw > 0 ? Math.round(craw / ofraw * 100) + "%" : "–")
+                              : (of_ > 0 ? Math.round(c / of_ * 100) + "%" : "–");
+    pop += `<tr><td>${selIcon(o, kind, "ricon")}<span class="bdot" style="background:${bc}"></span>${nm(o)}</td><td>${cnt.toLocaleString()}</td>`
+      + `<td>${rate}</td><td style="color:${placeColorF(c ? pw2 / c : 0)}">${c ? (pw2 / c).toFixed(2) : "–"}</td></tr>`;
   }
   pop += `</table></div>`;
   return `<div class="fphase"><div class="flabel">${ord}</div>

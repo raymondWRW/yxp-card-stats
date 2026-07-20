@@ -227,10 +227,11 @@ STATE = {
                                  "swr": 0.0, "swr2": 0.0, "swrp": 0.0}),
     "fam_idx": {}, "fam_meta": [],        # family registry
     "fam_pop": defaultdict(float),        # famIdx -> weighted board appearances (for card ordering)
-    # (char,career,selectionId,optionId) -> per DaoXin band [selected_w, offered_w, selected_place_w]
-    "fates": defaultdict(lambda: [[0.0, 0.0, 0.0] for _ in range(3)]),   # fate picks (talentSelectionDatas)
-    "derivs": defaultdict(lambda: [[0.0, 0.0, 0.0] for _ in range(3)]),  # 天衍 picks (fateStrategyData.strategies)
-    "daoyun": defaultdict(lambda: [[0.0, 0.0, 0.0] for _ in range(3)]),  # 道韵 picks (daoYunSelectionDatas)
+    # (char,career,variant,selectionId,optionId) -> per DaoXin band
+    # [selected_w, offered_w, selected_place_w, selected_raw, offered_raw]
+    "fates": defaultdict(lambda: [[0.0, 0.0, 0.0, 0, 0] for _ in range(3)]),   # fate picks (talentSelectionDatas)
+    "derivs": defaultdict(lambda: [[0.0, 0.0, 0.0, 0, 0] for _ in range(3)]),  # 天衍 picks (fateStrategyData.strategies)
+    "daoyun": defaultdict(lambda: [[0.0, 0.0, 0.0, 0, 0] for _ in range(3)]),  # 道韵 picks (daoYunSelectionDatas)
     # skill-matched matchups: every >=3000 player appears as a self-record, so we map
     # (gameId, uid) -> final placement, buffer per-game matchup events, then keep only
     # those where the opponent's own record of the SAME game confirms them >=3000 —
@@ -390,10 +391,11 @@ def record_selection(acc, char, career, var, s, w, placew, bi, sid=None):
     if sid is None or not sel:
         return
     e = acc[(char, career, var, sid, sel)][bi]
-    e[0] += w; e[2] += placew                        # chosen weight, placement-weight when chosen
+    e[0] += w; e[2] += placew; e[3] += 1             # chosen weight + raw, placement-weight
     for o in s.get("pendings") or []:
         if o:
-            acc[(char, career, var, sid, o)][bi][1] += w  # offered
+            oe = acc[(char, career, var, sid, o)][bi]
+            oe[1] += w; oe[4] += 1                   # offered weight + raw
 
 
 # ---- shard streaming -------------------------------------------------------
@@ -671,7 +673,7 @@ def write_output():
         ynames[str(i)] = {"cn": cn, "en": CN2EN.get(cn, ""),
                           "free": 1 if (i == 27 or cn == "自在随心") else 0}
     fates_file = {
-        "v": 4,                    # v3: per-DaoXin-band rows; v4: strategy-variant keys
+        "v": 5,   # v3: per-band rows; v4: strategy-variant keys; v5: raw counts appended
         "meta": {"season": 9, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
                  "selfRecords": STATE["self"], "iconBase": ICON_BASE},
         "fates": fates_out, "derivations": derivs_out, "daoyun": daoyun_out,
