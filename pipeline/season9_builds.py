@@ -143,17 +143,49 @@ def new_build():
         # display can show each slot's most common level; families are derived on output.
         "boards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # realm->cids->per band [raw, w_count, w_wins]
         "mboards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # oppChar->cids->per band [raw, w_count, w_wins]
-        # 轮椅指数 raw material (rounds >= WC_ROUND), per band:
-        # wc = [w_rounds, raw_rounds, w_wins]; wc_pool = famIdx -> w (card-pool distribution);
-        # wc_slot = board slot -> famIdx -> w (what sits in each slot)
-        "wc": [[0.0, 0, 0.0] for _ in range(3)],
-        "wc_pool": [defaultdict(float) for _ in range(3)],
-        "wc_slot": [defaultdict(lambda: defaultdict(float)) for _ in range(3)],
     }
+
+
+# ---- 轮椅指数 archetype splits ----------------------------------------------
+# Some combos look "diverse" only because they blend distinct fixed archetypes;
+# split them into labeled variants by the defining fate pick (publicData.talents,
+# which may carry +10000/20000/30000 upgrade offsets) or a defining board card.
+def _fate_tiers(base):
+    return {base, base + 10000, base + 20000, base + 30000}
+WC_MENGGONG = _fate_tiers(173)   # 屠馗 天命 猛攻之姿 -> 百杀 archetype
+WC_BENGLIE = _fate_tiers(174)    # 屠馗 天命 崩裂之拳 -> 崩拳 archetype
+WC_RONGHUI = _fate_tiers(192)    # 黎承云 天命 剑招融汇 -> 融剑 archetype
+CHAR_TUKUI, CHAR_XIAOBU, CHAR_YEMM, CHAR_LICHY = 4000002, 4000001, 4000003, 1000006
+CAREER_EL, CAREER_PM = 1, 6      # 炼丹师, 灵植师
+
+
+def wc_variant(char, career, talents, cids):
+    """Variant label for the wheelchair split ('' = this combo is not split)."""
+    if char == CHAR_TUKUI and career in (CAREER_EL, CAREER_PM):
+        ts = set(talents)
+        if ts & WC_MENGGONG:
+            return "百杀"
+        if ts & WC_BENGLIE:
+            return "崩拳"
+        return "其他"
+    if char in (CHAR_XIAOBU, CHAR_YEMM) and career == CAREER_EL:
+        return "玄奶" if any(CN_NAME.get(str(x)) == "玄灵愈体" for x in cids) else "其他"
+    if char == CHAR_LICHY:
+        return "融剑" if set(talents) & WC_RONGHUI else "其他"
+    return ""
+
+
+def new_wc():
+    # 轮椅指数 raw material (rounds >= WC_ROUND), per band:
+    # n = [w_rounds, raw_rounds, w_wins]; pool = famIdx -> w; slot -> famIdx -> w
+    return {"n": [[0.0, 0, 0.0] for _ in range(3)],
+            "pool": [defaultdict(float) for _ in range(3)],
+            "slot": [defaultdict(lambda: defaultdict(float)) for _ in range(3)]}
 
 
 STATE = {
     "builds": defaultdict(new_build),     # (char,career) -> build
+    "wc": defaultdict(new_wc),            # (char,career,variantLabel) -> 轮椅指数 accumulators
     # char -> weighted/raw games + rank-score sufficient stats (for skill-adjusted Power)
     "char": defaultdict(lambda: {"gw": 0.0, "graw": 0, "swr": 0.0, "swr2": 0.0, "swrp": 0.0}),
     # (char,career,daoxin-band) -> placement+rank stats, for the tier filter on char/sidejob pages
@@ -254,8 +286,10 @@ def process_record(d):
             rec = b["boards"][realm][cids][bi]; rec[0] += 1; rec[1] += w; rec[2] += wwin
             # 轮椅指数 raw material: from round WC_ROUND on, what does this build keep playing?
             if rnd >= WC_ROUND:
-                wcb = b["wc"][bi]; wcb[0] += w; wcb[1] += 1; wcb[2] += wwin
-                pool = b["wc_pool"][bi]; slots = b["wc_slot"][bi]
+                var = wc_variant(char, career, side["publicData"].get("talents") or [], cids)
+                wk = STATE["wc"][(char, career, var)]
+                wcb = wk["n"][bi]; wcb[0] += w; wcb[1] += 1; wcb[2] += wwin
+                pool = wk["pool"][bi]; slots = wk["slot"][bi]
                 for i, fi in enumerate(fams):
                     pool[fi] += w; slots[i][fi] += w
 
@@ -478,21 +512,21 @@ def write_output():
         return math.exp(h)
 
     wc_out = {}
-    for (char, career), b in STATE["builds"].items():
+    for (char, career, var), wk in STATE["wc"].items():
         ent = {}
         for tier, idxs in (("3000", (0, 1, 2)), ("4000", (1, 2)), ("6000", (2,))):
-            raw = sum(b["wc"][i][1] for i in idxs)
+            raw = sum(wk["n"][i][1] for i in idxs)
             if raw < WC_MIN_RAW:
                 continue
-            wr_w = sum(b["wc"][i][0] for i in idxs)
-            wins = sum(b["wc"][i][2] for i in idxs)
+            wr_w = sum(wk["n"][i][0] for i in idxs)
+            wins = sum(wk["n"][i][2] for i in idxs)
             pool = defaultdict(float)
             for i in idxs:
-                for f, v in b["wc_pool"][i].items():
+                for f, v in wk["pool"][i].items():
                     pool[f] += v
             slots = defaultdict(lambda: defaultdict(float))
             for i in idxs:
-                for si, c in b["wc_slot"][i].items():
+                for si, c in wk["slot"][i].items():
                     for f, v in c.items():
                         slots[si][f] += v
             tot = sum(sum(c.values()) for c in slots.values())
@@ -500,7 +534,8 @@ def write_output():
             ent[tier] = [r2(wr_w), raw, round(wins / wr_w, 4) if wr_w else 0,
                          round(eff(pool), 2), round(slot_eff, 2)]
         if ent:
-            wc_out[f"{char}_{career}"] = ent
+            # split combos carry their archetype label after "|" (e.g. "4000002_6|百杀")
+            wc_out[f"{char}_{career}" + (f"|{var}" if var else "")] = ent
 
     # Split into a light file (drives the character leaderboard, loads instantly) and a
     # heavy file (build detail: boards/matchups/families, lazy-loaded on first build open).

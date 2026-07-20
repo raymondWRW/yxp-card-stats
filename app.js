@@ -679,10 +679,12 @@ function wheelchairRows() {
   for (const key in wc) {
     const e = wc[key][tier]; if (!e) continue;
     const [, raw, wr, pool, slot] = e;
-    if (raw < 200) continue;                       // sample gate on raw R12+ rounds
-    const [ch, cr] = key.split("_").map(Number);
+    if (raw < 1000) continue;                      // sample gate on raw R12+ rounds
+    // split combos are keyed "char_career|variant" (e.g. 屠馗's 百杀/崩拳/其他)
+    const [combo, variant] = key.split("|");
+    const [ch, cr] = combo.split("_").map(Number);
     if (!cr) continue;                             // skip the rare no-side-job records
-    rows.push({ ch, cr, wr, pool, slot, raw });
+    rows.push({ ch, cr, variant: variant || "", wr, pool, slot, raw });
   }
   const pct = (arr, v) => { let c = 0; for (const x of arr) if (x <= v) c++; return c / arr.length; };
   const wrs = rows.map((r) => r.wr).sort((a, b) => a - b);
@@ -693,17 +695,19 @@ function wheelchairRows() {
   }
   return rows.sort((a, b) => b.score - a.score || b.raw - a.raw);
 }
+const wcVarLabel = (v) => (S.lang === "en" && v === "其他") ? "other" : v;
 function renderWheelchairList(host) {
   const rows = wheelchairRows();
   if (!rows) { host.innerHTML = `<div class="empty">${t("updating")}</div>`; return; }
   let html = `<div class="wcnote">${t("wheelchairNote")}</div><div class="cgrid">`;
   rows.forEach((r, i) => {
+    const vtag = r.variant ? ` <span class="wcvar">${wcVarLabel(r.variant)}</span>` : "";
     html += `<div class="cchip wc" data-ch="${r.ch}" data-cr="${r.cr}"
         title="${t("wcWR")} ${(r.wr * 100).toFixed(1)}% · ${t("wcPool")} ${r.pool.toFixed(1)} · ${t("wcSlot")} ${r.slot.toFixed(2)} · n=${r.raw.toLocaleString()}">
       <span class="rank">#${i + 1}</span>
       <img loading="lazy" src="${charAvatar(r.ch)}" onerror="this.style.visibility='hidden'">
       <img class="sjbadge" src="${sidejobBadge(r.cr)}" onerror="this.style.visibility='hidden'">
-      <div class="cn">${charName(r.ch)}</div><div class="cs">${careerName(r.cr)}</div>
+      <div class="cn">${charName(r.ch)}${vtag}</div><div class="cs">${careerName(r.cr)}</div>
       <div class="big" style="color:${powerColor(r.score)}">${r.score}</div>
       <div class="sub2">${(r.wr * 100).toFixed(0)}% · ${t("wcPool")} ${r.pool.toFixed(0)} · ${t("wcSlot")} ${r.slot.toFixed(1)}</div></div>`;
   });
