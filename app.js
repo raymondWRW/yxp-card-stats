@@ -609,6 +609,42 @@ function charStatTier(id, tier) {
   return { id, g, graw, avg: avgPlace(place, g), place, careers, swr, swr2, swrp };
 }
 const buildStat = (char, career) => BS.data.builds[`${char}_${career}`];
+// Power per character+side-job build: same skill-adjusted standardized placement as the
+// character Power (see computePower), but each build is its own row in the regression.
+// Uses the light file's per-band tiers stats, so it works at every DaoXin tier.
+function computeBuildPower(tier) {
+  BS.bpowerCache = BS.bpowerCache || {};
+  if (BS.bpowerCache[tier]) return BS.bpowerCache[tier];
+  const bands = tierBands(tier);
+  const rows = [];
+  let gSwr = 0, gSw = 0;
+  for (const key in BS.data.tiers) {
+    if (key.endsWith("_0")) continue;              // skip no-side-job records
+    const tk = BS.data.tiers[key];
+    let g = 0, swr = 0, swr2 = 0, swrp = 0; const place = new Array(8).fill(0);
+    for (const bd of bands) {
+      const e = tk[bd]; if (!e) continue;
+      g += e.g; swr += e.swr; swr2 += e.swr2; swrp += e.swrp;
+      for (let i = 0; i < 8; i++) place[i] += e.place[i];
+    }
+    if (!g || !swr) continue;
+    const AP = avgPlace(place, g), R = swr / g;
+    rows.push({ key, AP, R, g, num: swrp - swr * AP, den: swr2 - swr * swr / g });
+    gSwr += swr; gSw += g;
+  }
+  const Rbar = gSw ? gSwr / gSw : 0;
+  let n = 0, dn = 0; for (const r of rows) { n += r.num; dn += r.den; }
+  const b = dn ? n / dn : 0;
+  const adj = rows.map((r) => r.AP - b * (r.R - Rbar));
+  const m = adj.reduce((a, x) => a + x, 0) / (adj.length || 1);
+  const sd = Math.sqrt(adj.reduce((a, x) => a + (x - m) ** 2, 0) / (adj.length || 1)) || 1;
+  const K = 410, out = {};                         // same shrinkage prior as character Power
+  rows.forEach((r, i) => {
+    const k = r.g / (r.g + K);
+    out[r.key] = Math.max(1, Math.min(99, Math.round(50 + 12 * k * (m - adj[i]) / sd)));
+  });
+  return BS.bpowerCache[tier] = out;
+}
 
 // ---- v3 band-split helpers -------------------------------------------------
 // v3 build data splits every stat by DaoXin band (0/1/2 = 3000-3999 / 4000-5999 / 6000+).
@@ -789,11 +825,13 @@ function renderCharDetail(host) {
       </div></div></div>`;
   html += `<div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(c.place, c.g)}</div>`;
   html += `<div class="bsection"><h3>${t("sidejobs")} <span style="color:var(--muted);font-size:12px">— ${t("selectCareer")}</span></h3>`;
+  const bpow = computeBuildPower(BS.tier);
   for (const cr of careers) {
     const [gw, graw, avg] = c.careers[cr];
+    const bp = bpow[`${id}_${cr}`] || 0;
     html += `<div class="sjrow" data-career="${cr}"><img src="${sidejobBadge(cr)}" onerror="this.style.visibility='hidden'">
       <div class="nm">${careerName(cr)}</div><div class="barwrap"><i style="width:${100 * gw / maxg}%"></i></div>
-      <div class="rt">${graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${avg.toFixed(2)}</b></div></div>`;
+      <div class="rt" title="${t("powerTip")}">${t("powerScore")} <b style="color:${powerColor(bp)}">${bp}</b> · ${graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${avg.toFixed(2)}</b></div></div>`;
   }
   html += `</div>`;
   host.innerHTML = html;
@@ -923,9 +961,11 @@ function renderBuildDetail(host) {
   b = collapseBuild(b, BS.char, BS.career);
   if (!b.graw) { host.innerHTML = `<div class="empty">${t("notAtTier")}</div>`; return; }
   const avg = avgPlace(b.place, b.g);
+  const bp = computeBuildPower(BS.tier)[`${BS.char}_${BS.career}`] || 0;
   host.innerHTML = `<div class="bh"><img class="av" src="${charAvatar(BS.char)}" onerror="this.style.visibility='hidden'">
     <div class="htxt"><h2>${charName(BS.char)} · ${careerName(BS.career)}</h2><div class="meta">${sectName(+String(BS.char)[0])}</div>
       <div class="kpis">
+        <div class="kpi" title="${t("powerTip")}"><b style="color:${powerColor(bp)}">${bp}</b><span>${t("powerScore")}</span></div>
         <div class="kpi"><b>${avg.toFixed(2)}</b><span>${t("avgplace")}</span></div>
         <div class="kpi"><b>${b.graw.toLocaleString()}</b><span>${t("games")}</span></div>
       </div></div>
