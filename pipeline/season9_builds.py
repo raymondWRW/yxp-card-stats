@@ -24,6 +24,7 @@ Usage:
 """
 import io
 import json
+import math
 import os
 import re
 import sys
@@ -54,6 +55,8 @@ DL_WORKERS = 10
 TOP_BOARDS = 20
 TOP_MBOARDS = 8        # top boards kept per (build, opponent character)
 LATE_ROUND = 14        # "late game" = round >= 14 (matches radar 'late' axis)
+WC_ROUND = 12          # 轮椅指数 (wheelchair index) looks at boards from this round on
+WC_MIN_RAW = 50        # min raw R12+ rounds for a build/tier to get a wheelchair entry
 HALF_LIFE_MS = 4 * 86400 * 1000   # recency half-life = 4 days
 T_REF = None           # reference time (newest game endTs); set before processing
 
@@ -140,6 +143,12 @@ def new_build():
         # display can show each slot's most common level; families are derived on output.
         "boards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # realm->cids->per band [raw, w_count, w_wins]
         "mboards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # oppChar->cids->per band [raw, w_count, w_wins]
+        # 轮椅指数 raw material (rounds >= WC_ROUND), per band:
+        # wc = [w_rounds, raw_rounds, w_wins]; wc_pool = famIdx -> w (card-pool distribution);
+        # wc_slot = board slot -> famIdx -> w (what sits in each slot)
+        "wc": [[0.0, 0, 0.0] for _ in range(3)],
+        "wc_pool": [defaultdict(float) for _ in range(3)],
+        "wc_slot": [defaultdict(lambda: defaultdict(float)) for _ in range(3)],
     }
 
 
@@ -239,9 +248,16 @@ def process_record(d):
         cards = side["privateData"].get("usedCards") or []
         cids = tuple(x for x in cards if x)
         if cids:
-            for x in cids:
-                STATE["fam_pop"][fam_index(x)] += w
+            fams = [fam_index(x) for x in cids]
+            for fi in fams:
+                STATE["fam_pop"][fi] += w
             rec = b["boards"][realm][cids][bi]; rec[0] += 1; rec[1] += w; rec[2] += wwin
+            # 轮椅指数 raw material: from round WC_ROUND on, what does this build keep playing?
+            if rnd >= WC_ROUND:
+                wcb = b["wc"][bi]; wcb[0] += w; wcb[1] += 1; wcb[2] += wwin
+                pool = b["wc_pool"][bi]; slots = b["wc_slot"][bi]
+                for i, fi in enumerate(fams):
+                    pool[fi] += w; slots[i][fi] += w
 
         # opponents: bots excluded; real ones buffered per-game for the placement matchup
         oppub = opp["publicData"]
@@ -443,12 +459,55 @@ def write_output():
         tiers_out.setdefault(f"{char}_{career}", {})[band] = {
             "graw": tk["graw"], "g": r2(tk["gw"]), "place": [r2(p) for p in tk["place"]],
             "swr": round(tk["swr"]), "swr2": round(tk["swr2"]), "swrp": round(tk["swrp"])}
+    # 轮椅指数 components per build per tier (cumulative bands, like the tier filter).
+    # Diversity is the ENTROPY-based effective count, so frequency matters: a card played
+    # once in 100 games barely moves it, while an always-played 8-card core reads as ~8.
+    #   poolEff = exp(H) of the R12+ card-family distribution (effective card pool size)
+    #   slotEff = usage-weighted mean of per-board-slot exp(H) (effective choices per slot)
+    #   wr      = recency-weighted R12+ round win rate (the "strength in that range")
+    # The frontend turns these into a 0-100 ranking via percentiles across builds.
+    def eff(counter):
+        tot = sum(counter.values())
+        if tot <= 0:
+            return 0.0
+        h = 0.0
+        for v in counter.values():
+            p = v / tot
+            if p > 0:
+                h -= p * math.log(p)
+        return math.exp(h)
+
+    wc_out = {}
+    for (char, career), b in STATE["builds"].items():
+        ent = {}
+        for tier, idxs in (("3000", (0, 1, 2)), ("4000", (1, 2)), ("6000", (2,))):
+            raw = sum(b["wc"][i][1] for i in idxs)
+            if raw < WC_MIN_RAW:
+                continue
+            wr_w = sum(b["wc"][i][0] for i in idxs)
+            wins = sum(b["wc"][i][2] for i in idxs)
+            pool = defaultdict(float)
+            for i in idxs:
+                for f, v in b["wc_pool"][i].items():
+                    pool[f] += v
+            slots = defaultdict(lambda: defaultdict(float))
+            for i in idxs:
+                for si, c in b["wc_slot"][i].items():
+                    for f, v in c.items():
+                        slots[si][f] += v
+            tot = sum(sum(c.values()) for c in slots.values())
+            slot_eff = sum(eff(c) * (sum(c.values()) / tot) for c in slots.values()) if tot else 0.0
+            ent[tier] = [r2(wr_w), raw, round(wins / wr_w, 4) if wr_w else 0,
+                         round(eff(pool), 2), round(slot_eff, 2)]
+        if ent:
+            wc_out[f"{char}_{career}"] = ent
+
     # Split into a light file (drives the character leaderboard, loads instantly) and a
     # heavy file (build detail: boards/matchups/families, lazy-loaded on first build open).
     light = {
         "meta": {"season": 9, "mode": 3, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
-                 "selfRecords": STATE["self"], "shards": STATE["shards"]},
-        "chars": char_out, "tiers": tiers_out,
+                 "selfRecords": STATE["self"], "shards": STATE["shards"], "wcRound": WC_ROUND},
+        "chars": char_out, "tiers": tiers_out, "wc": wc_out,
     }
     # v2: radar = destiny received (not round WR), matchup = placement head-to-head,
     # boards carry per-slot modal card levels. v3: all build stats split by DaoXin band

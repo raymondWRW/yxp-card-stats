@@ -32,6 +32,9 @@ const UI = {
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥", notAtTier: "This build doesn't exist at this DaoXin tier (no games).",
+    wheelchair: "Wheelchair index",
+    wheelchairNote: "character+side-job builds that are strong from R12 on while always playing the same board — combines R12+ strength, effective card-pool size, and per-slot variety (all recency-weighted)",
+    wcPool: "eff. cards", wcSlot: "slot choices", wcWR: "R12+ WR",
     subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
     arrangements: "arrangements",
     fates: "Fates", tianyan: "天衍 (Derivations)", daoyun: "道韵 (Dao Rhyme)",
@@ -68,6 +71,9 @@ const UI = {
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
+    wheelchair: "轮椅指数",
+    wheelchairNote: "12回合后又强又固定的角色+副职流派——综合12回合后强度、有效卡池大小、各槽位选择多样性（均近期加权）",
+    wcPool: "有效卡池", wcSlot: "槽位选择", wcWR: "12+回合胜率",
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
     arrangements: "种排列",
     fates: "天命", tianyan: "天衍", daoyun: "道韵",
@@ -661,14 +667,67 @@ function getAxv() {
   return BS.axvCache[BS.tier] = axv;
 }
 
+// ---- 轮椅指数 (wheelchair index) --------------------------------------------
+// Ranks character+side-job builds by "strong AND repetitive from round 12 on".
+// Data per build/tier: [w_rounds, raw_rounds, wr, poolEff, slotEff] (entropy-based
+// effective counts, recency-weighted). Score = mean of three percentiles across
+// builds: high R12+ win rate, small effective card pool, few choices per slot.
+function wheelchairRows() {
+  const wc = BS.data.wc; if (!wc) return null;
+  const tier = String(BS.tier);
+  const rows = [];
+  for (const key in wc) {
+    const e = wc[key][tier]; if (!e) continue;
+    const [, raw, wr, pool, slot] = e;
+    if (raw < 200) continue;                       // sample gate on raw R12+ rounds
+    const [ch, cr] = key.split("_").map(Number);
+    if (!cr) continue;                             // skip the rare no-side-job records
+    rows.push({ ch, cr, wr, pool, slot, raw });
+  }
+  const pct = (arr, v) => { let c = 0; for (const x of arr) if (x <= v) c++; return c / arr.length; };
+  const wrs = rows.map((r) => r.wr).sort((a, b) => a - b);
+  const pools = rows.map((r) => r.pool).sort((a, b) => a - b);
+  const slots = rows.map((r) => r.slot).sort((a, b) => a - b);
+  for (const r of rows) {
+    r.score = Math.round(100 * (pct(wrs, r.wr) + (1 - pct(pools, r.pool)) + (1 - pct(slots, r.slot))) / 3);
+  }
+  return rows.sort((a, b) => b.score - a.score || b.raw - a.raw);
+}
+function renderWheelchairList(host) {
+  const rows = wheelchairRows();
+  if (!rows) { host.innerHTML = `<div class="empty">${t("updating")}</div>`; return; }
+  let html = `<div class="wcnote">${t("wheelchairNote")}</div><div class="cgrid">`;
+  rows.forEach((r, i) => {
+    html += `<div class="cchip wc" data-ch="${r.ch}" data-cr="${r.cr}"
+        title="${t("wcWR")} ${(r.wr * 100).toFixed(1)}% · ${t("wcPool")} ${r.pool.toFixed(1)} · ${t("wcSlot")} ${r.slot.toFixed(2)} · n=${r.raw.toLocaleString()}">
+      <span class="rank">#${i + 1}</span>
+      <img loading="lazy" src="${charAvatar(r.ch)}" onerror="this.style.visibility='hidden'">
+      <img class="sjbadge" src="${sidejobBadge(r.cr)}" onerror="this.style.visibility='hidden'">
+      <div class="cn">${charName(r.ch)}</div><div class="cs">${careerName(r.cr)}</div>
+      <div class="big" style="color:${powerColor(r.score)}">${r.score}</div>
+      <div class="sub2">${(r.wr * 100).toFixed(0)}% · ${t("wcPool")} ${r.pool.toFixed(0)} · ${t("wcSlot")} ${r.slot.toFixed(1)}</div></div>`;
+  });
+  host.innerHTML = html + `</div>`;
+  host.querySelectorAll(".cchip.wc").forEach((el) => el.onclick = async () => {
+    BS.char = +el.dataset.ch; BS.career = +el.dataset.cr; BS.realm = null;
+    BS.boardsShowAll = false; BS.mShowAll = false;
+    BS.screen = "build"; renderBuilds();
+    try { await ensureBuilds(); } catch (e) { console.error("build data load failed", e); }
+    renderBuilds();
+  });
+}
+
 function renderBuilds() {
   if (!BS.data) return;
+  // the wheelchair sort needs wc data (published with the newest pipeline)
+  const wcOpt = document.querySelector('#bsort option[value="wheelchair"]');
+  if (wcOpt) wcOpt.hidden = !BS.data.wc;
   $("#bsort-ctl").style.display = BS.screen === "list" ? "" : "none";
   // the build page supports the tier filter only with v3 (band-split) data
   $("#tier-ctl").style.display = (BS.screen === "build" && !BS.v3) ? "none" : "";
   renderCrumbs();
   const host = $("#builds-content");
-  if (BS.screen === "list") renderCharList(host);
+  if (BS.screen === "list") (BS.sort === "wheelchair" ? renderWheelchairList : renderCharList)(host);
   else if (BS.screen === "char") renderCharDetail(host);
   else renderBuildDetail(host);
 }
