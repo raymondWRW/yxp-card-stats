@@ -159,11 +159,25 @@ def _fate_tiers(base):
 WC_MENGGONG = _fate_tiers(173)   # 屠馗 天命 猛攻之姿 -> 百杀 archetype
 WC_BENGLIE = _fate_tiers(174)    # 屠馗 天命 崩裂之拳 -> 崩拳 archetype
 WC_RONGHUI = _fate_tiers(192)    # 黎承云 天命 剑招融汇 -> 融剑 archetype
+# 陆剑心 phase-4 upgrade of fate 95 灵气凝铸 — the chosen TIER is the discriminator:
+LJX_FUFANG = {10095, 20095}      # 聚灵凝铸 (Spiritage) / 御灵凝铸 (Spiritstat) -> 符防
+LJX_FUJIANYI = {30095}           # 灵威凝铸 (Spiritual Power Forging) -> 符剑意
+NGS_SWIFT = _fate_tiers(140)     # 南宫生 疾燃咒印 (Swift Burning Seal), with 硬枝竹 -> 田土
+DLY_NIKE = _fate_tiers(124)      # 杜伶鸳 双鸳逆克 (Overcome with each other) -> 逆克
+JXM_DINGHUN = _fate_tiers(52)    # 姜袭明 七星定魂 (Heptastar Soulstat) -> 定魂
 CHAR_TUKUI, CHAR_XIAOBU, CHAR_YEMM, CHAR_LICHY = 4000002, 4000001, 4000003, 1000006
-CAREER_EL, CAREER_PM = 1, 6      # 炼丹师, 灵植师
+CHAR_LJX, CHAR_NGS, CHAR_DLY, CHAR_JXM = 1000005, 3000005, 3000002, 2000004
+CAREER_EL, CAREER_FU, CAREER_PM = 1, 2, 6      # 炼丹师, 符咒师, 灵植师
+
+# combos whose classification also needs a board-card scan: (char, career) -> card name
+WC_BOARD_MARK = {
+    (CHAR_XIAOBU, CAREER_EL): "玄灵愈体",
+    (CHAR_YEMM, CAREER_EL): "玄灵愈体",
+    (CHAR_NGS, CAREER_PM): "硬枝竹",
+}
 
 
-def classify_variant(char, career, talents, has_xly):
+def classify_variant(char, career, talents, has_mark):
     """Per-game strategy label ('' = this combo is not split)."""
     if char == CHAR_TUKUI and career in (CAREER_EL, CAREER_PM):
         ts = set(talents)
@@ -173,9 +187,22 @@ def classify_variant(char, career, talents, has_xly):
             return "崩拳"
         return "其他"
     if char in (CHAR_XIAOBU, CHAR_YEMM) and career == CAREER_EL:
-        return "玄奶" if has_xly else "其他"
+        return "玄奶" if has_mark else "其他"
     if char == CHAR_LICHY:
         return "融剑" if set(talents) & WC_RONGHUI else "其他"
+    if char == CHAR_LJX and career == CAREER_FU:
+        ts = set(talents)
+        if ts & LJX_FUFANG:
+            return "符防"
+        if ts & LJX_FUJIANYI:
+            return "符剑意"
+        return "其他"
+    if char == CHAR_NGS and career == CAREER_PM:
+        return "田土" if (has_mark and set(talents) & NGS_SWIFT) else "混元"
+    if char == CHAR_DLY and career == CAREER_EL:
+        return "逆克" if set(talents) & DLY_NIKE else "其他"
+    if char == CHAR_JXM:
+        return "定魂" if set(talents) & JXM_DINGHUN else "其他"
     return ""
 
 
@@ -248,13 +275,14 @@ def process_record(d):
     if not sides:
         return
     last_side = sides[-1][1]
-    has_xly = False
-    if char in (CHAR_XIAOBU, CHAR_YEMM) and career == CAREER_EL:
+    mark = WC_BOARD_MARK.get((char, career))
+    has_mark = False
+    if mark:
         for _, side, _, _ in sides:
-            if any(x and CN_NAME.get(str(x)) == "玄灵愈体" for x in side["privateData"].get("usedCards") or []):
-                has_xly = True
+            if any(x and CN_NAME.get(str(x)) == mark for x in side["privateData"].get("usedCards") or []):
+                has_mark = True
                 break
-    var = classify_variant(char, career, last_side["publicData"].get("talents") or [], has_xly)
+    var = classify_variant(char, career, last_side["publicData"].get("talents") or [], has_mark)
 
     b = STATE["builds"][(char, career, var)]
     c = STATE["char"][char]

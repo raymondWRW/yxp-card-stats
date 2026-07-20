@@ -33,7 +33,7 @@ const UI = {
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥", notAtTier: "This build doesn't exist at this DaoXin tier (no games).",
     wheelchair: "Wheelchair index", strategies: "strategies",
-    rerollsByRound: "Avg rerolls held by round", realmByRound: "Avg realm by round",
+    rerollsByRound: "Avg rerolls held by round (full bar = 20)", realmByRound: "Avg realm by round",
     wheelchairNote: "character+side-job builds that place well while always playing the same board from R12 on — combines avg final placement, effective card-pool size, and per-slot variety (all recency-weighted)",
     wcPool: "eff. cards", wcSlot: "slot choices", wcWR: "R12+ WR",
     subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
@@ -73,7 +73,7 @@ const UI = {
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
     wheelchair: "轮椅指数", strategies: "策略",
-    rerollsByRound: "每回合平均持有换牌数", realmByRound: "每回合平均境界",
+    rerollsByRound: "每回合平均持有换牌数（满格 = 20）", realmByRound: "每回合平均境界",
     wheelchairNote: "名次好且12回合后卡组固定的角色+副职流派——综合平均名次、有效卡池大小、各槽位选择多样性（均近期加权）",
     wcPool: "有效卡池", wcSlot: "槽位选择", wcWR: "12+回合胜率",
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
@@ -883,12 +883,13 @@ function renderCharDetail(host) {
       <div class="rt" title="${t("powerTip")}">${vars ? "" : `${t("powerScore")} <b style="color:${powerColor(bp)}">${bp}</b> · `}${graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${avg.toFixed(2)}</b></div></div>`;
     if (vars) {
       const vstats = vars.map((v) => ({ v, ...variantStat(`${combo}|${v}`) })).filter((s) => s.graw > 0);
-      const maxvg = Math.max(1, ...vstats.map((s) => s.g));
       html += `<div class="sjvars" hidden>`;
       for (const s of vstats) {
         const vp = bpow[`${combo}|${s.v}`] || 0;
+        // bar on the same scale as the character's side-job rows (maxg), so a
+        // strategy's share is directly comparable with the rows above it
         html += `<div class="sjrow vchild" data-career="${cr}" data-variant="${s.v}">
-          <span class="wcvar">${wcVarLabel(s.v)}</span><div class="barwrap"><i style="width:${100 * s.g / maxvg}%"></i></div>
+          <span class="wcvar">${wcVarLabel(s.v)}</span><div class="barwrap"><i style="width:${Math.min(100, 100 * s.g / maxg)}%"></i></div>
           <div class="rt" title="${t("powerTip")}">${t("powerScore")} <b style="color:${powerColor(vp)}">${vp}</b> · ${s.graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${s.avg.toFixed(2)}</b></div></div>`;
       }
       html += `</div>`;
@@ -1054,14 +1055,15 @@ function renderBuildDetail(host) {
 function renderCurves(b) {
   let last = 0;
   b.curve.forEach((c, i) => { if (c[0] > 0.001) last = i + 1; });
-  const rounds = []; for (let r = 1; r <= last; r++) rounds.push(r);
-  if (!rounds.length) return;
+  if (!last) return;
   const val = (r, j) => { const c = b.curve[r - 1]; return c[0] ? c[j] / c[0] : 0; };
-  const maxRC = Math.max(1, ...rounds.map((r) => val(r, 1)));
-  drawChart($("#chartRC"), rounds, (r) => {
+  // rerolls: FIXED y-scale 0-20 so bar heights read directly; past R13 it's ~0, so stop there
+  const rcRounds = []; for (let r = 1; r <= Math.min(last, 13); r++) rcRounds.push(r);
+  drawChart($("#chartRC"), rcRounds, (r) => {
     const v = val(r, 1);
-    return { h: v / maxRC, label: r, tip: `R${r}: ${v.toFixed(1)}`, color: "#5b8cff", faded: !b.curve[r - 1][0] };
+    return { h: Math.min(1, v / 20), label: r, tip: `R${r}: ${v.toFixed(1)}`, color: "#5b8cff", faded: !b.curve[r - 1][0] };
   }, false);
+  const rounds = []; for (let r = 1; r <= last; r++) rounds.push(r);
   drawChart($("#chartLV"), rounds, (r) => {
     const v = val(r, 2);
     return { h: v / 5, label: r, tip: `R${r}: ${v.toFixed(2)}`, color: "#36c46b", faded: !b.curve[r - 1][0] };
