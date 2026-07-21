@@ -33,7 +33,7 @@ const UI = {
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "DaoXin ≥", notAtTier: "This build doesn't exist at this DaoXin tier (no games).",
     wheelchair: "Wheelchair index", strategies: "strategies",
-    rerollsByRound: "Avg rerolls held by round (full bar = 20)", realmByRound: "Avg realm by round",
+    rerollsByRound: "Median rerolls held by round (full bar = 20)", realmByRound: "Median realm by round",
     wheelchairNote: "character+side-job builds that place well while always playing the same board from R12 on — combines avg final placement, effective card-pool size, and per-slot variety (all recency-weighted)",
     wcPool: "eff. cards", wcSlot: "slot choices", wcWR: "R12+ WR",
     subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
@@ -73,7 +73,7 @@ const UI = {
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "道心 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
     wheelchair: "轮椅指数", strategies: "策略",
-    rerollsByRound: "每回合平均持有换牌数（满格 = 20）", realmByRound: "每回合平均境界",
+    rerollsByRound: "每回合持有换牌数中位数（满格 = 20）", realmByRound: "每回合境界中位数",
     wheelchairNote: "名次好且12回合后卡组固定的角色+副职流派——综合平均名次、有效卡池大小、各槽位选择多样性（均近期加权）",
     wcPool: "有效卡池", wcSlot: "槽位选择", wcWR: "12+回合胜率",
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
@@ -539,6 +539,7 @@ async function ensureBuilds() {
   // Until the daily pipeline republishes in the newest format, gate the new renderings.
   BS.v2 = (bd.v || 1) >= 2;
   BS.v3 = (bd.v || 1) >= 3;
+  BS.v5 = (bd.v || 1) >= 5;                // curves are per-tier medians since v5
   if (!BS.v3) {                          // v3 percentile pools are built per-tier on demand
     const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
     for (const id in BS.data.builds) {
@@ -704,15 +705,10 @@ function collapseBuild(b, key) {
     const e = tk[bd]; if (!e) continue;
     g += e.g; graw += e.graw; for (let i = 0; i < 8; i++) place[i] += e.place[i];
   }
-  // per-round curves (v4): sum the selected bands per round -> [w, w*rerolls, w*realm]
+  // per-round median curves (v5): precomputed per tier -> pick the tier's rows directly
+  // [w, medianRerolls, medianRealm]. (v4 sum-format curves are skipped.)
   let curve = null;
-  if (b.curve) {
-    curve = b.curve[0].map((_, ri) => {
-      const o = [0, 0, 0];
-      for (const i of idxs) for (let j = 0; j < 3; j++) o[j] += b.curve[i][ri][j];
-      return o;
-    });
-  }
+  if (BS.v5 && b.curve) curve = b.curve[{ 3000: 0, 4000: 1, 6000: 2 }[BS.tier] || 0];
   return { g, graw, place, radar, matchup, boards, mboards, curve };
 }
 // selection rows: v3+ [oid, perBand [sel, off, placew, selRaw?, offRaw?]] ->
@@ -1057,7 +1053,7 @@ function renderCurves(b) {
   let last = 0;
   b.curve.forEach((c, i) => { if (c[0] > 0.001) last = i + 1; });
   if (!last) return;
-  const val = (r, j) => { const c = b.curve[r - 1]; return c[0] ? c[j] / c[0] : 0; };
+  const val = (r, j) => b.curve[r - 1][j];   // precomputed weighted medians
   // rerolls: FIXED y-scale 0-20 so bar heights read directly; past R13 it's ~0, so stop there
   const rcRounds = []; for (let r = 1; r <= Math.min(last, 13); r++) rcRounds.push(r);
   drawChart($("#chartRC"), rcRounds, (r) => {

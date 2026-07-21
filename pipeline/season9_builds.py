@@ -144,8 +144,10 @@ def new_build():
         # display can show each slot's most common level; families are derived on output.
         "boards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # realm->cids->per band [raw, w_count, w_wins]
         "mboards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # oppChar->cids->per band [raw, w_count, w_wins]
-        # per-round curves: per band, per round 1..CURVE_ROUNDS: [w, w*rerollsHeld, w*realmLevel]
-        "curve": [[[0.0, 0.0, 0.0] for _ in range(CURVE_ROUNDS)] for _ in range(3)],
+        # per-round value HISTOGRAMS (for median curves): per band, per round 1..CURVE_ROUNDS,
+        # recency-weighted counts per value — rerolls held clamped to 0..25, realm to 0..6.
+        "rch": [[[0.0] * 26 for _ in range(CURVE_ROUNDS)] for _ in range(3)],
+        "lvh": [[[0.0] * 7 for _ in range(CURVE_ROUNDS)] for _ in range(3)],
     }
 
 
@@ -328,10 +330,11 @@ def process_record(d):
 
         # per-round curves: rerolls held (replaceCardChance snapshot) + realm level
         if rnd >= 1:
-            cv = b["curve"][bi][min(rnd, CURVE_ROUNDS) - 1]
-            cv[0] += w
-            cv[1] += w * (side["privateData"].get("replaceCardChance") or 0)
-            cv[2] += w * (side["publicData"].get("level") or 0)
+            ri = min(rnd, CURVE_ROUNDS) - 1
+            rc = side["privateData"].get("replaceCardChance") or 0
+            lv = side["publicData"].get("level") or 0
+            b["rch"][bi][ri][min(max(int(rc), 0), 25)] += w
+            b["lvh"][bi][ri][min(max(int(lv), 0), 6)] += w
 
         # board this round — keep the real board layout: slot order + duplicates + levels
         realm = side["publicData"].get("level") or 0
@@ -535,11 +538,34 @@ def write_output():
             mb = merge_boards(bd, TOP_MBOARDS)
             if mb:
                 mboards[str(oc)] = mb
+        # curves: WEIGHTED MEDIAN per round, precomputed per cumulative tier (medians
+        # can't be merged client-side). Entry [ti][round] = [w, medRerolls, medRealm];
+        # the interpolated (grouped-data) median keeps integer domains readable.
+        def wmed(hist):
+            tot = sum(hist)
+            if tot <= 0:
+                return 0.0
+            half = tot / 2; cum = 0.0
+            for v, n in enumerate(hist):
+                if n <= 0:
+                    continue
+                if cum + n >= half:
+                    return round(v - 0.5 + (half - cum) / n, 2)
+                cum += n
+            return 0.0
+        curve = []
+        for idxs in ((0, 1, 2), (1, 2), (2,)):     # tiers 3000 / 4000 / 6000
+            trows = []
+            for ri in range(CURVE_ROUNDS):
+                rch = [sum(b["rch"][i][ri][v] for i in idxs) for v in range(26)]
+                lvh = [sum(b["lvh"][i][ri][v] for i in idxs) for v in range(7)]
+                trows.append([r2(sum(rch)), wmed(rch), wmed(lvh)])
+            curve.append(trows)
         # split combos live ONLY under their variant keys ("char_career|variant")
         builds_out[f"{char}_{career}" + (f"|{var}" if var else "")] = {
             "g": r2(b["gw"]), "graw": b["graw"], "place": [r2(p) for p in b["place"]],
             "radar": rad, "matchup": matchup, "boards": boards, "mboards": mboards,
-            "curve": [[[r2(x) for x in cv] for cv in bandrows] for bandrows in b["curve"]],
+            "curve": curve,
         }
     char_out = {str(char): {"g": r2(c["gw"]), "graw": c["graw"],
                             "swr": round(c["swr"]), "swr2": round(c["swr2"]), "swrp": round(c["swrp"])}
@@ -623,9 +649,9 @@ def write_output():
     # v2: radar = destiny received (not round WR), matchup = placement head-to-head,
     # boards carry per-slot modal card levels. v3: all build stats split by DaoXin band
     # (A/B/C) for the build-page tier filter. v4: split combos keyed per strategy
-    # variant + per-round curves (rerolls held / realm). Frontend gates on this.
+    # variant + per-round curves. v5: curves are per-tier weighted MEDIANS.
     heavy = {
-        "v": 4,
+        "v": 5,
         "builds": builds_out,
         "families": [{**m, "pop": r2(STATE["fam_pop"].get(m["i"], 0))} for m in STATE["fam_meta"]],
     }
