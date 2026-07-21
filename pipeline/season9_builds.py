@@ -449,8 +449,18 @@ def new_shards():
     sess = requests.Session(); names = []; cursor = None
     while True:
         url = API + "?recursive=true&limit=1000" + (f"&cursor={cursor}" if cursor else "")
-        r = sess.get(url, timeout=60)
-        names += [int(f["path"][:-8]) for f in r.json() if f.get("path", "").endswith(".tar.zst")]
+        # the HF API occasionally returns an error object instead of the file list;
+        # retry a few times before giving up so transient hiccups don't kill the run
+        for attempt in range(4):
+            r = sess.get(url, timeout=60)
+            body = r.json() if r.status_code == 200 else None
+            if isinstance(body, list):
+                break
+            print(f"  !! shard listing attempt {attempt + 1}: status={r.status_code} body={str(body)[:200]}")
+            if attempt == 3:
+                raise RuntimeError("HuggingFace tree API kept failing")
+            time.sleep(5 * (attempt + 1))
+        names += [int(f["path"][:-8]) for f in body if f.get("path", "").endswith(".tar.zst")]
         link = r.headers.get("Link", "")
         if 'rel="next"' in link:
             mm = re.search(r"cursor=([^&>]+)", link); cursor = mm.group(1) if mm else None
