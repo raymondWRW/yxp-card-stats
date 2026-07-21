@@ -1058,12 +1058,12 @@ function renderCurves(b) {
   const rcRounds = []; for (let r = 1; r <= Math.min(last, 13); r++) rcRounds.push(r);
   drawChart($("#chartRC"), rcRounds, (r) => {
     const v = val(r, 1);
-    return { h: Math.min(1, v / 20), label: r, tip: `R${r}: ${v.toFixed(1)}`, color: "#5b8cff", faded: !b.curve[r - 1][0] };
+    return { h: Math.min(1, v / 20), label: r, tip: `R${r}: ${v}`, color: "#5b8cff", faded: !b.curve[r - 1][0] };
   }, false);
   const rounds = []; for (let r = 1; r <= last; r++) rounds.push(r);
   drawChart($("#chartLV"), rounds, (r) => {
     const v = val(r, 2);
-    return { h: v / 5, label: r, tip: `R${r}: ${v.toFixed(2)}`, color: "#36c46b", faded: !b.curve[r - 1][0] };
+    return { h: v / 5, label: r, tip: `R${r}: ${v}`, color: "#36c46b", faded: !b.curve[r - 1][0] };
   }, false);
 }
 // ---- Fates & 天衍 -----------------------------------------------------------

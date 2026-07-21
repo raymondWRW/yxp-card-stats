@@ -540,19 +540,17 @@ def write_output():
                 mboards[str(oc)] = mb
         # curves: WEIGHTED MEDIAN per round, precomputed per cumulative tier (medians
         # can't be merged client-side). Entry [ti][round] = [w, medRerolls, medRealm];
-        # the interpolated (grouped-data) median keeps integer domains readable.
+        # plain (lower) weighted median — the actual most-central integer value.
         def wmed(hist):
             tot = sum(hist)
             if tot <= 0:
-                return 0.0
+                return 0
             half = tot / 2; cum = 0.0
             for v, n in enumerate(hist):
-                if n <= 0:
-                    continue
-                if cum + n >= half:
-                    return round(v - 0.5 + (half - cum) / n, 2)
                 cum += n
-            return 0.0
+                if cum >= half:
+                    return v
+            return 0
         curve = []
         for idxs in ((0, 1, 2), (1, 2), (2,)):     # tiers 3000 / 4000 / 6000
             trows = []
