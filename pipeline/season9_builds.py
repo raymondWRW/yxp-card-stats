@@ -188,10 +188,12 @@ def classify_variant(char, career, talents, has_mark):
         if ts & WC_BENGLIE:
             return "崩拳"
         return "其他"
-    if char in (CHAR_XIAOBU, CHAR_YEMM) and career == CAREER_EL:
+    if char == CHAR_XIAOBU and career == CAREER_EL:
         return "玄奶" if has_mark else "其他"
+    if char == CHAR_YEMM and career == CAREER_EL:
+        return "玄奶" if has_mark else "崩拳"       # 叶冥冥's non-玄奶 elixirist line is 崩拳
     if char == CHAR_LICHY:
-        return "融剑" if set(talents) & WC_RONGHUI else "其他"
+        return "融剑" if set(talents) & WC_RONGHUI else "白板"   # 白板 = plain / no 融剑
     if char == CHAR_LJX and career == CAREER_FU:
         ts = set(talents)
         if ts & LJX_FUFANG:

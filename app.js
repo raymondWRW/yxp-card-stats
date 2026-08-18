@@ -522,7 +522,8 @@ async function loadBuilds() {
       const combo = key.slice(0, i);
       (BS.variants[combo] = BS.variants[combo] || []).push(key.slice(i + 1));
     }
-    for (const combo in BS.variants) BS.variants[combo].sort((a, b) => (a === "其他") - (b === "其他"));
+    const isRest = (v) => v === "其他" || v === "白板";     // catch-all variants sort last
+    for (const combo in BS.variants) BS.variants[combo].sort((a, b) => isRest(a) - isRest(b));
     computePower(BS.tier);
   }
   renderBuilds();
@@ -766,13 +767,30 @@ function wheelchairRows() {
   }
   return rows.sort((a, b) => b.score - a.score || b.raw - a.raw);
 }
-const wcVarLabel = (v) => (S.lang === "en" && v === "其他") ? "other" : v;
+// Strategy-variant display labels. Data keys carry the raw pipeline label; some are
+// renamed for display per combo (so already-published data reads right), and every
+// label gets an English name.
+const VAR_RENAME = {                    // "char_career" or "char" -> {rawLabel: displayLabel}
+  "4000003_1": { "其他": "崩拳" },     // 叶冥冥+炼丹师: the non-玄奶 line is 崩拳
+  "1000006": { "其他": "白板" },       // 黎承云 (all side-jobs): the non-融剑 line is 白板
+};
+const VAR_EN = {
+  "其他": "Other", "白板": "Vanilla", "崩拳": "Crushing Fist", "百杀": "Hundred Kills",
+  "玄奶": "Mystic Heal", "融剑": "Sword Fusion", "符防": "Talisman Guard",
+  "符剑意": "Talisman Sword Intent", "田土": "Earth Field", "混元": "Primordial",
+  "逆克": "Overcome", "定魂": "Soulstat",
+};
+function wcVarLabel(v, ch, cr) {
+  const rn = (ch != null && VAR_RENAME[`${ch}_${cr}`]) || (ch != null && VAR_RENAME[String(ch)]) || null;
+  const disp = (rn && rn[v]) || v;
+  return S.lang === "en" ? (VAR_EN[disp] || disp) : disp;
+}
 function renderWheelchairList(host) {
   const rows = wheelchairRows();
   if (!rows) { host.innerHTML = `<div class="empty">${t("updating")}</div>`; return; }
   let html = `<div class="wcnote">${t("wheelchairNote")}</div><div class="cgrid">`;
   rows.forEach((r, i) => {
-    const vtag = r.variant ? ` <span class="wcvar">${wcVarLabel(r.variant)}</span>` : "";
+    const vtag = r.variant ? ` <span class="wcvar">${wcVarLabel(r.variant, r.ch, r.cr)}</span>` : "";
     html += `<div class="cchip wc" data-ch="${r.ch}" data-cr="${r.cr}" data-v="${r.variant}"
         title="${t("avgplace")} ${r.avgPl.toFixed(2)} · ${t("wcWR")} ${(r.wr * 100).toFixed(1)}% · ${t("wcPool")} ${r.pool.toFixed(1)} · ${t("wcSlot")} ${r.slot.toFixed(2)} · n=${r.raw.toLocaleString()}">
       <span class="rank">#${i + 1}</span>
@@ -812,7 +830,7 @@ function renderCrumbs() {
   const sep = () => { const s = document.createElement("span"); s.className = "sep"; s.textContent = "›"; c.appendChild(s); };
   add(t("characters"), BS.screen !== "list" ? () => { BS.screen = "list"; renderBuilds(); } : null, BS.screen === "list");
   if (BS.char != null && BS.screen !== "list") { sep(); add(charName(BS.char), BS.screen === "build" ? () => { BS.screen = "char"; renderBuilds(); } : null, BS.screen === "char"); }
-  if (BS.screen === "build") { sep(); add(careerName(BS.career) + (BS.variant ? ` · ${wcVarLabel(BS.variant)}` : ""), null, true); }
+  if (BS.screen === "build") { sep(); add(careerName(BS.career) + (BS.variant ? ` · ${wcVarLabel(BS.variant, BS.char, BS.career)}` : ""), null, true); }
 }
 function renderCharList(host) {
   const rows = Object.keys(BS.data.chars).map((id) => charStatTier(+id, BS.tier)).filter((r) => r && r.g > 0);
@@ -886,7 +904,7 @@ function renderCharDetail(host) {
         // bar on the same scale as the character's side-job rows (maxg), so a
         // strategy's share is directly comparable with the rows above it
         html += `<div class="sjrow vchild" data-career="${cr}" data-variant="${s.v}">
-          <span class="wcvar">${wcVarLabel(s.v)}</span><div class="barwrap"><i style="width:${Math.min(100, 100 * s.g / maxg)}%"></i></div>
+          <span class="wcvar">${wcVarLabel(s.v, id, cr)}</span><div class="barwrap"><i style="width:${Math.min(100, 100 * s.g / maxg)}%"></i></div>
           <div class="rt" title="${t("powerTip")}">${t("powerScore")} <b style="color:${powerColor(vp)}">${vp}</b> · ${s.graw.toLocaleString()} ${t("games")} · ${t("avgplace")} <b>${s.avg.toFixed(2)}</b></div></div>`;
       }
       html += `</div>`;
@@ -1027,7 +1045,7 @@ function renderBuildDetail(host) {
   if (!b.graw) { host.innerHTML = `<div class="empty">${t("notAtTier")}</div>`; return; }
   const avg = avgPlace(b.place, b.g);
   const bp = computeBuildPower(BS.tier)[key] || 0;
-  const vtag = BS.variant ? ` <span class="wcvar" style="font-size:14px">${wcVarLabel(BS.variant)}</span>` : "";
+  const vtag = BS.variant ? ` <span class="wcvar" style="font-size:14px">${wcVarLabel(BS.variant, BS.char, BS.career)}</span>` : "";
   host.innerHTML = `<div class="bh"><img class="av" src="${charAvatar(BS.char)}" onerror="this.style.visibility='hidden'">
     <div class="htxt"><h2>${charName(BS.char)} · ${careerName(BS.career)}${vtag}</h2><div class="meta">${sectName(+String(BS.char)[0])}</div>
       <div class="kpis">
