@@ -352,8 +352,8 @@ function tile(r) {
   const el = document.createElement("div");
   el.className = "card";
   el.innerHTML = `
-    <img loading="lazy" src="${WIKI}${c.img}_${S.lang}.png"
-      onerror="this.onerror=null;this.src='${WIKI}${c.img}_en.png'" alt="${name}">
+    <img loading="lazy" src="${WIKI}${c.img}_${S.lang}.webp"
+      onerror="this.onerror=null;this.src='${WIKI}${c.img}_en.webp'" alt="${name}">
     <div class="nm">${name}</div>
     <div class="sect">${sectLabel(c.sect)}</div>
     <div class="stats"><span class="wr" style="color:${col}">${(r.wr * 100).toFixed(1)}%</span>
@@ -395,8 +395,8 @@ function modalAgg() {
 function renderModal() {
   if (S.modalFam == null) return;
   const c = DATA.cards[S.modalFam];
-  $("#mImg").src = `${WIKI}${c.img}_${S.lang}.png`;
-  $("#mImg").onerror = function () { this.onerror = null; this.src = `${WIKI}${c.img}_en.png`; };
+  $("#mImg").src = `${WIKI}${c.img}_${S.lang}.webp`;
+  $("#mImg").onerror = function () { this.onerror = null; this.src = `${WIKI}${c.img}_en.webp`; };
   $("#mName").textContent = cardName(c);
   $("#mSect").textContent = sectLabel(c.sect);
 
@@ -503,8 +503,8 @@ function wireStatic() {
 //  BUILDS VIEW (Season 9, hsreplay-style)
 // ============================================================================
 const WIKI_ROOT = "https://sharpobject.github.io/yxp_wiki/assets/";
-const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.png`;
-const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.png`;
+const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.webp`;
+const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.webp`;
 const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
 
 const BS = { active: false, data: null, screen: "list", char: null, career: null, variant: "", sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false, tier: 3000 };
@@ -956,7 +956,7 @@ function cardImgs(fidxs, imgs) {
   const fam = BS.data.families;
   // imgs (v2) = per-slot most common card LEVEL id for this board; fall back to the
   // family's representative art on older data.
-  return fidxs.map((i, j) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; const im = (imgs && imgs[j]) || f.img; return `<img title="${nm}" loading="lazy" src="${WIKI}${im}_${S.lang}.png" onerror="this.onerror=null;this.src='${WIKI}${im}_en.png'">`; }).join("");
+  return fidxs.map((i, j) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; const im = (imgs && imgs[j]) || f.img; return `<img title="${nm}" loading="lazy" src="${WIKI}${im}_${S.lang}.webp" onerror="this.onerror=null;this.src='${WIKI}${im}_en.webp'">`; }).join("");
 }
 function boardRowHTML(fidxs, raw, wc, ww, cls, hint, imgs) {
   const wr = wc ? ww / wc : 0;
@@ -1091,9 +1091,10 @@ function fname(oid) { const e = (BS.data.fnames || {})[oid] || {}; return (S.lan
 function dname(oid) { const e = (BS.data.dnames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
 function yname(oid) { const e = (BS.data.ynames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
 function selIconURL(oid, kind) {
-  if (kind === "daoyun") return `${WIKI}${oid}_${S.lang}.png`;   // 道韵 options are cards -> card art
+  if (kind === "daoyun") return `${WIKI}${oid}_${S.lang}.webp`;   // 道韵 options are cards -> card art
   const e = ((kind === "fate" ? BS.data.fnames : BS.data.dnames) || {})[oid] || {};
-  return e.icon ? (BS.iconBase + e.icon) : "";
+  // the wiki serves .webp only now; older data JSON may still carry .png icon names
+  return e.icon ? (BS.iconBase + e.icon.replace(/\.png$/i, ".webp")) : "";
 }
 function selIcon(oid, kind, cls) {
   const u = selIconURL(oid, kind);

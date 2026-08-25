@@ -100,8 +100,9 @@ try:
 except Exception:
     pass
 
-# wiki icon CDN base; fate icons are Icon_Talent_<id>.png, derivation icons use their
-# registry icon field (mix of Icon_FateStrategy_/Icon_Talent_/Card_).
+# wiki icon CDN base; fate icons are Icon_Talent_<id>.webp, derivation icons use their
+# registry icon field (mix of Icon_FateStrategy_/Icon_Talent_/Card_). The wiki serves
+# .webp only — normalize any .png names coming from the registry.
 ICON_BASE = "https://sharpobject.github.io/yxp_wiki/assets/fates/"
 
 # Chinese -> English card names. Prefer the small distilled card_en_map.json (shipped to CI);
@@ -694,12 +695,13 @@ def write_output():
     names = {}
     for i in ids1:
         names[str(i)] = {"cn": FATE_CN.get(str(i), ""), "en": FATE_EN.get(str(i), ""),
-                         "bucket": fate_bucket(i), "icon": f"Icon_Talent_{i}.png"}
+                         "bucket": fate_bucket(i), "icon": f"Icon_Talent_{i}.webp"}
     dnames = {}
     for i in ids2:
         k = str(i)
         dnames[k] = {"cn": DERIV_CN.get(k, ""), "en": DERIV_EN.get(k, ""),
-                     "sect": DERIV_SECT.get(k, ""), "icon": DERIV_ICON.get(k, "")}
+                     "sect": DERIV_SECT.get(k, ""),
+                     "icon": DERIV_ICON.get(k, "").replace(".png", ".webp")}
     # 道韵 options are regular CARDS (plus the free pick 自在随心, id 27) — name them from
     # the card maps; the frontend uses the card art itself as the icon. "free": 1 marks
     # 自在随心 so the showcased top pick can skip it.
