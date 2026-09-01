@@ -500,6 +500,7 @@ def write_output():
     # Each board/matchup entry carries BOTH a raw occurrence count (for sample-size
     # thresholds) and recency-weighted sums (for current-meta rates & ordering).
     r2 = lambda x: round(x, 2)
+    generated = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())   # shown as "Data updated" on the site
 
     def merge_boards(bd, top_n, top_var=6):
         # bd keys are positional CARD-ID tuples (level-specific); values are per-DaoXin-band
@@ -654,7 +655,8 @@ def write_output():
     # heavy file (build detail: boards/matchups/families, lazy-loaded on first build open).
     light = {
         "meta": {"season": 9, "mode": 3, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
-                 "selfRecords": STATE["self"], "shards": STATE["shards"], "wcRound": WC_ROUND},
+                 "selfRecords": STATE["self"], "shards": STATE["shards"], "wcRound": WC_ROUND,
+                 "generated": generated},
         "chars": char_out, "tiers": tiers_out, "wc": wc_out,
     }
     # v2: radar = destiny received (not round WR), matchup = placement head-to-head,
@@ -713,7 +715,7 @@ def write_output():
     fates_file = {
         "v": 5,   # v3: per-band rows; v4: strategy-variant keys; v5: raw counts appended
         "meta": {"season": 9, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
-                 "selfRecords": STATE["self"], "iconBase": ICON_BASE},
+                 "selfRecords": STATE["self"], "iconBase": ICON_BASE, "generated": generated},
         "fates": fates_out, "derivations": derivs_out, "daoyun": daoyun_out,
         "names": names, "dnames": dnames, "ynames": ynames,
     }

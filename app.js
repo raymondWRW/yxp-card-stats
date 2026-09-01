@@ -11,6 +11,7 @@ const UI = {
     rounds: "Rounds", sortby: "Sort by", popularity: "Popularity", winrate: "Win rate",
     cardname: "Name", mingames: "Min games", search: "Search", nomatch: "No cards match these filters.",
     footData: "Data:", footArt: "card art:",
+    footUpdated: "Data updated:", agoNow: "just now", agoHours: "{n} h ago", agoDays: "{n} days ago",
     footNote: "Win rate = round wins / rounds the card was on the player's board. Levels merged on tiles.",
     levels: "Levels", wrByRound: "Win rate by round", popByRound: "Popularity by round (games)",
     all: "All", none: "None", allSel: "All", nSel: "selected", searchPh: "card name…",
@@ -51,6 +52,7 @@ const UI = {
     rounds: "回合", sortby: "排序", popularity: "使用率", winrate: "胜率", cardname: "名称",
     mingames: "最少场次", search: "搜索", nomatch: "没有符合条件的卡牌。",
     footData: "数据：", footArt: "卡图：",
+    footUpdated: "数据更新：", agoNow: "刚刚", agoHours: "{n} 小时前", agoDays: "{n} 天前",
     footNote: "胜率 = 该回合胜场 / 该卡在场上的回合数。卡面已合并等级。",
     levels: "等级", wrByRound: "各回合胜率", popByRound: "各回合使用次数",
     all: "全部", none: "清空", allSel: "全部", nSel: "项已选", searchPh: "卡牌名称…",
@@ -467,6 +469,7 @@ function applyLang() {
   document.documentElement.lang = S.lang === "zh" ? "zh" : "en";
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   $("#search").placeholder = t("searchPh");
+  renderUpdated();
   // refresh dynamic controls' labels
   ["season", "career", "character"].forEach((k) => {
     const h = document.querySelector(`[data-ms="${k}"]`); if (h && h._refresh) h._refresh();
@@ -510,10 +513,25 @@ const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f
 const BS = { active: false, data: null, screen: "list", char: null, career: null, variant: "", sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false, tier: 3000 };
 const BOARD_MIN = 30;   // a board needs >= this many raw occurrences to show by default
 
+// "Data updated" footer line. Prefers the pipeline's generation stamp (meta.generated,
+// UTC ISO); falls back to the file's Last-Modified header (= when Pages last deployed it).
+function renderUpdated() {
+  const el = $("#updated"); if (!el) return;
+  const d = BS.updatedAt ? new Date(BS.updatedAt) : null;
+  if (!d || isNaN(d)) { el.textContent = ""; return; }
+  const h = Math.max(0, Math.round((Date.now() - d) / 36e5));
+  const rel = h < 1 ? t("agoNow") : h < 48 ? t("agoHours").replace("{n}", h) : t("agoDays").replace("{n}", Math.round(h / 24));
+  const abs = d.toLocaleString(S.lang === "zh" ? "zh-CN" : "en-US",
+    { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZoneName: "short" });
+  el.textContent = `${t("footUpdated")} ${abs} (${rel})`;
+}
 async function loadBuilds() {
   if (!BS.data) {
     // light file: meta + chars + tiers — drives the leaderboard, loads instantly
-    BS.data = await fetch("data/season9.json").then((r) => r.json());
+    const res = await fetch("data/season9.json");
+    BS.data = await res.json();
+    BS.updatedAt = (BS.data.meta && BS.data.meta.generated) || res.headers.get("Last-Modified") || null;
+    renderUpdated();
     // strategy-split combos: "char_career|variant" tier keys -> combo -> [variants]
     BS.variants = {};
     for (const key in BS.data.tiers) {

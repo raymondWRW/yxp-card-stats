@@ -18,7 +18,9 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # Full scan takes ~30 shards/min over a dataset that keeps growing (2408 shards on
+    # 2026-09-01 ≈ 85 min); the old 90-min cap killed the 8/30–9/1 runs just short of done.
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v5
 

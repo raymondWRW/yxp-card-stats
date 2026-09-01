@@ -222,3 +222,5 @@ footer{padding:18px 24px 40px;color:var(--muted);font-size:12px;border-top:1px s
 .mdh{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:14px}
 .mdh img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#0c0e12}
 .muted{color:var(--muted)}
+
+footer #updated{margin-top:6px}
