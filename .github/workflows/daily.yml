@@ -1,8 +1,13 @@
 name: Daily data refresh
 
-# Re-runs the Season-9 extraction against the HuggingFace replay dataset and commits
-# the refreshed data/ JSON so GitHub Pages serves up-to-date stats. Runs every day and
-# can also be triggered manually from the Actions tab.
+# Folds the new HuggingFace replay shards into the Season-9 stats and commits the
+# refreshed data/ JSON so GitHub Pages serves up-to-date stats. Runs every day and can
+# also be triggered manually from the Actions tab.
+#
+# The extraction is INCREMENTAL: the accumulated state lives in the Actions cache
+# (restored below, saved after the run -- also after a cancelled/timed-out run, thanks
+# to the script's periodic checkpoints). No cache = full rebuild (~2 h); with it a daily
+# run only scans the ~30 new shards (minutes).
 on:
   schedule:
     - cron: "0 8 * * *" # 08:00 UTC daily
@@ -18,8 +23,8 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    # Full scan takes ~30 shards/min over a dataset that keeps growing (2408 shards on
-    # 2026-09-01 ≈ 85 min); the old 90-min cap killed the 8/30–9/1 runs just short of done.
+    # Only a cold full rebuild needs this long (~30 shards/min, 2400+ shards); a
+    # checkpointed state survives a timeout, so the next run resumes where it stopped.
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v5
@@ -31,10 +36,19 @@ jobs:
       - name: Install dependencies
         run: pip install -r pipeline/requirements.txt
 
+      - name: Restore extraction state
+        uses: actions/cache/restore@v4
+        with:
+          path: state/season9_state.pkl.zst
+          key: s9-state-${{ github.run_id }}
+          restore-keys: |
+            s9-state-
+
       - name: Run extraction
         env:
           YXP_PROXY: ${{ github.workspace }}/pipeline
           YXP_OUTDIR: ${{ github.workspace }}/data
+          YXP_STATE: ${{ github.workspace }}/state/season9_state.pkl.zst
         run: python -u pipeline/season9_builds.py full
 
       - name: Commit refreshed data if changed
@@ -51,3 +65,12 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+      # New cache entry per run (entries are immutable); restore-keys above picks the
+      # newest. always(): a cancelled run still saves its last checkpoint.
+      - name: Save extraction state
+        if: always() && hashFiles('state/season9_state.pkl.zst') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: state/season9_state.pkl.zst
+          key: s9-state-${{ github.run_id }}

@@ -29,9 +29,11 @@ import os
 import re
 import sys
 import time
+import pickle
 import tarfile
-from collections import defaultdict, Counter
-from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
+from collections import defaultdict, Counter, deque
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 
 import requests
 import zstandard
@@ -60,6 +62,24 @@ WC_MIN_RAW = 50        # min raw R12+ rounds for a build/tier to get a wheelchai
 CURVE_ROUNDS = 30      # per-round curves (rerolls held / realm level) track rounds 1..30
 HALF_LIFE_MS = 4 * 86400 * 1000   # recency half-life = 4 days
 T_REF = None           # reference time (newest game endTs); set before processing
+
+# ---- incremental state ---------------------------------------------------------
+# A run loads the accumulated STATE left by the previous run, scans only the shards it
+# has not seen, and saves the STATE back (CI keeps it in the Actions cache; a missing or
+# incompatible state simply means a full rebuild). Recency weights are exponential in
+# age, so a state built against an older reference time is brought to the new one by
+# multiplying every weighted accumulator by one constant -- see rescale_state().
+SCHEMA = 1             # bump whenever accumulators / classification change -> forces a full rebuild
+STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, "_season9_state.pkl.zst")
+SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
+MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
+                       # (measured: both players' replays of a game land in the SAME shard)
+CHECKPOINT_EVERY = int(os.environ.get("YXP_CHECKPOINT") or 300)   # shards between state saves (0 = only at end)
+PRUNE = True              # prune negligible board-table tails (--no-prune disables)
+PRUNE_EVERY = 100         # ...every this many scanned shards, and on every state save
+PRUNE_MIN_ENTRIES = int(os.environ.get("YXP_PRUNE_MIN") or 400)   # only board tables longer than this are pruned
+PRUNE_RAW = 2             # ...dropping entries with at most this many raw sightings and
+PRUNE_REL = 0.01          # ...weight below this fraction of the last top-list slot's weight
 
 RX_DAOXIN = re.compile(rb'"beginDaoXinRankScore":(\d+)')
 
@@ -132,19 +152,44 @@ def card_family(cid):
 
 
 # ---- accumulators ----------------------------------------------------------
+# Factories are module-level functions (not lambdas) so the STATE can be pickled.
+# TYPE DISCIPLINE: every recency-weighted accumulator is a float, every raw count an
+# int -- rescale_state() relies on exactly that split.
+def _rad3():
+    return [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
+def _mu3():
+    return [[0.0, 0.0, 0, 0.0, 0.0] for _ in range(3)]
+def _b3():
+    return [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]]
+def _sel3():
+    return [[0.0, 0.0, 0.0, 0, 0] for _ in range(3)]
+def _fd():
+    return defaultdict(float)
+def _fdd():
+    return defaultdict(_fd)
+def _char():
+    return {"gw": 0.0, "graw": 0, "swr": 0.0, "swr2": 0.0, "swrp": 0.0}
+def _tier():
+    return {"gw": 0.0, "graw": 0, "place": [0.0] * 8, "swr": 0.0, "swr2": 0.0, "swrp": 0.0}
+def _botexp():
+    return [0, 0, 0]
+
+
 def new_build():
     # weighted = recency-weighted sum; raw = unweighted count (for sample thresholds)
     return {
         "gw": 0.0, "graw": 0, "place": [0.0] * 8,      # weighted games, raw games, weighted placement
         # Everything below is split by the player's DaoXin band (index 0/1/2 =
         # A 3000-3999 / B 4000-5999 / C 6000+) so the build page can tier-filter.
-        "radar": {k: [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]] for k in ("e", "m", "l", "f", "s")},  # per band [w_destinyRecv, w_rounds]
+        "radar": {k: _rad3() for k in ("e", "m", "l", "f", "s")},  # per band [w_destinyRecv, w_rounds]
         # oppChar -> per band [w_games, w_finishHigher, raw_games, w_selfPlaceSum, w_oppPlaceSum]
-        "matchup": defaultdict(lambda: [[0.0, 0.0, 0, 0.0, 0.0] for _ in range(3)]),
-        # board keys are the positional tuple of raw card IDS (level-specific) so the
-        # display can show each slot's most common level; families are derived on output.
-        "boards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # realm->cids->per band [raw, w_count, w_wins]
-        "mboards": defaultdict(lambda: defaultdict(lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]])),  # oppChar->cids->per band [raw, w_count, w_wins]
+        "matchup": defaultdict(_mu3),
+        # Boards are accumulated already grouped the way the output wants them (see
+        # add_board): realm -> familySet -> [per band [raw, w, w_wins],
+        # {positionalFams -> [per band [raw, w, w_wins], {cidTuple -> raw}]}]. The per-slot
+        # "most common level" comes from the cid tuples of each positional variation.
+        "boards": defaultdict(dict),
+        "mboards": defaultdict(dict),        # oppChar -> same structure (late-game boards vs that opponent)
         # per-round value HISTOGRAMS (for median curves): per band, per round 1..CURVE_ROUNDS,
         # recency-weighted counts per value — rerolls held clamped to 0..25, realm to 0..6.
         "rch": [[[0.0] * 26 for _ in range(CURVE_ROUNDS)] for _ in range(3)],
@@ -217,35 +262,46 @@ def new_wc():
     # pl = [w_games, raw_games, w*placement] — per GAME, variant judged from the
     # game's final board/talents, so split variants get their own placement.
     return {"n": [[0.0, 0, 0.0] for _ in range(3)],
-            "pool": [defaultdict(float) for _ in range(3)],
-            "slot": [defaultdict(lambda: defaultdict(float)) for _ in range(3)],
+            "pool": [_fd() for _ in range(3)],
+            "slot": [_fdd() for _ in range(3)],
             "pl": [[0.0, 0, 0.0] for _ in range(3)]}
+
+
+def new_mu():
+    # Streaming skill-matched matchup resolution. Every >=3000 player appears as a
+    # self-record, so a matchup event (me vs opponent O in game G) counts only once O's
+    # own record of G is seen -- which confirms O >=3000 (no bots) and gives O's final
+    # placement. Both records are uploaded around the same time, i.e. land in nearby
+    # shards, so a record's placement only needs to stay available for MU_WINDOW shards.
+    return {"ranks": {},        # (gameId, uid) -> (battleRank, shardSeq)
+            "pending": {},      # (gameId, oppUid) -> [events waiting for that record]
+            "win": deque(),     # per shard: [seq, rank keys added, pending keys added] (for eviction)
+            "seq": 0, "kept": 0, "dropped": 0,
+            "dist": Counter()}  # shard distance at which events got resolved (diagnostic)
 
 
 STATE = {
     "builds": defaultdict(new_build),     # (char,career,strategyVariant) -> build
     "wc": defaultdict(new_wc),            # (char,career,strategyVariant) -> 轮椅指数 accumulators
     # char -> weighted/raw games + rank-score sufficient stats (for skill-adjusted Power)
-    "char": defaultdict(lambda: {"gw": 0.0, "graw": 0, "swr": 0.0, "swr2": 0.0, "swrp": 0.0}),
+    "char": defaultdict(_char),
     # (char,career,variant,daoxin-band) -> placement+rank stats for the tier filters
-    "tier": defaultdict(lambda: {"gw": 0.0, "graw": 0, "place": [0.0] * 8,
-                                 "swr": 0.0, "swr2": 0.0, "swrp": 0.0}),
-    "fam_idx": {}, "fam_meta": [],        # family registry
+    "tier": defaultdict(_tier),
+    "fam_idx": {}, "fam_meta": [],        # family registry (indices stay stable across runs)
     "fam_pop": defaultdict(float),        # famIdx -> weighted board appearances (for card ordering)
     # (char,career,variant,selectionId,optionId) -> per DaoXin band
     # [selected_w, offered_w, selected_place_w, selected_raw, offered_raw]
-    "fates": defaultdict(lambda: [[0.0, 0.0, 0.0, 0, 0] for _ in range(3)]),   # fate picks (talentSelectionDatas)
-    "derivs": defaultdict(lambda: [[0.0, 0.0, 0.0, 0, 0] for _ in range(3)]),  # 天衍 picks (fateStrategyData.strategies)
-    "daoyun": defaultdict(lambda: [[0.0, 0.0, 0.0, 0, 0] for _ in range(3)]),  # 道韵 picks (daoYunSelectionDatas)
-    # skill-matched matchups: every >=3000 player appears as a self-record, so we map
-    # (gameId, uid) -> final placement, buffer per-game matchup events, then keep only
-    # those where the opponent's own record of the SAME game confirms them >=3000 —
-    # which also hands us their final placement for the head-to-head comparison.
-    "self_ranks": {},                     # (gameId, uid) -> battleRank (0-7)
-    "mu_pending": [],                     # (char, career, oppChar, oppUid, gameId, w, myRank)
-    "botexp": defaultdict(lambda: [0, 0.0, 0.0]),  # char -> [records, sum_bot_opps, sum_real_opps]
+    "fates": defaultdict(_sel3),   # fate picks (talentSelectionDatas)
+    "derivs": defaultdict(_sel3),  # 天衍 picks (fateStrategyData.strategies)
+    "daoyun": defaultdict(_sel3),  # 道韵 picks (daoYunSelectionDatas)
+    "mu": new_mu(),
+    "botexp": defaultdict(_botexp),       # char -> [records, sum_bot_opps, sum_real_opps]
+    "done": set(),                        # shard ids folded into this state
     "files": 0, "self": 0, "shards": 0,
+    "schema": SCHEMA, "ref": 0,           # ref = the T_REF the weights are relative to
 }
+# STATE members holding recency-weighted accumulators (what rescale_state touches)
+WEIGHTED = ("builds", "wc", "char", "tier", "fam_pop", "fates", "derivs", "daoyun")
 
 
 def fam_index(cid):
@@ -257,6 +313,80 @@ def fam_index(cid):
         # representative image id = this card_id (level art); good enough
         STATE["fam_meta"].append({"i": idx, "en": en, "cn": cn, "img": cid})
     return idx
+
+
+@lru_cache(maxsize=1 << 17)
+def fam_key(cids):
+    """board (cid tuple) -> (positional family tuple, sorted family multiset)."""
+    fams = tuple(fam_index(x) for x in cids)
+    return fams, tuple(sorted(fams))
+
+
+def add_board(bd, cids, fams, cs, bi, w, wwin):
+    """Fold one board sighting into a grouped board table (see new_build)."""
+    g = bd.get(cs)
+    if g is None:
+        g = bd[cs] = [_b3(), {}]
+    vv = g[1].get(fams)
+    if vv is None:
+        vv = g[1][fams] = [_b3(), {}]
+    gb = g[0][bi]; gb[0] += 1; gb[1] += w; gb[2] += wwin
+    vb = vv[0][bi]; vb[0] += 1; vb[1] += w; vb[2] += wwin
+    vv[1][cids] = vv[1].get(cids, 0) + 1
+
+
+def _weight(endTs):
+    return 0.5 ** (max(0, T_REF - endTs) / HALF_LIFE_MS)   # recency weight (newest ~1)
+
+
+def apply_matchup(char, career, var, och, bi, w, myrank, orank):
+    m = STATE["builds"][(char, career, var)]["matchup"][och][bi]
+    m[0] += w; m[2] += 1
+    if myrank < orank:
+        m[1] += w                          # finished above this opponent
+    m[3] += w * (myrank + 1); m[4] += w * (orank + 1)
+
+
+def mu_begin_shard():
+    mu = STATE["mu"]; mu["seq"] += 1
+    mu["win"].append([mu["seq"], [], []])
+
+
+def mu_register(gid, uid, rank):
+    """Publish this record's final placement; resolve events that were waiting for it."""
+    mu = STATE["mu"]; key = (gid, uid)
+    mu["ranks"][key] = (rank, mu["seq"]); mu["win"][-1][1].append(key)
+    evs = mu["pending"].pop(key, None)
+    if evs:
+        for char, career, var, och, endTs, myrank, bi, seq in evs:
+            apply_matchup(char, career, var, och, bi, _weight(endTs), myrank, rank)
+            mu["kept"] += 1; mu["dist"][mu["seq"] - seq] += 1
+
+
+def mu_event(gid, ouid, char, career, var, och, endTs, myrank, bi):
+    """Me (char/career/var, placed myrank) met opponent ouid playing och in game gid."""
+    mu = STATE["mu"]; key = (gid, ouid)
+    hit = mu["ranks"].get(key)
+    if hit is not None:
+        apply_matchup(char, career, var, och, bi, _weight(endTs), myrank, hit[0])
+        mu["kept"] += 1; mu["dist"][mu["seq"] - hit[1]] += 1
+    else:
+        lst = mu["pending"].get(key)
+        if lst is None:
+            lst = mu["pending"][key] = []; mu["win"][-1][2].append(key)
+        lst.append((char, career, var, och, endTs, myrank, bi, mu["seq"]))
+
+
+def mu_end_shard():
+    mu = STATE["mu"]
+    while len(mu["win"]) > MU_WINDOW:
+        _, rkeys, pkeys = mu["win"].popleft()
+        for k in rkeys:
+            mu["ranks"].pop(k, None)
+        for k in pkeys:
+            evs = mu["pending"].pop(k, None)
+            if evs:
+                mu["dropped"] += len(evs)
 
 
 def process_record(d):
@@ -306,7 +436,7 @@ def process_record(d):
     tk["swr"] += w * r; tk["swr2"] += w * r * r; tk["swrp"] += w * r * p
 
     gid = sys.intern(str(d.get("gameId", "")))
-    STATE["self_ranks"][(gid, uid)] = rank
+    mu_register(gid, str(uid), rank)
     # 轮椅指数 placement for this game's variant
     wk = STATE["wc"][(char, career, var)]
     wpl = wk["pl"][bi]
@@ -344,10 +474,10 @@ def process_record(d):
         cards = side["privateData"].get("usedCards") or []
         cids = tuple(x for x in cards if x)
         if cids:
-            fams = [fam_index(x) for x in cids]
+            fams, cs = fam_key(cids)
             for fi in fams:
                 STATE["fam_pop"][fi] += w
-            rec = b["boards"][realm][cids][bi]; rec[0] += 1; rec[1] += w; rec[2] += wwin
+            add_board(b["boards"][realm], cids, fams, cs, bi, w, wwin)
             # 轮椅指数 raw material: from round WC_ROUND on, what does this build keep playing?
             if rnd >= WC_ROUND:
                 wcb = wk["n"][bi]; wcb[0] += w; wcb[1] += 1; wcb[2] += wwin
@@ -366,12 +496,12 @@ def process_record(d):
                 opp_chars[ouid] = och
                 # late-game board played vs this opponent character
                 if rnd >= LATE_ROUND and cids:
-                    mr = b["mboards"][och][cids][bi]; mr[0] += 1; mr[1] += w; mr[2] += wwin
+                    add_board(b["mboards"][och], cids, fams, cs, bi, w, wwin)
 
-    # one matchup event per distinct real opponent per game; resolved after all shards
-    # (we need the opponent's own record to confirm >=3000 and get their placement).
+    # one matchup event per distinct real opponent per game; it counts once the opponent's
+    # own >=3000 record of the same game is seen (now, or within the next MU_WINDOW shards).
     for ouid, och in opp_chars.items():
-        STATE["mu_pending"].append((char, career, var, och, sys.intern(ouid), gid, w, rank, bi))
+        mu_event(gid, ouid, char, career, var, och, endTs, rank, bi)
 
     be = STATE["botexp"][char]; be[0] += 1; be[1] += len(bot_uids); be[2] += len(opp_chars)
 
@@ -438,17 +568,27 @@ def iter_records_from_raw(raw):
 
 
 def fetch_raw(shard):
+    cached = os.path.join(SHARD_CACHE, f"{shard}.tar.zst") if SHARD_CACHE else None
+    if cached and os.path.exists(cached):
+        return shard, open(cached, "rb").read()
     for a in range(3):
         try:
-            return shard, requests.get(f"{BASE}/{shard}.tar.zst", timeout=300).content
+            raw = requests.get(f"{BASE}/{shard}.tar.zst", timeout=300).content
+            if cached:
+                os.makedirs(SHARD_CACHE, exist_ok=True)
+                with open(cached, "wb") as f:
+                    f.write(raw)
+            return shard, raw
         except Exception:
             if a == 2:
                 return shard, None
             time.sleep(1.5 * (a + 1))
 
 
-def new_shards():
-    old = set(json.load(open(os.path.join(HERE, "_shards.json"))))
+def new_shards(only=None):
+    """Shards not yet folded into STATE: HF listing minus the pre-season baseline
+    (_shards.json) minus STATE["done"]. `only(shardId)` restricts the listing (tests)."""
+    old = set(json.load(open(os.path.join(HERE, "_shards.json")))) | STATE["done"]
     sess = requests.Session(); names = []; cursor = None
     while True:
         url = API + "?recursive=true&limit=1000" + (f"&cursor={cursor}" if cursor else "")
@@ -471,68 +611,137 @@ def new_shards():
                 break
         else:
             break
-    return sorted(set(names) - old)
+    names = set(names) - old
+    if only is not None:
+        names = {n for n in names if only(n)}
+    return sorted(names)
+
+
+# ---- state persistence -----------------------------------------------------------
+def _rescale(obj, f):
+    # multiply every float (weighted accumulator) by f; ints (raw counts) stay as they are
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if type(v) is float:
+                obj[k] = v * f
+            elif isinstance(v, (dict, list)):
+                _rescale(v, f)
+    else:
+        for i, v in enumerate(obj):
+            if type(v) is float:
+                obj[i] = v * f
+            elif isinstance(v, (dict, list)):
+                _rescale(v, f)
+
+
+def rescale_state(f):
+    """Re-reference all recency weights: w_new = w_old * 0.5^((T_new - T_old) / half-life)."""
+    for k in WEIGHTED:
+        _rescale(STATE[k], f)
+
+
+def prune_boards():
+    """Drop board-table tail entries that can no longer reach a top list: seen at most
+    PRUNE_RAW times AND weighing under PRUNE_REL of the last top-list slot. Keeps the
+    state bounded as the season grows; the published top lists are unaffected."""
+    dropped = kept = 0
+    wtot = lambda s3: s3[0][1] + s3[1][1] + s3[2][1]
+    rtot = lambda s3: s3[0][0] + s3[1][0] + s3[2][0]
+    for b in STATE["builds"].values():
+        for tables, top_n in ((b["boards"], TOP_BOARDS), (b["mboards"], TOP_MBOARDS)):
+            for bd in tables.values():
+                if len(bd) <= PRUNE_MIN_ENTRIES:
+                    kept += len(bd)
+                    continue
+                ws = sorted((wtot(g[0]) for g in bd.values()), reverse=True)
+                thr = ws[min(top_n, len(ws)) - 1] * PRUNE_REL
+                dead = [k for k, g in bd.items() if rtot(g[0]) <= PRUNE_RAW and wtot(g[0]) < thr]
+                for k in dead:
+                    del bd[k]
+                dropped += len(dead); kept += len(bd)
+    print(f"pruned {dropped} negligible board entries ({kept} kept)")
+
+
+def save_state(path=None):
+    path = path or STATE_PATH
+    if PRUNE:
+        prune_boards()
+    STATE["schema"] = SCHEMA; STATE["ref"] = T_REF
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    tmp = path + ".tmp"; t0 = time.time()
+    with open(tmp, "wb") as f, zstandard.ZstdCompressor(level=3).stream_writer(f) as z:
+        p = pickle.Pickler(z, protocol=pickle.HIGHEST_PROTOCOL)
+        try:
+            p.fast = True      # no memo table: the state is a plain tree and the memo would cost GBs
+        except Exception:
+            pass
+        p.dump(STATE)
+    os.replace(tmp, path)
+    print(f"state saved: {os.path.getsize(path) / 1e6:.1f} MB, {len(STATE['done'])} shards folded, "
+          f"{time.time() - t0:.0f}s")
+
+
+class _Unpickler(pickle.Unpickler):
+    # The defaultdict factories are pickled by module name, which is "__main__" when the
+    # script runs directly and "season9_builds" when imported -- resolve both to this module.
+    def find_class(self, module, name):
+        if module in ("__main__", "season9_builds") and name in globals():
+            return globals()[name]
+        return super().find_class(module, name)
+
+
+def load_state(path=None):
+    path = path or STATE_PATH
+    if not os.path.exists(path):
+        return False
+    try:
+        with open(path, "rb") as f, zstandard.ZstdDecompressor().stream_reader(f) as z:
+            st = _Unpickler(io.BufferedReader(z)).load()
+    except Exception as e:
+        print(f"  !! state unreadable ({e}) -> full rebuild")
+        return False
+    if st.get("schema") != SCHEMA:
+        print(f"state schema {st.get('schema')} != {SCHEMA} -> full rebuild")
+        return False
+    STATE.clear(); STATE.update(st)
+    return True
 
 
 # ---- output ----------------------------------------------------------------
-def resolve_matchups():
-    """Fold buffered per-game matchup events into builds. An event survives only if the
-    opponent has their own >=DAOXIN_MIN self-record of the SAME game (skill-matched, no
-    bots) — that record also gives their final placement for the head-to-head compare."""
-    ranks = STATE["self_ranks"]; kept = dropped = 0
-    for char, career, var, och, ouid, gid, w, myrank, bi in STATE["mu_pending"]:
-        orank = ranks.get((gid, ouid))
-        if orank is None:
-            dropped += 1
-            continue
-        m = STATE["builds"][(char, career, var)]["matchup"][och][bi]
-        m[0] += w; m[2] += 1; kept += 1
-        if myrank < orank:
-            m[1] += w                          # finished above this opponent
-        m[3] += w * (myrank + 1); m[4] += w * (orank + 1)
-    print(f"matchups: kept {kept} skill-matched, dropped {dropped} "
-          f"({dropped / max(1, kept + dropped) * 100:.0f}% non->=3000 opponents)")
-    STATE["mu_pending"] = []
-
-
 def write_output():
-    resolve_matchups()
+    mu = STATE["mu"]; tot = mu["kept"] + mu["dropped"]
+    waiting = sum(len(v) for v in mu["pending"].values())
+    dist = sorted(mu["dist"].items()); n = sum(c for _, c in dist); acc = 0; p999 = 0
+    for d_, c in dist:
+        acc += c
+        if acc >= 0.999 * n:
+            p999 = d_; break
+    print(f"matchups: kept {mu['kept']} skill-matched, dropped {mu['dropped']} "
+          f"({mu['dropped'] / max(1, tot) * 100:.0f}% non->=3000 opponents), {waiting} still waiting; "
+          f"resolve distance p99.9={p999} max={dist[-1][0] if dist else 0} shards (window {MU_WINDOW})")
     # Each board/matchup entry carries BOTH a raw occurrence count (for sample-size
     # thresholds) and recency-weighted sums (for current-meta rates & ordering).
     r2 = lambda x: round(x, 2)
     generated = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())   # shown as "Data updated" on the site
 
     def merge_boards(bd, top_n, top_var=6):
-        # bd keys are positional CARD-ID tuples (level-specific); values are per-DaoXin-band
-        # [raw, w, ww] triplets. Group by card-family SET (sorted multiset) for the top
-        # list; within a set, group by positional family layout for the variations; per
-        # slot, keep the most common LEVEL (cid). Grouping/ordering use all-band totals;
-        # stats stay band-split so the frontend can tier-filter.
+        # bd is a grouped board table (see add_board): family SET -> [bands, {positional
+        # layout -> [bands, {cid tuple -> raw}]}]. Top lists are by all-band weight; stats
+        # stay band-split so the frontend can tier-filter; per slot, the most common LEVEL.
         # entry -> [famlist, [[raw,w,ww] xA/B/C], [[famlist, bands, imgs], ...], imgs]
-        zero3 = lambda: [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]]
         wtot = lambda s3: s3[0][1] + s3[1][1] + s3[2][1]
         rb = lambda s3: [[s[0], r2(s[1]), r2(s[2])] for s in s3]
-        groups = {}
-        for ckey, v in bd.items():
-            fams = tuple(fam_index(c) for c in ckey)
-            cs = tuple(sorted(fams))
-            g = groups.get(cs)
-            if g is None:
-                g = groups[cs] = [zero3(), {}]
-            vv = g[1].get(fams)
-            if vv is None:
-                vv = g[1][fams] = [zero3(), [Counter() for _ in fams]]
-            for b3 in range(3):
-                for j in range(3):
-                    g[0][b3][j] += v[b3][j]; vv[0][b3][j] += v[b3][j]
-            raw_all = v[0][0] + v[1][0] + v[2][0]
-            for i, c in enumerate(ckey):
-                vv[1][i][c] += raw_all           # level popularity per slot (raw count)
+
+        def slot_levels(fams, cidcounts):
+            per = [Counter() for _ in fams]
+            for ckey, raw in cidcounts.items():
+                for i, c in enumerate(ckey):
+                    per[i][c] += raw             # level popularity per slot (raw count)
+            return [c.most_common(1)[0][0] for c in per]
         out = []
-        for cs, g in sorted(groups.items(), key=lambda kv: -wtot(kv[1][0]))[:top_n]:
+        for cs, g in sorted(bd.items(), key=lambda kv: -wtot(kv[1][0]))[:top_n]:
             vs = sorted(g[1].items(), key=lambda kv: -wtot(kv[1][0]))
-            variations = [[list(fams), rb(vv[0]), [c.most_common(1)[0][0] for c in vv[1]]]
-                          for fams, vv in vs[:top_var]]
+            variations = [[list(fams), rb(vv[0]), slot_levels(fams, vv[1])] for fams, vv in vs[:top_var]]
             top = variations[0]
             out.append([top[0], rb(g[0]), variations, top[2]])
         return out
@@ -767,48 +976,102 @@ def max_endts_from_raw(raw):
     return mx
 
 
-def main(mode):
+def scan(shards, no_save=False):
+    """Download shards in parallel but fold them in shard order (the matchup window
+    relies on it), checkpointing the state every CHECKPOINT_EVERY shards."""
+    if not shards:
+        return
+    t0 = time.time(); done = 0; since_ckpt = 0
+    with ThreadPoolExecutor(max_workers=DL_WORKERS) as ex:
+        it = iter(shards); q = deque()
+
+        def sub():
+            sh = next(it, None)
+            if sh is not None:
+                q.append(ex.submit(fetch_raw, sh))
+        for _ in range(DL_WORKERS * 2):
+            sub()
+        while q:
+            sh, raw = q.popleft().result(); sub()
+            if raw is None:
+                print(f"  !! shard {sh}: download failed, will retry next run")
+            else:
+                mu_begin_shard()
+                try:
+                    iter_records_from_raw(raw); STATE["shards"] += 1
+                except Exception as e:
+                    print(f"  !! shard {sh}: {e}")
+                mu_end_shard()
+                STATE["done"].add(sh); since_ckpt += 1
+            done += 1
+            if done % 25 == 0 or done == len(shards):
+                el = time.time() - t0
+                print(f"[{done}/{len(shards)}] self={STATE['self']} "
+                      f"builds={len(STATE['builds'])} | {done / el * 60:.0f} shards/min")
+            if PRUNE and PRUNE_EVERY and done % PRUNE_EVERY == 0:
+                prune_boards()             # keep the transient tail small between saves
+            if CHECKPOINT_EVERY and since_ckpt >= CHECKPOINT_EVERY and not no_save:
+                save_state(); since_ckpt = 0
+
+
+def main(mode, opts):
     global T_REF
     if mode == "local":
         raw = open(os.path.join(HERE, "_new.tar.zst"), "rb").read()
         T_REF = max_endts_from_raw(raw)
         print(f"T_REF (newest game) = {T_REF}")
-        iter_records_from_raw(raw)
+        mu_begin_shard(); iter_records_from_raw(raw); mu_end_shard()
         STATE["shards"] = 1
-    else:
-        shards = new_shards()
-        print(f"new (season-9) shards to scan: {len(shards)}")
+        write_output()
+        return
+    loaded = (not opts["fresh"]) and load_state()
+    shards = new_shards(opts["only"])
+    print(f"state: {'loaded, ' + str(len(STATE['done'])) + ' shards folded' if loaded else 'fresh (full rebuild)'}; "
+          f"new (season-9) shards to scan: {len(shards)}")
+    ref = STATE.get("ref") or 0
+    if shards:
         _, lastraw = fetch_raw(shards[-1])    # newest shard sets the recency reference
-        T_REF = max_endts_from_raw(lastraw) if lastraw else 0
-        print(f"T_REF (newest game) = {T_REF}")
-        t0 = time.time(); done = 0
-        it = iter(shards); inflight = set()
-        with ThreadPoolExecutor(max_workers=DL_WORKERS) as ex:
-            def sub():
-                s = next(it, None)
-                if s is None:
-                    return False
-                inflight.add(ex.submit(fetch_raw, s)); return True
-            for _ in range(DL_WORKERS * 2):
-                if not sub():
-                    break
-            while inflight:
-                ds, _ = wait(inflight, return_when=FIRST_COMPLETED)
-                for fut in ds:
-                    inflight.discard(fut)
-                    sh, raw = fut.result()
-                    if raw is not None:
-                        try:
-                            iter_records_from_raw(raw); STATE["shards"] += 1
-                        except Exception as e:
-                            print(f"  !! shard {sh}: {e}")
-                    done += 1; sub()
-                    if done % 25 == 0:
-                        el = time.time() - t0
-                        print(f"[{done}/{len(shards)}] self={STATE['self']} "
-                              f"builds={len(STATE['builds'])} | {done/el*60:.0f} shards/min")
+        T_REF = max(ref, max_endts_from_raw(lastraw) if lastraw else 0)
+    else:
+        T_REF = ref
+    if loaded and ref and T_REF > ref:
+        f = 0.5 ** ((T_REF - ref) / HALF_LIFE_MS)
+        print(f"re-referencing weights: +{(T_REF - ref) / 86400e3:.2f} days -> x{f:.4g}")
+        rescale_state(f)
+    print(f"T_REF (newest game) = {T_REF}")
+    scan(shards, opts["no_save"])
     write_output()
+    if not opts["no_save"]:
+        save_state()
+
+
+def parse_args(argv):
+    """season9_builds.py [local|full] [--fresh] [--no-save] [--no-prune]
+                         [--shards LO:HI] [--shards-file F]      (the last two: tests)"""
+    global PRUNE
+    opts = {"fresh": False, "no_save": False, "only": None}
+    mode = "local"; i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == "--fresh":
+            opts["fresh"] = True          # ignore an existing state: full rebuild
+        elif a == "--no-save":
+            opts["no_save"] = True        # do not write the state back
+        elif a == "--no-prune":
+            PRUNE = False
+        elif a == "--shards":             # restrict to a numeric shard-id range LO:HI
+            lo, hi = (int(x) for x in argv[i + 1].split(":")); i += 1
+            opts["only"] = lambda n, lo=lo, hi=hi: lo <= n < hi
+        elif a == "--shards-file":        # restrict to the shard ids listed in a JSON file
+            allowed = set(json.load(open(argv[i + 1]))); i += 1
+            opts["only"] = lambda n, allowed=allowed: n in allowed
+        elif not a.startswith("--"):
+            mode = a
+        else:
+            raise SystemExit(f"unknown option {a}")
+        i += 1
+    return mode, opts
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "local")
+    main(*parse_args(sys.argv[1:]))
