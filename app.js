@@ -81,7 +81,7 @@ const UI = {
     subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
     arrangements: "种排列",
     fates: "天命", tianyan: "天衍", daoyun: "道韵",
-    fatesHint: "各阶段最高桶的热门选择 · 悬停查看全部",
+    fatesHint: "各阶段最热门选择",
     tianyanHint: "各阶段热门选择 · 悬停查看全部",
     daoyunHint: "最常见选择（忽略自在随心）· 悬停查看全部",
     fateName: "天命", picks: "次数", pickRate: "选取率", winTop4: "前四率",
