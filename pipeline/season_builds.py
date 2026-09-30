@@ -1,12 +1,13 @@
 """
-Season-9 "build" analytics extraction (hsreplay-style) for sharpobject/yxp_replays.
+Per-season "build" analytics extraction (hsreplay-style) for sharpobject/yxp_replays.
+The season comes from SEASON below (YXP_SEASON overrides; default = the current season).
 
-Filter: seasonMec==9, gameMode==3, beginDaoXinRankScore>=3000, and the file is a
+Filter: seasonMec==SEASON, gameMode==3, beginDaoXinRankScore>=3000, and the file is a
 real-player SELF-RECORD (the entity present in the most rounds == data.uid). For
 each self-record the subject's character/career/placement come from data.*, and we
 walk roundStats (subject side) for board, realm, per-round result, opponent, net.
 
-Outputs site/data/season9.json with character + (character,career) build stats:
+Outputs site/data/season<N>.json with character + (character,career) build stats:
   - top-4 win rate (battleRank<=3), placement distribution, average placement
   - side-job popularity per character
   - popularity (games)
@@ -41,6 +42,11 @@ import zstandard
 HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = "https://huggingface.co/datasets/sharpobject/yxp_replays/resolve/main"
 API = "https://huggingface.co/api/datasets/sharpobject/yxp_replays/tree/main"
+
+SEASON = int(os.environ.get("YXP_SEASON") or 10)
+# First shard worth scanning per season (found by probing the dataset around the season
+# rollover; everything earlier is skipped outright instead of downloaded-and-filtered).
+SEASON_START = {9: 0, 10: 33400000}
 # PROXY holds the id->name maps; override with YXP_PROXY (CI bundles them next to the script).
 PROXY = os.environ.get("YXP_PROXY") or r"C:\Users\raymo\OneDrive\Desktop\card counter with proxy\proxy"
 MAP_PATH = os.path.join(PROXY, "card_id_map.json")
@@ -48,10 +54,10 @@ FATE_ID_MAP = os.path.join(PROXY, "fate_id_map.json")        # fate/talent id ->
 FATE_TALENT_MAP = os.path.join(PROXY, "fate_talent_map.json")  # id -> {name(en), nameCn}
 # output dir: site/data locally, or the deploy repo's data/ in CI (YXP_OUTDIR).
 OUTDIR = os.environ.get("YXP_OUTDIR") or os.path.join(HERE, "site", "data")
-OUT = os.path.join(OUTDIR, "season9.json")            # light: meta, chars, tiers
-OUT_BUILDS = os.path.join(OUTDIR, "season9_builds.json")  # heavy: builds, families
-OUT_FATES = os.path.join(OUTDIR, "season9_fates.json")    # fate + 天衍 selections
-OUT_DIAG = os.path.join(HERE, "season9_diag.json")                      # per-char bot-exposure diag
+OUT = os.path.join(OUTDIR, f"season{SEASON}.json")            # light: meta, chars, tiers
+OUT_BUILDS = os.path.join(OUTDIR, f"season{SEASON}_builds.json")  # heavy: builds, families
+OUT_FATES = os.path.join(OUTDIR, f"season{SEASON}_fates.json")    # fate + 天衍 selections
+OUT_DIAG = os.path.join(HERE, f"season{SEASON}_diag.json")              # per-char bot-exposure diag
 DAOXIN_MIN = 3000
 DL_WORKERS = 10
 TOP_BOARDS = 20
@@ -70,7 +76,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
 SCHEMA = 1             # bump whenever accumulators / classification change -> forces a full rebuild
-STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, "_season9_state.pkl.zst")
+STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
                        # (measured: both players' replays of a game land in the SAME shard)
@@ -298,7 +304,7 @@ STATE = {
     "botexp": defaultdict(_botexp),       # char -> [records, sum_bot_opps, sum_real_opps]
     "done": set(),                        # shard ids folded into this state
     "files": 0, "self": 0, "shards": 0,
-    "schema": SCHEMA, "ref": 0,           # ref = the T_REF the weights are relative to
+    "schema": SCHEMA, "season": SEASON, "ref": 0,   # ref = the T_REF the weights are relative to
 }
 # STATE members holding recency-weighted accumulators (what rescale_state touches)
 WEIGHTED = ("builds", "wc", "char", "tier", "fam_pop", "fates", "derivs", "daoyun")
@@ -550,7 +556,7 @@ def iter_records_from_raw(raw):
             d = json.loads(b).get("data")
         except Exception:
             continue
-        if not d or d.get("seasonMec") != 9 or d.get("gameMode") != 3:
+        if not d or d.get("seasonMec") != SEASON or d.get("gameMode") != 3:
             continue
         if d.get("beginDaoXinRankScore", 0) < DAOXIN_MIN:
             continue
@@ -611,7 +617,8 @@ def new_shards(only=None):
                 break
         else:
             break
-    names = set(names) - old
+    start = SEASON_START.get(SEASON, 0)
+    names = {n for n in set(names) - old if n >= start}
     if only is not None:
         names = {n for n in names if only(n)}
     return sorted(names)
@@ -666,7 +673,7 @@ def save_state(path=None):
     path = path or STATE_PATH
     if PRUNE:
         prune_boards()
-    STATE["schema"] = SCHEMA; STATE["ref"] = T_REF
+    STATE["schema"] = SCHEMA; STATE["season"] = SEASON; STATE["ref"] = T_REF
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     tmp = path + ".tmp"; t0 = time.time()
     with open(tmp, "wb") as f, zstandard.ZstdCompressor(level=3).stream_writer(f) as z:
@@ -685,7 +692,7 @@ class _Unpickler(pickle.Unpickler):
     # The defaultdict factories are pickled by module name, which is "__main__" when the
     # script runs directly and "season9_builds" when imported -- resolve both to this module.
     def find_class(self, module, name):
-        if module in ("__main__", "season9_builds") and name in globals():
+        if module in ("__main__", "season9_builds", "season_builds") and name in globals():
             return globals()[name]
         return super().find_class(module, name)
 
@@ -702,6 +709,9 @@ def load_state(path=None):
         return False
     if st.get("schema") != SCHEMA:
         print(f"state schema {st.get('schema')} != {SCHEMA} -> full rebuild")
+        return False
+    if st.get("season", 9) != SEASON:     # pre-rollover states carried no season field
+        print(f"state is for season {st.get('season', 9)} -> full rebuild for season {SEASON}")
         return False
     STATE.clear(); STATE.update(st)
     return True
@@ -863,7 +873,7 @@ def write_output():
     # Split into a light file (drives the character leaderboard, loads instantly) and a
     # heavy file (build detail: boards/matchups/families, lazy-loaded on first build open).
     light = {
-        "meta": {"season": 9, "mode": 3, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
+        "meta": {"season": SEASON, "mode": 3, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
                  "selfRecords": STATE["self"], "shards": STATE["shards"], "wcRound": WC_ROUND,
                  "generated": generated},
         "chars": char_out, "tiers": tiers_out, "wc": wc_out,
@@ -923,7 +933,7 @@ def write_output():
                           "free": 1 if (i == 27 or cn == "自在随心") else 0}
     fates_file = {
         "v": 5,   # v3: per-band rows; v4: strategy-variant keys; v5: raw counts appended
-        "meta": {"season": 9, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
+        "meta": {"season": SEASON, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
                  "selfRecords": STATE["self"], "iconBase": ICON_BASE, "generated": generated},
         "fates": fates_out, "derivations": derivs_out, "daoyun": daoyun_out,
         "names": names, "dnames": dnames, "ynames": ynames,
@@ -969,7 +979,7 @@ def max_endts_from_raw(raw):
             d = json.loads(tf.extractfile(mem).read()).get("data")
         except Exception:
             continue
-        if d and d.get("seasonMec") == 9:
+        if d and d.get("seasonMec") == SEASON:
             ts = d.get("endTs") or d.get("beginTs") or 0
             if ts > mx:
                 mx = ts
@@ -1027,7 +1037,7 @@ def main(mode, opts):
     loaded = (not opts["fresh"]) and load_state()
     shards = new_shards(opts["only"])
     print(f"state: {'loaded, ' + str(len(STATE['done'])) + ' shards folded' if loaded else 'fresh (full rebuild)'}; "
-          f"new (season-9) shards to scan: {len(shards)}")
+          f"new (season-{SEASON}) shards to scan: {len(shards)}")
     ref = STATE.get("ref") or 0
     if shards:
         _, lastraw = fetch_raw(shards[-1])    # newest shard sets the recency reference

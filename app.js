@@ -17,7 +17,7 @@ const UI = {
     all: "All", none: "None", allSel: "All", nSel: "selected", searchPh: "card name…",
     sect: "Sect", baseLevel: "base", overall: "overall",
     notEnough: "Not enough data to calculate win rate at this Min games.",
-    tabCards: "Cards · Tianji Sigil / Dream Weave", tabBuilds: "Builds · Heavenly Derivation", top4rate: "Top-4 win rate",
+    tabCards: "Cards · Tianji Sigil / Dream Weave", tabBuilds10: "Season 10 · Builds", tabBuilds9: "Season 9 · Heavenly Derivation", top4rate: "Top-4 win rate",
     avgplace: "Avg placement", sidejobs: "Side-jobs played", power: "Power profile",
     boards: "Popular boards", matchup: "Placement vs character", realm: "Realm",
     hhHigher: "finishes higher", youAbbr: "you", oppAbbr: "opp",
@@ -37,7 +37,9 @@ const UI = {
     rerollsByRound: "Median rerolls held by round (full bar = 20)", realmByRound: "Median realm by round",
     wheelchairNote: "character+side-job builds that place well while always playing the same board from R12 on — combines avg final placement, effective card-pool size, and per-slot variety (all recency-weighted)",
     wcPool: "eff. cards", wcSlot: "slot choices", wcWR: "R12+ WR",
-    subBuilds: "Heavenly Derivation (S9) · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
+    subBuilds10: "Season 10 · DaoXin-ranked builds · recency-weighted (~4-day half-life)",
+    subBuilds9: "Heavenly Derivation (Season 9 · ended) · DaoXin-ranked builds",
+    buildsEmpty: "No ranked games recorded for this season yet — the site updates daily, check back soon.",
     arrangements: "arrangements",
     fates: "Fates", tianyan: "天衍 (Derivations)", daoyun: "道韵 (Dao Rhyme)",
     fatesHint: "top pick per phase by bucket · hover for all",
@@ -58,7 +60,7 @@ const UI = {
     all: "全部", none: "清空", allSel: "全部", nSel: "项已选", searchPh: "卡牌名称…",
     sect: "门派", baseLevel: "基础", overall: "总体",
     notEnough: "当前最少场次下数据不足，无法计算胜率。",
-    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabBuilds: "流派 · 天衍万象", top4rate: "前四胜率",
+    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabBuilds10: "第10赛季 · 流派", tabBuilds9: "第9赛季 · 天衍万象", top4rate: "前四胜率",
     avgplace: "平均名次", sidejobs: "搭配副职", power: "强度雷达",
     boards: "热门卡组", matchup: "对位名次", realm: "境界",
     hhHigher: "名次高于对方", youAbbr: "我", oppAbbr: "对方",
@@ -78,7 +80,9 @@ const UI = {
     rerollsByRound: "每回合持有换牌数中位数（满格 = 20）", realmByRound: "每回合境界中位数",
     wheelchairNote: "名次好且12回合后卡组固定的角色+副职流派——综合平均名次、有效卡池大小、各槽位选择多样性（均近期加权）",
     wcPool: "有效卡池", wcSlot: "槽位选择", wcWR: "12+回合胜率",
-    subBuilds: "天衍万象（第9赛季）· 道心排位流派 · 近期加权（约4天半衰期）",
+    subBuilds10: "第10赛季 · 道心排位流派 · 近期加权（约4天半衰期）",
+    subBuilds9: "天衍万象（第9赛季 · 已结束）· 道心排位流派",
+    buildsEmpty: "本赛季暂无排位对局数据——每日自动更新，敬请期待。",
     arrangements: "种排列",
     fates: "天命", tianyan: "天衍", daoyun: "道韵",
     fatesHint: "各阶段最热门选择",
@@ -128,7 +132,8 @@ async function boot() {
   NAMES = await fetch("data/names.json").then((r) => r.json());
   wireStatic();
   wireBuilds();
-  BS.active = true;          // Season-9 Builds is the default landing view
+  setBuildsSeason(10);       // the current season's Builds is the default landing view
+  BS.active = true;
   await loadBuilds();
   applyLang();
 }
@@ -503,14 +508,20 @@ function wireStatic() {
 }
 
 // ============================================================================
-//  BUILDS VIEW (Season 9, hsreplay-style)
+//  BUILDS VIEW (per season, hsreplay-style)
 // ============================================================================
 const WIKI_ROOT = "https://sharpobject.github.io/yxp_wiki/assets/";
 const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.webp`;
 const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.webp`;
 const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
 
-const BS = { active: false, data: null, screen: "list", char: null, career: null, variant: "", sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false, tier: 3000 };
+// One independent view state per season tab; BS always points at the active season's.
+const newBS = (season) => ({ season, active: false, data: null, screen: "list", char: null, career: null, variant: "", sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false, tier: 3000, loaded: false });
+const BS_SEASONS = {};
+let BS = newBS(10); BS_SEASONS[10] = BS;
+function setBuildsSeason(season) {
+  if (BS_SEASONS[season] !== BS) { BS.active = false; BS = BS_SEASONS[season] || (BS_SEASONS[season] = newBS(season)); }
+}
 const BOARD_MIN = 30;   // a board needs >= this many raw occurrences to show by default
 
 // "Data updated" footer line. Prefers the pipeline's generation stamp (meta.generated,
@@ -528,7 +539,7 @@ function renderUpdated() {
 async function loadBuilds() {
   if (!BS.data) {
     // light file: meta + chars + tiers — drives the leaderboard, loads instantly
-    const res = await fetch("data/season9.json");
+    const res = await fetch(`data/season${BS.season}.json`);
     BS.data = await res.json();
     BS.updatedAt = (BS.data.meta && BS.data.meta.generated) || res.headers.get("Last-Modified") || null;
     renderUpdated();
@@ -546,12 +557,11 @@ async function loadBuilds() {
   }
   renderBuilds();
 }
-let BUILDS_LOADED = false;
 // Heavy file (builds + families) is fetched only when the user first opens a build detail.
 async function ensureBuilds() {
-  if (BUILDS_LOADED) return;
+  if (BS.loaded) return;
   // builds are required (throws -> caller catches -> can retry on next click)
-  const bd = await fetch("data/season9_builds.json").then((r) => r.json());
+  const bd = await fetch(`data/season${BS.season}_builds.json`).then((r) => r.json());
   BS.data.builds = bd.builds; BS.data.families = bd.families;
   // v2 data: radar = destiny received (lower = better), matchup = placement head-to-head.
   // v3 data: build stats split by DaoXin band -> the build page gets a tier filter.
@@ -569,13 +579,13 @@ async function ensureBuilds() {
     BS.axv = axv;
   }
   try {                                            // fates are optional (may not be deployed yet)
-    const fd = await fetch("data/season9_fates.json").then((r) => r.json());
+    const fd = await fetch(`data/season${BS.season}_fates.json`).then((r) => r.json());
     BS.data.fates = fd.fates; BS.data.derivations = fd.derivations; BS.data.fnames = fd.names; BS.data.dnames = fd.dnames;
     BS.data.daoyun = fd.daoyun; BS.data.ynames = fd.ynames;
     BS.fv3 = (fd.v || 1) >= 3;           // selection rows are per-DaoXin-band since v3
     BS.iconBase = (fd.meta && fd.meta.iconBase) || "https://sharpobject.github.io/yxp_wiki/assets/fates/";
   } catch (e) { /* no fate data yet — the Fates/天衍 sections just won't render */ }
-  BUILDS_LOADED = true;
+  BS.loaded = true;
 }
 // Power = standardized, SKILL-ADJUSTED average placement (recency-weighted).
 // Controls for player skill (rank score): each character's placement is re-baselined to
@@ -830,6 +840,13 @@ function renderWheelchairList(host) {
 
 function renderBuilds() {
   if (!BS.data) return;
+  if (BS.screen === "list" && !Object.keys(BS.data.chars || {}).length) {
+    // the season is configured but has no ranked games yet (right after a rollover)
+    renderCrumbs();
+    $("#bsort-ctl").style.display = "none"; $("#tier-ctl").style.display = "none";
+    $("#builds-content").innerHTML = `<div class="empty">${t("buildsEmpty")}</div>`;
+    return;
+  }
   // the wheelchair sort needs wc data (published with the newest pipeline)
   const wcOpt = document.querySelector('#bsort option[value="wheelchair"]');
   if (wcOpt) wcOpt.hidden = !BS.data.wc;
@@ -1177,11 +1194,19 @@ function fatesSectionHTML(key) {
 function wireBuilds() {
   document.querySelectorAll("#tabbar .tab").forEach((tb) => tb.onclick = () => {
     document.querySelectorAll("#tabbar .tab").forEach((x) => x.classList.remove("on")); tb.classList.add("on");
-    const isB = tb.dataset.tab === "builds";
-    $("#view-cards").hidden = isB; $("#view-builds").hidden = !isB; BS.active = isB;
+    const isB = tb.dataset.tab.startsWith("builds");
+    $("#view-cards").hidden = isB; $("#view-builds").hidden = !isB;
     $("#sub-cards").hidden = isB; $("#sub-builds").hidden = !isB;   // tab-appropriate subtitle
-    if (isB) loadBuilds();
-    else if (!CARDS_INIT) { CARDS_INIT = true; loadThreshold(4000); }
+    if (isB) {
+      setBuildsSeason(+tb.dataset.tab.slice(6));
+      BS.active = true;
+      const sb = $("#sub-builds"); sb.dataset.i18n = "subBuilds" + BS.season; sb.textContent = t("subBuilds" + BS.season);
+      renderUpdated();                     // footer reflects the selected season's data stamp
+      loadBuilds();
+    } else {
+      BS.active = false;
+      if (!CARDS_INIT) { CARDS_INIT = true; loadThreshold(4000); }
+    }
   });
   $("#bsort").addEventListener("change", (e) => { BS.sort = e.target.value; renderBuilds(); });
   seg("tier", (v) => { BS.tier = +v; computePower(BS.tier); renderBuilds(); });

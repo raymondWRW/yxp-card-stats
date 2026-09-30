@@ -1,13 +1,14 @@
 name: Daily data refresh
 
-# Folds the new HuggingFace replay shards into the Season-9 stats and commits the
-# refreshed data/ JSON so GitHub Pages serves up-to-date stats. Runs every day and can
-# also be triggered manually from the Actions tab.
+# Folds the new HuggingFace replay shards into the current season's stats and commits
+# the refreshed data/ JSON so GitHub Pages serves up-to-date stats. Runs every day and
+# can also be triggered manually from the Actions tab. The season lives in
+# pipeline/season_builds.py (SEASON, currently 10); season9*.json stays frozen.
 #
 # The extraction is INCREMENTAL: the accumulated state lives in the Actions cache
 # (restored below, saved after the run -- also after a cancelled/timed-out run, thanks
-# to the script's periodic checkpoints). No cache = full rebuild (~2 h); with it a daily
-# run only scans the ~30 new shards (minutes).
+# to the script's periodic checkpoints). No cache = rebuild from the season's first
+# shard; with it a daily run only scans the ~30 new shards (minutes either way early on).
 on:
   schedule:
     - cron: "0 8 * * *" # 08:00 UTC daily
@@ -39,23 +40,23 @@ jobs:
       - name: Restore extraction state
         uses: actions/cache/restore@v4
         with:
-          path: state/season9_state.pkl.zst
-          key: s9-state-${{ github.run_id }}
+          path: state/season10_state.pkl.zst
+          key: s10-state-${{ github.run_id }}
           restore-keys: |
-            s9-state-
+            s10-state-
 
       - name: Run extraction
         env:
           YXP_PROXY: ${{ github.workspace }}/pipeline
           YXP_OUTDIR: ${{ github.workspace }}/data
-          YXP_STATE: ${{ github.workspace }}/state/season9_state.pkl.zst
-        run: python -u pipeline/season9_builds.py full
+          YXP_STATE: ${{ github.workspace }}/state/season10_state.pkl.zst
+        run: python -u pipeline/season_builds.py full
 
       - name: Commit refreshed data if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/season9.json data/season9_builds.json data/season9_fates.json
+          git add data/season10.json data/season10_builds.json data/season10_fates.json
           if git diff --cached --quiet; then
             echo "No data changes today."
           else
@@ -69,8 +70,8 @@ jobs:
       # New cache entry per run (entries are immutable); restore-keys above picks the
       # newest. always(): a cancelled run still saves its last checkpoint.
       - name: Save extraction state
-        if: always() && hashFiles('state/season9_state.pkl.zst') != ''
+        if: always() && hashFiles('state/season10_state.pkl.zst') != ''
         uses: actions/cache/save@v4
         with:
-          path: state/season9_state.pkl.zst
-          key: s9-state-${{ github.run_id }}
+          path: state/season10_state.pkl.zst
+          key: s10-state-${{ github.run_id }}

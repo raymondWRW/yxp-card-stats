@@ -1,5 +1,5 @@
-pipeline/season9_diag.json
+pipeline/season*_diag.json
 
 __pycache__/
 state/
-_season9_state.pkl.zst*
+_season*_state.pkl.zst*
