@@ -2,8 +2,8 @@
 Per-season "build" analytics extraction (hsreplay-style) for sharpobject/yxp_replays.
 The season comes from SEASON below (YXP_SEASON overrides; default = the current season).
 
-Filter: seasonMec==SEASON, gameMode==3, beginDaoXinRankScore>=3000, and the file is a
-real-player SELF-RECORD (the entity present in the most rounds == data.uid). For
+Filter: seasonMec==SEASON, gameMode==3 (ranked), beginDaoXinRankScore>=DAOXIN_MIN, and
+the file is a real-player SELF-RECORD (the entity present in the most rounds == data.uid). For
 each self-record the subject's character/career/placement come from data.*, and we
 walk roundStats (subject side) for board, realm, per-round result, opponent, net.
 
@@ -47,6 +47,10 @@ SEASON = int(os.environ.get("YXP_SEASON") or 10)
 # First shard worth scanning per season (found by probing the dataset around the season
 # rollover; everything earlier is skipped outright instead of downloaded-and-filtered).
 SEASON_START = {9: 0, 10: 33400000}
+# Minimum DaoXin rank score per season. Season 10 starts everyone at 0 (every ranked
+# game counts; nobody has DaoXin yet), so there is no floor -- raise it later in the
+# season if desired, which needs a state rebuild (bump SCHEMA) to take effect cleanly.
+SEASON_DAOXIN_MIN = {9: 3000, 10: 0}
 # PROXY holds the id->name maps; override with YXP_PROXY (CI bundles them next to the script).
 PROXY = os.environ.get("YXP_PROXY") or r"C:\Users\raymo\OneDrive\Desktop\card counter with proxy\proxy"
 MAP_PATH = os.path.join(PROXY, "card_id_map.json")
@@ -58,7 +62,8 @@ OUT = os.path.join(OUTDIR, f"season{SEASON}.json")            # light: meta, cha
 OUT_BUILDS = os.path.join(OUTDIR, f"season{SEASON}_builds.json")  # heavy: builds, families
 OUT_FATES = os.path.join(OUTDIR, f"season{SEASON}_fates.json")    # fate + 天衍 selections
 OUT_DIAG = os.path.join(HERE, f"season{SEASON}_diag.json")              # per-char bot-exposure diag
-DAOXIN_MIN = 3000
+_dx = os.environ.get("YXP_DAOXIN_MIN")
+DAOXIN_MIN = int(_dx) if _dx is not None else SEASON_DAOXIN_MIN.get(SEASON, 3000)
 DL_WORKERS = 10
 TOP_BOARDS = 20
 TOP_MBOARDS = 8        # top boards kept per (build, opponent character)
@@ -75,7 +80,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 1             # bump whenever accumulators / classification change -> forces a full rebuild
+SCHEMA = 2             # bump whenever accumulators / classification / filters change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -549,9 +554,10 @@ def iter_records_from_raw(raw):
             continue
         b = tf.extractfile(mem).read()
         STATE["files"] += 1
-        m = RX_DAOXIN.search(b)
-        if not m or int(m.group(1)) < DAOXIN_MIN:
-            continue
+        if DAOXIN_MIN > 0:        # fast byte-level pre-filter; with no floor every file is parsed
+            m = RX_DAOXIN.search(b)
+            if not m or int(m.group(1)) < DAOXIN_MIN:
+                continue
         try:
             d = json.loads(b).get("data")
         except Exception:
