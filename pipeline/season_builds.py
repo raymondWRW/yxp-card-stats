@@ -2,8 +2,8 @@
 Per-season "build" analytics extraction (hsreplay-style) for sharpobject/yxp_replays.
 The season comes from SEASON below (YXP_SEASON overrides; default = the current season).
 
-Filter: seasonMec==SEASON, gameMode==3 (ranked), beginDaoXinRankScore>=DAOXIN_MIN, and
-the file is a real-player SELF-RECORD (the entity present in the most rounds == data.uid). For
+Filter: seasonMec==SEASON, gameMode==3 (ranked), TIER_FIELD>=DAOXIN_MIN, and the file
+is a real-player SELF-RECORD (the entity present in the most rounds == data.uid). For
 each self-record the subject's character/career/placement come from data.*, and we
 walk roundStats (subject side) for board, realm, per-round result, opponent, net.
 
@@ -47,10 +47,13 @@ SEASON = int(os.environ.get("YXP_SEASON") or 10)
 # First shard worth scanning per season (found by probing the dataset around the season
 # rollover; everything earlier is skipped outright instead of downloaded-and-filtered).
 SEASON_START = {9: 0, 10: 33400000}
-# Minimum DaoXin rank score per season. Season 10 starts everyone at 0 (every ranked
-# game counts; nobody has DaoXin yet), so there is no floor -- raise it later in the
-# season if desired, which needs a state rebuild (bump SCHEMA) to take effect cleanly.
-SEASON_DAOXIN_MIN = {9: 3000, 10: 0}
+# Tier field + floor per season. Season 9 gated on the DaoXin ladder; from season 10 on
+# every ranked record carries a plain rank score (beginRankScore; DaoXin stays 0 early
+# in a season), and that score drives BOTH the entry floor and the site's 3000-3999 /
+# 4000-5999 / 6000+ tier bands. Changing either needs a SCHEMA bump (state rebuild).
+SEASON_TIER_FIELD = {9: "beginDaoXinRankScore"}
+TIER_FIELD = SEASON_TIER_FIELD.get(SEASON, "beginRankScore")
+SEASON_DAOXIN_MIN = {9: 3000, 10: 3000}
 # PROXY holds the id->name maps; override with YXP_PROXY (CI bundles them next to the script).
 PROXY = os.environ.get("YXP_PROXY") or r"C:\Users\raymo\OneDrive\Desktop\card counter with proxy\proxy"
 MAP_PATH = os.path.join(PROXY, "card_id_map.json")
@@ -80,7 +83,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 2             # bump whenever accumulators / classification / filters change -> forces a full rebuild
+SCHEMA = 3             # bump whenever accumulators / classification / filters change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -92,7 +95,7 @@ PRUNE_MIN_ENTRIES = int(os.environ.get("YXP_PRUNE_MIN") or 400)   # only board t
 PRUNE_RAW = 2             # ...dropping entries with at most this many raw sightings and
 PRUNE_REL = 0.01          # ...weight below this fraction of the last top-list slot's weight
 
-RX_DAOXIN = re.compile(rb'"beginDaoXinRankScore":(\d+)')
+RX_TIER = re.compile(rb'"' + TIER_FIELD.encode() + rb'":(\d+)')
 
 # card_id -> Chinese name (level-collapsed: all levels share the name)
 with open(MAP_PATH, encoding="utf-8") as f:
@@ -438,8 +441,8 @@ def process_record(d):
     # rank-score sufficient stats for the within-character skill slope
     p = rank + 1; r = d.get("beginRankScore", 0) or 0
     c["swr"] += w * r; c["swr2"] += w * r * r; c["swrp"] += w * r * p
-    # DaoXin band (A=3000-3999, B=4000-5999, C=6000+) for the tier filter
-    dx = d.get("beginDaoXinRankScore", 0)
+    # tier band (A=3000-3999, B=4000-5999, C=6000+ on TIER_FIELD) for the tier filter
+    dx = d.get(TIER_FIELD) or 0
     band = "A" if dx < 4000 else ("B" if dx < 6000 else "C")
     bi = "ABC".index(band)                # band index for the band-split build stats
     tk = STATE["tier"][(char, career, var, band)]
@@ -555,7 +558,7 @@ def iter_records_from_raw(raw):
         b = tf.extractfile(mem).read()
         STATE["files"] += 1
         if DAOXIN_MIN > 0:        # fast byte-level pre-filter; with no floor every file is parsed
-            m = RX_DAOXIN.search(b)
+            m = RX_TIER.search(b)
             if not m or int(m.group(1)) < DAOXIN_MIN:
                 continue
         try:
@@ -564,7 +567,7 @@ def iter_records_from_raw(raw):
             continue
         if not d or d.get("seasonMec") != SEASON or d.get("gameMode") != 3:
             continue
-        if d.get("beginDaoXinRankScore", 0) < DAOXIN_MIN:
+        if (d.get(TIER_FIELD) or 0) < DAOXIN_MIN:
             continue
         rss = d.get("roundStats") or []
         if not rss:
