@@ -83,7 +83,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 4             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 5             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -155,6 +155,11 @@ except Exception:
                     CN2EN[cn] = en
     except Exception:
         pass
+
+
+# card_en_map keys use '·' while many game card names carry '•' -- alias both styles
+for _k in [k for k in CN2EN if "·" in k]:
+    CN2EN.setdefault(_k.replace("·", "•"), CN2EN[_k])
 
 
 def card_family(cid):
