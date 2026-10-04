@@ -83,7 +83,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 6             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 7             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -234,6 +234,14 @@ DLY_NIKE = _fate_tiers(124)      # 杜伶鸳 双鸳逆克 (Overcome with each ot
 JXM_DINGHUN = _fate_tiers(52)    # 姜袭明 七星定魂 (Heptastar Soulstat) -> 定魂
 CHAR_TUKUI, CHAR_XIAOBU, CHAR_YEMM, CHAR_LICHY = 4000002, 4000001, 4000003, 1000006
 CHAR_LJX, CHAR_NGS, CHAR_DLY, CHAR_JXM = 1000005, 3000005, 3000002, 2000004
+CHAR_YANXUE, CHAR_WUXZ = 1000002, 3000001      # 炎雪, 吾行之 (five-elements)
+YX_KUANG = _fate_tiers(70) | _fate_tiers(22)   # 炎雪 phase-5 fate 狂之执念 / 炎舞 -> 狂剑
+YX_BENGXUE = _fate_tiers(23)                   # 炎雪 phase-5 fate 崩雪 -> 云剑
+ELEMENTS = ("水", "火", "木", "土", "金")
+
+def board_elements(names):
+    """which of the five elements appear on a board (card names like 火灵·X / 梦·火灵X)"""
+    return {e for e in ELEMENTS if any(e + "灵" in n for n in names)}
 CAREER_EL, CAREER_FU, CAREER_PM = 1, 2, 6      # 炼丹师, 符咒师, 灵植师
 
 # combos whose classification also needs a board-card scan: (char, career) -> card name
@@ -244,8 +252,9 @@ WC_BOARD_MARK = {
 }
 
 
-def classify_variant(char, career, talents, has_mark):
-    """Per-game strategy label ('' = this combo is not split)."""
+def classify_variant(char, career, talents, has_mark, final_names):
+    """Per-game strategy label ('' = this combo is not split). final_names = card names
+    on the END-GAME board (last recorded round), for the element/marker archetypes."""
     if char == CHAR_TUKUI and career in (CAREER_EL, CAREER_PM):
         ts = set(talents)
         if ts & WC_MENGGONG:
@@ -269,9 +278,30 @@ def classify_variant(char, career, talents, has_mark):
     if char == CHAR_NGS and career == CAREER_PM:
         return "田土" if (has_mark and set(talents) & NGS_SWIFT) else "混元"
     if char == CHAR_DLY and career == CAREER_EL:
-        return "逆克" if set(talents) & DLY_NIKE else "其他"
+        if set(talents) & DLY_NIKE:
+            return "逆克"
+        els = board_elements(final_names)      # mono-element end-game board -> 纯X
+        if len(els) == 1:
+            return "纯" + next(iter(els))
+        return "其他"
     if char == CHAR_JXM:
         return "定魂" if set(talents) & JXM_DINGHUN else "其他"
+    if char == CHAR_YANXUE:
+        ts = set(talents)
+        if ts & YX_KUANG:
+            return "狂剑"
+        if ts & YX_BENGXUE:
+            return "云剑"
+        return "多段"
+    if char == CHAR_WUXZ:
+        if any("混元碎击" in n for n in final_names):
+            return "答辩"
+        els = board_elements(final_names)
+        if els == {"水"}:
+            return "纯水"
+        if els & {"火", "木"}:
+            return "火木"
+        return "其他"
     return ""
 
 
@@ -437,7 +467,8 @@ def process_record(d):
             if any(x and CN_NAME.get(str(x)) == mark for x in side["privateData"].get("usedCards") or []):
                 has_mark = True
                 break
-    var = classify_variant(char, career, last_side["publicData"].get("talents") or [], has_mark)
+    final_names = {CN_NAME.get(str(x), "") for x in (last_side["privateData"].get("usedCards") or []) if x}
+    var = classify_variant(char, career, last_side["publicData"].get("talents") or [], has_mark, final_names)
 
     b = STATE["builds"][(char, career, var)]
     c = STATE["char"][char]

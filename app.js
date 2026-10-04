@@ -839,6 +839,8 @@ const VAR_EN = {
   "玄奶": "Mystic Heal", "融剑": "Sword Fusion", "符防": "Talisman Guard",
   "符剑意": "Talisman Sword Intent", "田土": "Earth Field", "混元": "Primordial",
   "逆克": "Overcome", "定魂": "Soulstat",
+  "纯水": "Pure Water", "纯火": "Pure Fire", "纯木": "Pure Wood", "纯土": "Pure Earth", "纯金": "Pure Metal",
+  "狂剑": "Mad Sword", "云剑": "Cloud Sword", "多段": "Multi-hit", "火木": "Fire & Wood", "答辩": "World Smash",
 };
 function wcVarLabel(v, ch, cr) {
   const rn = (ch != null && VAR_RENAME[`${ch}_${cr}`]) || (ch != null && VAR_RENAME[String(ch)]) || null;
