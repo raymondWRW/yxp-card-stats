@@ -83,7 +83,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 5             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 6             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -200,7 +200,7 @@ def new_build():
         "gw": 0.0, "graw": 0, "place": [0.0] * 8,      # weighted games, raw games, weighted placement
         # Everything below is split by the player's DaoXin band (index 0/1/2 =
         # A 3000-3999 / B 4000-5999 / C 6000+) so the build page can tier-filter.
-        "radar": {k: _rad3() for k in ("e", "m", "l", "f", "s")},  # per band [w_destinyRecv, w_rounds]
+        "radar": {k: _rad3() for k in ("e", "m", "l", "fr")},  # e/m/l per band [w_destinyRecv, w_rounds]; fr [w_first, w_rounds] (R12+)
         # oppChar -> per band [w_games, w_finishHigher, raw_games, w_selfPlaceSum, w_oppPlaceSum]
         "matchup": defaultdict(_mu3),
         # Boards are accumulated already grouped the way the output wants them (see
@@ -477,8 +477,10 @@ def process_record(d):
         rad = b["radar"]
         phase = "e" if rnd <= 7 else ("m" if rnd <= 13 else "l")
         rad[phase][bi][1] += w; rad[phase][bi][0] += w * recv
-        slot = "f" if first else "s"
-        rad[slot][bi][1] += w; rad[slot][bi][0] += w * recv
+        if rnd >= WC_ROUND:                   # 先手率: share of late (R12+) rounds acting first
+            fx = rad["fr"][bi]; fx[1] += w
+            if first:
+                fx[0] += w
 
         # per-round curves: rerolls held (replaceCardChance snapshot) + realm level
         if rnd >= 1:
@@ -895,9 +897,11 @@ def write_output():
     # v2: radar = destiny received (not round WR), matchup = placement head-to-head,
     # boards carry per-slot modal card levels. v3: all build stats split by DaoXin band
     # (A/B/C) for the build-page tier filter. v4: split combos keyed per strategy
-    # variant + per-round curves. v5: curves are per-tier weighted MEDIANS.
+    # variant + per-round curves. v5: curves are per-tier weighted MEDIANS. v6: radar
+    # first/second axes replaced by "fr" (R12+ first-move share); the deck-complexity
+    # axis is derived client-side from the wheelchair (wc) pool/slot entropies.
     heavy = {
-        "v": 5,
+        "v": 6,
         "builds": builds_out,
         "families": [{**m, "pop": r2(STATE["fam_pop"].get(m["i"], 0))} for m in STATE["fam_meta"]],
     }

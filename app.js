@@ -23,13 +23,14 @@ const UI = {
     hhHigher: "finishes higher", youAbbr: "you", oppAbbr: "opp",
     games: "Games", topFinish: "Top-4 rate", placement: "Placement distribution",
     characters: "Characters", axisEarly: "Early", axisMid: "Mid", axisLate: "Late",
-    axisFirst: "First", axisSecond: "Second", roundWR: "round WR",
+    axisFirst: "First", axisSecond: "Second", axisFirstRate: "First rate", axisComplexity: "Complexity", roundWR: "round WR",
     buildsNote: "Rank ≥ 3000 · top-4 placement = win. Absolute rates run high (winners record more) — compare characters relatively.",
     noBuildData: "Not enough games for this build yet.",
     selectCareer: "Pick a side-job below to see its build detail.",
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "destiny dmg taken per round by phase (number = actual, larger shape = takes less)",
+    powerNote6: "early/mid/late: destiny dmg taken per round (larger shape = takes less) · first rate: share of R12+ rounds acting first · complexity: effective card pool × per-slot variety (R12+)",
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "Rank ≥", notAtTier: "This build doesn't exist at this rank tier (no games).",
@@ -66,13 +67,14 @@ const UI = {
     hhHigher: "名次高于对方", youAbbr: "我", oppAbbr: "对方",
     games: "场次", topFinish: "前四率", placement: "名次分布",
     characters: "角色", axisEarly: "前期", axisMid: "中期", axisLate: "后期",
-    axisFirst: "先手", axisSecond: "后手", roundWR: "回合胜率",
+    axisFirst: "先手", axisSecond: "后手", axisFirstRate: "先手率", axisComplexity: "卡组复杂程度", roundWR: "回合胜率",
     buildsNote: "段位分≥3000 · 前四视为胜。绝对胜率偏高（赢家上传更多）——请横向比较角色。",
     noBuildData: "该流派样本不足。",
     selectCareer: "选择下方副职查看具体流派。",
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段每回合承受命元伤害（数字为实际，形状越大承伤越低）",
+    powerNote6: "前/中/后期：每回合承受命元伤害（形状越大承伤越低）· 先手率：12回合后的先手占比 · 卡组复杂程度：有效卡池×各槽位选择多样性（12回合后）",
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "段位分 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
@@ -513,7 +515,15 @@ function wireStatic() {
 const WIKI_ROOT = "https://sharpobject.github.io/yxp_wiki/assets/";
 const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.webp`;
 const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.webp`;
-const RADAR_AXES = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
+const RADAR_AXES_V5 = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
+const RADAR_AXES_V6 = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["fr", "axisFirstRate"], ["cx", "axisComplexity"]];
+const radarAxes = () => (BS.v6 ? RADAR_AXES_V6 : RADAR_AXES_V5);
+// 卡组复杂程度: effective R12+ card pool x per-slot variety, straight from the wheelchair
+// data of this build at the current tier (null when the build has too few R12+ rounds).
+function cxValue(key) {
+  const e = BS.data.wc && BS.data.wc[key] && BS.data.wc[key][String(BS.tier)];
+  return e ? +(e[3] * e[4]).toFixed(1) : null;
+}
 
 // One independent view state per season tab; BS always points at the active season's.
 const newBS = (season) => ({ season, active: false, data: null, screen: "list", char: null, career: null, variant: "", sort: "power", realm: null, power: {}, boardsShowAll: false, mShowAll: false, tier: 3000, loaded: false });
@@ -569,13 +579,14 @@ async function ensureBuilds() {
   BS.v2 = (bd.v || 1) >= 2;
   BS.v3 = (bd.v || 1) >= 3;
   BS.v5 = (bd.v || 1) >= 5;                // curves are per-tier medians since v5
+  BS.v6 = (bd.v || 1) >= 6;                // radar = e/m/l dmg + first-rate + complexity since v6
   if (!BS.v3) {                          // v3 percentile pools are built per-tier on demand
-    const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
+    const axv = {}; RADAR_AXES_V5.forEach(([k]) => axv[k] = []);
     for (const id in BS.data.builds) {
       const b = BS.data.builds[id]; if (b.g < 20) continue;
-      RADAR_AXES.forEach(([k]) => axv[k].push(b.radar[k]));
+      RADAR_AXES_V5.forEach(([k]) => axv[k].push(b.radar[k]));
     }
-    RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
+    RADAR_AXES_V5.forEach(([k]) => axv[k].sort((a, b) => a - b));
     BS.axv = axv;
   }
   try {                                            // fates are optional (may not be deployed yet)
@@ -717,7 +728,8 @@ function sumBands(s3, idxs) {
 function collapseBuild(b, key) {
   if (!BS.v3) return b;
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
-  const radar = {}; RADAR_AXES.forEach(([k]) => { const [recv, w] = sumBands(b.radar[k], idxs); radar[k] = w ? recv / w : 0; });
+  const radar = {}; for (const k in b.radar) { const [num, den] = sumBands(b.radar[k], idxs); radar[k] = den ? num / den : 0; }
+  if (BS.v6) radar.cx = cxValue(key);
   const cb = (lst) => lst.map(([fidxs, s3, vars, imgs]) => {
     const [raw, w, ww] = sumBands(s3, idxs);
     const cvars = vars.map(([vf, vs3, vimgs]) => { const [vr, vw, vww] = sumBands(vs3, idxs); return [vf, vr, vw, vww, vimgs]; }).filter((v) => v[1] > 0);
@@ -754,15 +766,18 @@ function getAxv() {
   BS.axvCache = BS.axvCache || {};
   if (BS.axvCache[BS.tier]) return BS.axvCache[BS.tier];
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
-  const axv = {}; RADAR_AXES.forEach(([k]) => axv[k] = []);
+  const axv = {}; radarAxes().forEach(([k]) => axv[k] = []);
   for (const id in BS.data.builds) {
     const tk = BS.data.tiers[id]; if (!tk) continue;
     let g = 0; for (const bd of tierBands(BS.tier)) if (tk[bd]) g += tk[bd].g;
     if (g < 20) continue;
     const b = BS.data.builds[id];
-    RADAR_AXES.forEach(([k]) => { const [recv, w] = sumBands(b.radar[k], idxs); if (w) axv[k].push(recv / w); });
+    radarAxes().forEach(([k]) => {
+      if (k === "cx") { const v = cxValue(id); if (v != null) axv.cx.push(v); return; }
+      const [num, den] = sumBands(b.radar[k], idxs); if (den) axv[k].push(num / den);
+    });
   }
-  RADAR_AXES.forEach(([k]) => axv[k].sort((a, b) => a - b));
+  radarAxes().forEach(([k]) => axv[k].sort((a, b) => a - b));
   return BS.axvCache[BS.tier] = axv;
 }
 
@@ -962,25 +977,33 @@ function renderCharDetail(host) {
 }
 function radarSVG(b) {
   const R = 76, cx = 130, cy = 110;
-  // shape = percentile of this build vs all builds (relative strength). v2 axes are
-  // destiny dmg RECEIVED per round — lower is better, so the percentile is inverted
-  // (a build that takes little damage gets a big shape).
+  // shape = percentile of this build vs all builds (relative strength). Damage axes
+  // (destiny dmg RECEIVED per round) are inverted — taking little damage reads big;
+  // 先手率 and 卡组复杂程度 point outward as-is (bigger = more often first / more complex).
+  const AX = radarAxes();
   const axv = getAxv();
-  const vals = RADAR_AXES.map(([k]) => {
-    const arr = axv[k]; if (!arr || !arr.length) return 0.5;
-    const v = b.radar[k]; let c = 0;
+  const INV = { e: 1, m: 1, l: 1, f: 1, s: 1 };
+  const vals = AX.map(([k]) => {
+    const arr = axv[k], v = b.radar[k];
+    if (!arr || !arr.length || v == null) return 0;
+    let c = 0;
     for (let i = 0; i < arr.length; i++) if (arr[i] <= v) c++;
-    return BS.v2 ? 1 - c / arr.length : c / arr.length;
+    const p = c / arr.length;
+    return BS.v2 && INV[k] ? 1 - p : p;
   });
   const ang = (i) => (-90 + i * 72) * Math.PI / 180;
   const pt = (i, r) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r];
   let svg = `<svg width="260" height="224" viewBox="0 0 260 224">`;
-  [0.33, 0.66, 1].forEach((rr) => { svg += `<polygon points="${RADAR_AXES.map((_, i) => pt(i, rr).join(",")).join(" ")}" fill="none" stroke="#2c3445"/>`; });
-  RADAR_AXES.forEach(([k, lk], i) => {
+  [0.33, 0.66, 1].forEach((rr) => { svg += `<polygon points="${AX.map((_, i) => pt(i, rr).join(",")).join(" ")}" fill="none" stroke="#2c3445"/>`; });
+  AX.forEach(([k, lk], i) => {
     const [x, y] = pt(i, 1); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3445"/>`;
     const [lx, ly] = pt(i, 1.28);
-    // v2: actual destiny dmg received per round; v1 (legacy data): round win rate %
-    const lab = BS.v2 ? (b.radar[k] || 0).toFixed(1) : Math.round((b.radar[k] || 0) * 100) + "%";
+    // damage axes: actual dmg/round; fr: percent; cx: pool x slot product; v1 legacy: WR%
+    const v = b.radar[k];
+    const lab = !BS.v2 ? Math.round((v || 0) * 100) + "%"
+      : k === "fr" ? Math.round((v || 0) * 100) + "%"
+      : k === "cx" ? (v == null ? "–" : v.toFixed(0))
+      : (v || 0).toFixed(1);
     svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle">
       <tspan x="${lx}">${t(lk)}</tspan><tspan x="${lx}" dy="12" fill="#cfd8e6" font-weight="700">${lab}</tspan></text>`;
   });
@@ -1090,7 +1113,7 @@ function renderBuildDetail(host) {
       </div></div>
       <div class="bh-sel">${fatesSectionHTML(key)}</div></div>
     <div class="bcols">
-      <div><div class="bsection"><h3>${t("power")} <span class="muted" style="font-size:12px">${t("powerNote")}</span></h3>${radarSVG(b)}</div>
+      <div><div class="bsection"><h3>${t("power")} <span class="muted" style="font-size:12px">${t(BS.v6 ? "powerNote6" : "powerNote")}</span></h3>${radarSVG(b)}</div>
         <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div>
         ${b.curve ? `<div class="bsection"><h3>${t("rerollsByRound")}</h3><div id="chartRC" class="chart"></div></div>
         <div class="bsection"><h3>${t("realmByRound")}</h3><div id="chartLV" class="chart"></div></div>` : ""}</div>
