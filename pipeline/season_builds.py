@@ -83,7 +83,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 7             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 8             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -217,92 +217,42 @@ def new_build():
 
 
 # ---- strategy (archetype) splits --------------------------------------------
-# Some combos blend distinct fixed archetypes; classify each GAME's strategy and key
-# all build stats by (char, career, variant). Defining fates are read from the final
-# talents (publicData.talents, which may carry +10000/20000/30000 upgrade offsets);
-# defining board cards (e.g. 玄灵愈体 -> 玄奶) count if played in ANY round.
+# Since SCHEMA 8 the per-game strategy labels are DATA-DRIVEN: board co-occurrence
+# clustering over R12+ boards (subclass discovery tooling, scratch) found the
+# archetypes, the user confirmed and named them, and strategy_signatures.json keeps,
+# per combo ("charId_career"), each variant's most distinctive cards with weight =
+# inside-frequency − outside-frequency. A game is labeled by the best-scoring
+# signature over the card families of its R12+ boards (score > SIG_MIN_SCORE, else
+# 其他). Combos without signatures are not split. Regenerate the file with the
+# discovery tooling when the meta shifts (then bump SCHEMA).
+# One exception stays rule-based: 黎承云's 融剑/白板 split is defined by a FATE
+# (剑招融汇), which board signatures cannot see.
 def _fate_tiers(base):
     return {base, base + 10000, base + 20000, base + 30000}
-WC_MENGGONG = _fate_tiers(173)   # 屠馗 天命 猛攻之姿 -> 百杀 archetype
-WC_BENGLIE = _fate_tiers(174)    # 屠馗 天命 崩裂之拳 -> 崩拳 archetype
-WC_RONGHUI = _fate_tiers(192)    # 黎承云 天命 剑招融汇 -> 融剑 archetype
-# 陆剑心 phase-4 upgrade of fate 95 灵气凝铸 — the chosen TIER is the discriminator:
-LJX_FUFANG = {10095, 20095}      # 聚灵凝铸 (Spiritage) / 御灵凝铸 (Spiritstat) -> 符防
-LJX_FUJIANYI = {30095}           # 灵威凝铸 (Spiritual Power Forging) -> 符剑意
-NGS_SWIFT = _fate_tiers(140)     # 南宫生 疾燃咒印 (Swift Burning Seal), with 硬枝竹 -> 田土
-DLY_NIKE = _fate_tiers(124)      # 杜伶鸳 双鸳逆克 (Overcome with each other) -> 逆克
-JXM_DINGHUN = _fate_tiers(52)    # 姜袭明 七星定魂 (Heptastar Soulstat) -> 定魂
-CHAR_TUKUI, CHAR_XIAOBU, CHAR_YEMM, CHAR_LICHY = 4000002, 4000001, 4000003, 1000006
-CHAR_LJX, CHAR_NGS, CHAR_DLY, CHAR_JXM = 1000005, 3000005, 3000002, 2000004
-CHAR_YANXUE, CHAR_WUXZ = 1000002, 3000001      # 炎雪, 吾行之 (five-elements)
-YX_KUANG = _fate_tiers(70) | _fate_tiers(22)   # 炎雪 phase-5 fate 狂之执念 / 炎舞 -> 狂剑
-YX_BENGXUE = _fate_tiers(23)                   # 炎雪 phase-5 fate 崩雪 -> 云剑
-ELEMENTS = ("水", "火", "木", "土", "金")
+WC_RONGHUI = _fate_tiers(192)   # 黎承云 天命 剑招融汇 -> 融剑
+CHAR_LICHY = 1000006
+SIG_MIN_SCORE = 0.5
 
-def board_elements(names):
-    """which of the five elements appear on a board (card names like 火灵·X / 梦·火灵X)"""
-    return {e for e in ELEMENTS if any(e + "灵" in n for n in names)}
-CAREER_EL, CAREER_FU, CAREER_PM = 1, 2, 6      # 炼丹师, 符咒师, 灵植师
-
-# combos whose classification also needs a board-card scan: (char, career) -> card name
-WC_BOARD_MARK = {
-    (CHAR_XIAOBU, CAREER_EL): "玄灵愈体",
-    (CHAR_YEMM, CAREER_EL): "玄灵愈体",
-    (CHAR_NGS, CAREER_PM): "硬枝竹",
-}
+try:
+    with open(os.path.join(HERE, "strategy_signatures.json"), encoding="utf-8") as f:
+        SIGS = json.load(f)["combos"]
+except Exception:
+    SIGS = {}
 
 
-def classify_variant(char, career, talents, has_mark, final_names):
-    """Per-game strategy label ('' = this combo is not split). final_names = card names
-    on the END-GAME board (last recorded round), for the element/marker archetypes."""
-    if char == CHAR_TUKUI and career in (CAREER_EL, CAREER_PM):
-        ts = set(talents)
-        if ts & WC_MENGGONG:
-            return "百杀"
-        if ts & WC_BENGLIE:
-            return "崩拳"
-        return "其他"
-    if char == CHAR_XIAOBU and career == CAREER_EL:
-        return "玄奶" if has_mark else "其他"
-    if char == CHAR_YEMM and career == CAREER_EL:
-        return "玄奶" if has_mark else "崩拳"       # 叶冥冥's non-玄奶 elixirist line is 崩拳
+def classify_variant(char, career, talents, late_fams):
+    """Per-game strategy label ('' = this combo is not split)."""
     if char == CHAR_LICHY:
-        return "融剑" if set(talents) & WC_RONGHUI else "白板"   # 白板 = plain / no 融剑
-    if char == CHAR_LJX and career == CAREER_FU:
-        ts = set(talents)
-        if ts & LJX_FUFANG:
-            return "符防"
-        if ts & LJX_FUJIANYI:
-            return "符剑意"
-        return "其他"
-    if char == CHAR_NGS and career == CAREER_PM:
-        return "田土" if (has_mark and set(talents) & NGS_SWIFT) else "混元"
-    if char == CHAR_DLY and career == CAREER_EL:
-        if set(talents) & DLY_NIKE:
-            return "逆克"
-        els = board_elements(final_names)      # mono-element end-game board -> 纯X
-        if len(els) == 1:
-            return "纯" + next(iter(els))
-        return "其他"
-    if char == CHAR_JXM:
-        return "定魂" if set(talents) & JXM_DINGHUN else "其他"
-    if char == CHAR_YANXUE:
-        ts = set(talents)
-        if ts & YX_KUANG:
-            return "狂剑"
-        if ts & YX_BENGXUE:
-            return "云剑"
-        return "多段"
-    if char == CHAR_WUXZ:
-        if any("混元碎击" in n for n in final_names):
-            return "答辩"
-        els = board_elements(final_names)
-        if els == {"水"}:
-            return "纯水"
-        if els & {"火", "木"}:
-            return "火木"
-        return "其他"
-    return ""
+        return "融剑" if set(talents) & WC_RONGHUI else "白板"
+    sigs = SIGS.get(f"{char}_{career}")
+    if not sigs:
+        return ""
+    best, bs = "其他", SIG_MIN_SCORE
+    for sg in sigs:
+        sc = sum(w for c, w in sg["cards"].items() if c in late_fams)
+        if sc > bs:
+            best, bs = sg["name"], sc
+    return best
 
 
 def new_wc():
@@ -460,15 +410,14 @@ def process_record(d):
     if not sides:
         return
     last_side = sides[-1][1]
-    mark = WC_BOARD_MARK.get((char, career))
-    has_mark = False
-    if mark:
-        for _, side, _, _ in sides:
-            if any(x and CN_NAME.get(str(x)) == mark for x in side["privateData"].get("usedCards") or []):
-                has_mark = True
-                break
-    final_names = {CN_NAME.get(str(x), "") for x in (last_side["privateData"].get("usedCards") or []) if x}
-    var = classify_variant(char, career, last_side["publicData"].get("talents") or [], has_mark, final_names)
+    late_fams = set()        # card families on this game's R12+ boards (>=6 cards) — signature input
+    for rs_, side_, _, _ in sides:
+        if (rs_.get("round") or 0) >= WC_ROUND:
+            cards_ = [x for x in (side_["privateData"].get("usedCards") or []) if x]
+            if len(cards_) >= 6:
+                for x in cards_:
+                    late_fams.add(CN_NAME.get(str(x), ""))
+    var = classify_variant(char, career, last_side["publicData"].get("talents") or [], late_fams)
 
     b = STATE["builds"][(char, career, var)]
     c = STATE["char"][char]

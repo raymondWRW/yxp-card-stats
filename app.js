@@ -830,6 +830,8 @@ function wheelchairRows() {
 // Strategy-variant display labels. Data keys carry the raw pipeline label; some are
 // renamed for display per combo (so already-published data reads right), and every
 // label gets an English name.
+// Season-9 era only: that pipeline emitted catch-all labels these map to display names.
+// Season-10 labels come from user-named signatures and already read right (其他 is real).
 const VAR_RENAME = {                    // "char_career" or "char" -> {rawLabel: displayLabel}
   "4000003_1": { "其他": "崩拳" },     // 叶冥冥+炼丹师: the non-玄奶 line is 崩拳
   "1000006": { "其他": "白板" },       // 黎承云 (all side-jobs): the non-融剑 line is 白板
@@ -841,9 +843,10 @@ const VAR_EN = {
   "逆克": "Overcome", "定魂": "Soulstat",
   "纯水": "Pure Water", "纯火": "Pure Fire", "纯木": "Pure Wood", "纯土": "Pure Earth", "纯金": "Pure Metal",
   "狂剑": "Mad Sword", "云剑": "Cloud Sword", "多段": "Multi-hit", "火木": "Fire & Wood", "答辩": "World Smash",
+  "木火": "Wood & Fire", "金水": "Metal & Water",
 };
 function wcVarLabel(v, ch, cr) {
-  const rn = (ch != null && VAR_RENAME[`${ch}_${cr}`]) || (ch != null && VAR_RENAME[String(ch)]) || null;
+  const rn = BS.season === 9 ? ((ch != null && VAR_RENAME[`${ch}_${cr}`]) || (ch != null && VAR_RENAME[String(ch)]) || null) : null;
   const disp = (rn && rn[v]) || v;
   return S.lang === "en" ? (VAR_EN[disp] || disp) : disp;
 }
