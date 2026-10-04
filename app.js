@@ -23,14 +23,14 @@ const UI = {
     hhHigher: "finishes higher", youAbbr: "you", oppAbbr: "opp",
     games: "Games", topFinish: "Top-4 rate", placement: "Placement distribution",
     characters: "Characters", axisEarly: "Early", axisMid: "Mid", axisLate: "Late",
-    axisFirst: "First", axisSecond: "Second", axisFirstRate: "First rate", axisComplexity: "Complexity", roundWR: "round WR",
+    axisFirst: "First", axisSecond: "Second", axisFirstRate: "First rate", axisComplexity: "Simplicity", roundWR: "round WR",
     buildsNote: "Rank ≥ 3000 · top-4 placement = win. Absolute rates run high (winners record more) — compare characters relatively.",
     noBuildData: "Not enough games for this build yet.",
     selectCareer: "Pick a side-job below to see its build detail.",
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "destiny dmg taken per round by phase (number = actual, larger shape = takes less)",
-    powerNote6: "early/mid/late: destiny dmg taken per round (larger shape = takes less) · first rate: share of R12+ rounds acting first · complexity: effective card pool × per-slot variety (R12+)",
+    powerNote6: "early/mid/late: destiny dmg taken per round (larger shape = takes less) · first rate: share of R12+ rounds acting first · simplicity: 0-100 rank of needing a small card pool & few per-slot choices (R12+; bigger = simpler)",
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "Rank ≥", notAtTier: "This build doesn't exist at this rank tier (no games).",
@@ -67,14 +67,14 @@ const UI = {
     hhHigher: "名次高于对方", youAbbr: "我", oppAbbr: "对方",
     games: "场次", topFinish: "前四率", placement: "名次分布",
     characters: "角色", axisEarly: "前期", axisMid: "中期", axisLate: "后期",
-    axisFirst: "先手", axisSecond: "后手", axisFirstRate: "先手率", axisComplexity: "卡组复杂程度", roundWR: "回合胜率",
+    axisFirst: "先手", axisSecond: "后手", axisFirstRate: "先手率", axisComplexity: "卡组简易程度", roundWR: "回合胜率",
     buildsNote: "段位分≥3000 · 前四视为胜。绝对胜率偏高（赢家上传更多）——请横向比较角色。",
     noBuildData: "该流派样本不足。",
     selectCareer: "选择下方副职查看具体流派。",
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段每回合承受命元伤害（数字为实际，形状越大承伤越低）",
-    powerNote6: "前/中/后期：每回合承受命元伤害（形状越大承伤越低）· 先手率：12回合后的先手占比 · 卡组复杂程度：有效卡池×各槽位选择多样性（12回合后）",
+    powerNote6: "前/中/后期：每回合承受命元伤害（形状越大承伤越低）· 先手率：12回合后的先手占比 · 卡组简易程度：有效卡池小、槽位选择少的百分位得分（12回合后，0-100，越大越简单）",
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "段位分 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
@@ -518,11 +518,28 @@ const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.webp`;
 const RADAR_AXES_V5 = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
 const RADAR_AXES_V6 = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["fr", "axisFirstRate"], ["cx", "axisComplexity"]];
 const radarAxes = () => (BS.v6 ? RADAR_AXES_V6 : RADAR_AXES_V5);
-// 卡组复杂程度: effective R12+ card pool x per-slot variety, straight from the wheelchair
-// data of this build at the current tier (null when the build has too few R12+ rounds).
-function cxValue(key) {
+// 卡组简易程度: how little deck variety this build needs from R12 on, as a 0-100 rank
+// score — the mean of the INVERTED percentiles of effective card-pool size and per-slot
+// variety across all builds at the current tier (wheelchair data). Rank-based on
+// purpose: raw pool×slot values are heavy-tailed, and a few extreme-variety outliers
+// would compress everyone else toward "simple".
+function cxPools() {
+  BS.cxCache = BS.cxCache || {};
+  if (BS.cxCache[BS.tier]) return BS.cxCache[BS.tier];
+  const tier = String(BS.tier), pools = [], slots = [];
+  for (const key in BS.data.wc || {}) {
+    const e = BS.data.wc[key][tier];
+    if (e) { pools.push(e[3]); slots.push(e[4]); }
+  }
+  pools.sort((a, b) => a - b); slots.sort((a, b) => a - b);
+  return BS.cxCache[BS.tier] = { pools, slots };
+}
+function cxScore(key) {
   const e = BS.data.wc && BS.data.wc[key] && BS.data.wc[key][String(BS.tier)];
-  return e ? +(e[3] * e[4]).toFixed(1) : null;
+  if (!e) return null;
+  const { pools, slots } = cxPools();
+  const pct = (arr, v) => { let c = 0; for (const x of arr) if (x <= v) c++; return c / arr.length; };
+  return Math.round(100 * ((1 - pct(pools, e[3])) + (1 - pct(slots, e[4]))) / 2);
 }
 
 // One independent view state per season tab; BS always points at the active season's.
@@ -729,7 +746,7 @@ function collapseBuild(b, key) {
   if (!BS.v3) return b;
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
   const radar = {}; for (const k in b.radar) { const [num, den] = sumBands(b.radar[k], idxs); radar[k] = den ? num / den : 0; }
-  if (BS.v6) radar.cx = cxValue(key);
+  if (BS.v6) radar.cx = cxScore(key);
   const cb = (lst) => lst.map(([fidxs, s3, vars, imgs]) => {
     const [raw, w, ww] = sumBands(s3, idxs);
     const cvars = vars.map(([vf, vs3, vimgs]) => { const [vr, vw, vww] = sumBands(vs3, idxs); return [vf, vr, vw, vww, vimgs]; }).filter((v) => v[1] > 0);
@@ -773,7 +790,7 @@ function getAxv() {
     if (g < 20) continue;
     const b = BS.data.builds[id];
     radarAxes().forEach(([k]) => {
-      if (k === "cx") { const v = cxValue(id); if (v != null) axv.cx.push(v); return; }
+      if (k === "cx") return;           // 简易程度 is already a 0-100 rank score, no pool needed
       const [num, den] = sumBands(b.radar[k], idxs); if (den) axv[k].push(num / den);
     });
   }
@@ -984,7 +1001,9 @@ function radarSVG(b) {
   const axv = getAxv();
   const INV = { e: 1, m: 1, l: 1, f: 1, s: 1 };
   const vals = AX.map(([k]) => {
-    const arr = axv[k], v = b.radar[k];
+    const v = b.radar[k];
+    if (k === "cx") return v == null ? 0 : v / 100;   // already a rank score
+    const arr = axv[k];
     if (!arr || !arr.length || v == null) return 0;
     let c = 0;
     for (let i = 0; i < arr.length; i++) if (arr[i] <= v) c++;
