@@ -23,14 +23,14 @@ const UI = {
     hhHigher: "finishes higher", youAbbr: "you", oppAbbr: "opp",
     games: "Games", topFinish: "Top-4 rate", placement: "Placement distribution",
     characters: "Characters", axisEarly: "Early", axisMid: "Mid", axisLate: "Late",
-    axisFirst: "First", axisSecond: "Second", axisFirstRate: "First rate", axisComplexity: "Simplicity", roundWR: "round WR",
+    axisFirst: "First", axisSecond: "Second", axisPopularity: "Popularity", axisComplexity: "Simplicity", roundWR: "round WR",
     buildsNote: "Rank ≥ 3000 · top-4 placement = win. Absolute rates run high (winners record more) — compare characters relatively.",
     noBuildData: "Not enough games for this build yet.",
     selectCareer: "Pick a side-job below to see its build detail.",
     usedTimes: "used", vsReal: "vs real opponents",
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "destiny dmg taken per round by phase (number = actual, larger shape = takes less)",
-    powerNote6: "early/mid/late: destiny dmg taken per round (larger shape = takes less) · first rate: share of R12+ rounds acting first · simplicity: 0-100 rank of needing a small card pool & few per-slot choices (R12+; bigger = simpler)",
+    powerNote6: "early/mid/late: destiny dmg taken per round, ranked against the top 50 character+side-job strategies (larger shape = takes less) · popularity: percentile of total games played, shared by a combo's sub-strategies (bigger = more popular) · simplicity: percentile rank of needing a small card pool & few per-slot choices (R12+; bigger = simpler)",
     powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "Rank ≥", notAtTier: "This build doesn't exist at this rank tier (no games).",
@@ -67,14 +67,14 @@ const UI = {
     hhHigher: "名次高于对方", youAbbr: "我", oppAbbr: "对方",
     games: "场次", topFinish: "前四率", placement: "名次分布",
     characters: "角色", axisEarly: "前期", axisMid: "中期", axisLate: "后期",
-    axisFirst: "先手", axisSecond: "后手", axisFirstRate: "先手率", axisComplexity: "卡组简易程度", roundWR: "回合胜率",
+    axisFirst: "先手", axisSecond: "后手", axisPopularity: "人气", axisComplexity: "卡组简易程度", roundWR: "回合胜率",
     buildsNote: "段位分≥3000 · 前四视为胜。绝对胜率偏高（赢家上传更多）——请横向比较角色。",
     noBuildData: "该流派样本不足。",
     selectCareer: "选择下方副职查看具体流派。",
     usedTimes: "出现", vsReal: "对真实玩家",
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段每回合承受命元伤害（数字为实际，形状越大承伤越低）",
-    powerNote6: "前/中/后期：每回合承受命元伤害（形状越大承伤越低）· 先手率：12回合后的先手占比 · 卡组简易程度：有效卡池小、槽位选择少的百分位得分（12回合后，0-100，越大越简单）",
+    powerNote6: "前/中/后期：每回合承受命元伤害（形状越大承伤越低，与热门前50角色流派比较）· 人气：该角色+副职总出场量的百分位（越大越热门，分支共享） · 卡组简易程度：有效卡池小、槽位选择少的百分位得分（12回合后，0-100，越大越简单，与热门前50角色流派比较）",
     powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "段位分 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
@@ -516,19 +516,51 @@ const WIKI_ROOT = "https://sharpobject.github.io/yxp_wiki/assets/";
 const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.webp`;
 const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.webp`;
 const RADAR_AXES_V5 = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
-const RADAR_AXES_V6 = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["fr", "axisFirstRate"], ["cx", "axisComplexity"]];
+const RADAR_AXES_V6 = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["pop", "axisPopularity"], ["cx", "axisComplexity"]];
 const radarAxes = () => (BS.v6 ? RADAR_AXES_V6 : RADAR_AXES_V5);
-// 卡组简易程度: how little deck variety this build needs from R12 on, as a 0-100 rank
-// score — the mean of the INVERTED percentiles of effective card-pool size and per-slot
-// variety across all builds at the current tier (wheelchair data). Rank-based on
-// purpose: raw pool×slot values are heavy-tailed, and a few extreme-variety outliers
-// would compress everyone else toward "simple".
+// ---- 强度雷达's comparison population: the top 50 character+side-job combos by RAW
+// games at rank>=4000 (tierBands(4000) = bands B+C -- the same definition the strategy
+// -discovery tooling used), each expanded into its NAMED sub-strategies (其他 excluded;
+// an unsplit combo stays as itself). This fixes "compare vs every build in the game",
+// whose long tail of niche chars/careers/variants was skewing the 先手率/简易程度
+// percentiles. The SET is tier-filter-independent (stable cast); values compared within
+// it still respect the viewer's tier filter like every other axis.
+function radarPopulation() {
+  if (BS.radarPop) return BS.radarPop;
+  const combos = [];
+  for (const key in BS.data.tiers) {
+    if (key.indexOf("|") >= 0) continue;              // plain char_career keys only
+    const tk = BS.data.tiers[key]; let graw = 0;
+    for (const bd of tierBands(4000)) if (tk[bd]) graw += tk[bd].graw;
+    combos.push([key, graw]);
+  }
+  combos.sort((a, b) => b[1] - a[1]);
+  const keys = [];
+  for (const [combo] of combos.slice(0, 50)) {
+    const vars = (BS.variants[combo] || []).filter((v) => v !== "其他");
+    if (vars.length) vars.forEach((v) => keys.push(`${combo}|${v}`));
+    else keys.push(combo);
+  }
+  return BS.radarPop = keys;
+}
+const comboOf = (key) => { const i = key.indexOf("|"); return i < 0 ? key : key.slice(0, i); };
+// 人气: this build's parent character+side-job's total weighted games at the current
+// tier filter (shared identically by every one of its named sub-strategies -- splitting
+// into variants doesn't dilute the combo's own popularity).
+function comboPopularity(combo) {
+  const tk = BS.data.tiers[combo]; if (!tk) return 0;
+  let g = 0; for (const bd of tierBands(BS.tier)) if (tk[bd]) g += tk[bd].g;
+  return g;
+}
+// 卡组简易程度 / 人气 are both 0-100 RANK scores against radarPopulation() (not raw
+// magnitude) -- a handful of extreme-variety decks or a few blockbuster-popular combos
+// are heavy-tailed, and percentile rank is immune to that by construction.
 function cxPools() {
   BS.cxCache = BS.cxCache || {};
   if (BS.cxCache[BS.tier]) return BS.cxCache[BS.tier];
   const tier = String(BS.tier), pools = [], slots = [];
-  for (const key in BS.data.wc || {}) {
-    const e = BS.data.wc[key][tier];
+  for (const key of radarPopulation()) {
+    const e = BS.data.wc && BS.data.wc[key] && BS.data.wc[key][tier];
     if (e) { pools.push(e[3]); slots.push(e[4]); }
   }
   pools.sort((a, b) => a - b); slots.sort((a, b) => a - b);
@@ -540,6 +572,19 @@ function cxScore(key) {
   const { pools, slots } = cxPools();
   const pct = (arr, v) => { let c = 0; for (const x of arr) if (x <= v) c++; return c / arr.length; };
   return Math.round(100 * ((1 - pct(pools, e[3])) + (1 - pct(slots, e[4]))) / 2);
+}
+function popPool() {
+  BS.popCache = BS.popCache || {};
+  if (BS.popCache[BS.tier]) return BS.popCache[BS.tier];
+  const vals = radarPopulation().map((k) => comboPopularity(comboOf(k)));
+  vals.sort((a, b) => a - b);
+  return BS.popCache[BS.tier] = vals;
+}
+function popScore(key) {
+  const v = comboPopularity(comboOf(key));
+  const vals = popPool(); if (!vals.length) return null;
+  let c = 0; for (const x of vals) if (x <= v) c++;
+  return Math.round(100 * c / vals.length);
 }
 
 // One independent view state per season tab; BS always points at the active season's.
@@ -746,7 +791,7 @@ function collapseBuild(b, key) {
   if (!BS.v3) return b;
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
   const radar = {}; for (const k in b.radar) { const [num, den] = sumBands(b.radar[k], idxs); radar[k] = den ? num / den : 0; }
-  if (BS.v6) radar.cx = cxScore(key);
+  if (BS.v6) { radar.cx = cxScore(key); radar.pop = popScore(key); }
   const cb = (lst) => lst.map(([fidxs, s3, vars, imgs]) => {
     const [raw, w, ww] = sumBands(s3, idxs);
     const cvars = vars.map(([vf, vs3, vimgs]) => { const [vr, vw, vww] = sumBands(vs3, idxs); return [vf, vr, vw, vww, vimgs]; }).filter((v) => v[1] > 0);
@@ -784,13 +829,17 @@ function getAxv() {
   if (BS.axvCache[BS.tier]) return BS.axvCache[BS.tier];
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
   const axv = {}; radarAxes().forEach(([k]) => axv[k] = []);
-  for (const id in BS.data.builds) {
+  // v6 (current season): e/m/l are compared only within the top-50 combo population
+  // (see radarPopulation()); the frozen season-9 tab keeps comparing against every
+  // build, unchanged.
+  const ids = BS.v6 ? radarPopulation() : Object.keys(BS.data.builds);
+  for (const id of ids) {
+    const b = BS.data.builds[id]; if (!b) continue;
     const tk = BS.data.tiers[id]; if (!tk) continue;
     let g = 0; for (const bd of tierBands(BS.tier)) if (tk[bd]) g += tk[bd].g;
     if (g < 20) continue;
-    const b = BS.data.builds[id];
     radarAxes().forEach(([k]) => {
-      if (k === "cx") return;           // 简易程度 is already a 0-100 rank score, no pool needed
+      if (k === "cx" || k === "pop") return;   // rank scores already computed, no pool needed here
       const [num, den] = sumBands(b.radar[k], idxs); if (den) axv[k].push(num / den);
     });
   }
@@ -999,15 +1048,15 @@ function renderCharDetail(host) {
 }
 function radarSVG(b) {
   const R = 76, cx = 130, cy = 110;
-  // shape = percentile of this build vs all builds (relative strength). Damage axes
-  // (destiny dmg RECEIVED per round) are inverted — taking little damage reads big;
-  // 先手率 and 卡组复杂程度 point outward as-is (bigger = more often first / more complex).
+  // shape = percentile of this build vs the comparison population (relative strength).
+  // Damage axes (destiny dmg RECEIVED per round) are inverted — taking little damage
+  // reads big; 人气 and 卡组简易程度 point outward as-is (bigger = more popular / simpler).
   const AX = radarAxes();
   const axv = getAxv();
   const INV = { e: 1, m: 1, l: 1, f: 1, s: 1 };
   const vals = AX.map(([k]) => {
     const v = b.radar[k];
-    if (k === "cx") return v == null ? 0 : v / 100;   // already a rank score
+    if (k === "cx" || k === "pop") return v == null ? 0 : v / 100;   // already rank scores
     const arr = axv[k];
     if (!arr || !arr.length || v == null) return 0;
     let c = 0;
@@ -1022,11 +1071,10 @@ function radarSVG(b) {
   AX.forEach(([k, lk], i) => {
     const [x, y] = pt(i, 1); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3445"/>`;
     const [lx, ly] = pt(i, 1.28);
-    // damage axes: actual dmg/round; fr: percent; cx: pool x slot product; v1 legacy: WR%
+    // damage axes: actual dmg/round; pop/cx: 0-100 rank score; v1 legacy: WR%
     const v = b.radar[k];
     const lab = !BS.v2 ? Math.round((v || 0) * 100) + "%"
-      : k === "fr" ? Math.round((v || 0) * 100) + "%"
-      : k === "cx" ? (v == null ? "–" : v.toFixed(0))
+      : (k === "cx" || k === "pop") ? (v == null ? "–" : v.toFixed(0))
       : (v || 0).toFixed(1);
     svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle">
       <tspan x="${lx}">${t(lk)}</tspan><tspan x="${lx}" dy="12" fill="#cfd8e6" font-weight="700">${lab}</tspan></text>`;
