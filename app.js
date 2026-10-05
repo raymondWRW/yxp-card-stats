@@ -35,7 +35,7 @@ const UI = {
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "Rank ≥", notAtTier: "This build doesn't exist at this rank tier (no games).",
     wheelchair: "Wheelchair index", strategies: "strategies",
-    rerollsByRound: "Median rerolls held by round (full bar = 20)", realmByRound: "Median realm by round",
+    rerollsByRound: "Average rerolls held per round (median, with 25th / 75th percentile)", realmByRound: "Median realm by round",
     wheelchairNote: "character+side-job builds that place well while always playing the same board from R12 on — combines avg final placement, effective card-pool size, and per-slot variety (all recency-weighted)",
     wcPool: "eff. cards", wcSlot: "slot choices", wcWR: "R12+ WR",
     subBuilds10: "Hundred Schools · ranked builds (rank ≥ 3000) · recency-weighted (~4-day half-life)",
@@ -79,7 +79,7 @@ const UI = {
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "段位分 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
     wheelchair: "轮椅指数", strategies: "策略",
-    rerollsByRound: "每回合持有换牌数中位数（满格 = 20）", realmByRound: "每回合境界中位数",
+    rerollsByRound: "平均每回合持有换牌数（中位数，含25% / 75%分位）", realmByRound: "每回合境界中位数",
     wheelchairNote: "名次好且12回合后卡组固定的角色+副职流派——综合平均名次、有效卡池大小、各槽位选择多样性（均近期加权）",
     wcPool: "有效卡池", wcSlot: "槽位选择", wcWR: "12+回合胜率",
     subBuilds10: "百家之道 · 排位流派（段位分≥3000）· 近期加权（约4天半衰期）",
@@ -469,6 +469,38 @@ function drawChart(host, items, fn, isWr) {
   }
   if (isWr) { // 50% reference line via a faint marker is skipped for simplicity
   }
+}
+
+// line chart: median rerolls held per round (solid) + 25th / 75th percentile (lighter lines).
+// Fixed y-scale 0-20. Older data (no percentiles) draws the median line only.
+function drawLineChart(host, pts) {
+  const W = 600, H = 150, L = 24, R = 8, T = 8, B = 20, YMAX = 20;
+  const x = (i) => L + (pts.length > 1 ? i * (W - L - R) / (pts.length - 1) : (W - L - R) / 2);
+  const y = (v) => T + (1 - Math.min(YMAX, Math.max(0, v)) / YMAX) * (H - T - B);
+  const line = (k, color, op, wd) => {
+    const ps = pts.filter((p) => p[k] != null && p.w > 0.001);
+    if (ps.length < 1) return "";
+    const d = ps.map((p) => `${x(pts.indexOf(p)).toFixed(1)},${y(p[k]).toFixed(1)}`).join(" ");
+    return `<polyline points="${d}" fill="none" stroke="${color}" stroke-opacity="${op}" stroke-width="${wd}" stroke-linejoin="round" stroke-linecap="round"/>`;
+  };
+  let g = "";
+  for (let v = 0; v <= YMAX; v += 5) {
+    g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="currentColor" stroke-opacity=".12"/>`
+      + `<text x="${L - 4}" y="${y(v) + 3}" text-anchor="end" font-size="9" fill="currentColor" fill-opacity=".6">${v}</text>`;
+  }
+  pts.forEach((p, i) => { g += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="currentColor" fill-opacity=".6">${p.r}</text>`; });
+  const C = "#5b8cff";
+  let dots = "";
+  pts.forEach((p, i) => {
+    if (!(p.w > 0.001)) return;
+    const q = p.lo != null ? ` (P25 ${p.lo} · P75 ${p.hi})` : "";
+    dots += `<circle cx="${x(i)}" cy="${y(p.med)}" r="3" fill="${C}"><title>R${p.r}: ${p.med}${q}</title></circle>`;
+  });
+  const hasQ = pts.some((p) => p.lo != null);
+  const legend = `<div class="lc-legend"><span style="color:${C}">●</span> ${S.lang === "zh" ? "中位数" : "Median"}`
+    + (hasQ ? ` &nbsp; <span style="color:${C};opacity:.45">●</span> ${S.lang === "zh" ? "25% / 75% 分位" : "25th / 75th percentile"}` : "") + `</div>`;
+  host.classList.add("linechart");
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">${g}${line("hi", C, .4, 1.5)}${line("lo", C, .4, 1.5)}${line("med", C, 1, 2.5)}${dots}</svg>${legend}`;
 }
 
 // ---- language --------------------------------------------------------------
@@ -1204,10 +1236,9 @@ function renderCurves(b) {
   const val = (r, j) => b.curve[r - 1][j];   // precomputed weighted medians
   // rerolls: FIXED y-scale 0-20 so bar heights read directly; past R13 it's ~0, so stop there
   const rcRounds = []; for (let r = 1; r <= Math.min(last, 13); r++) rcRounds.push(r);
-  drawChart($("#chartRC"), rcRounds, (r) => {
-    const v = val(r, 1);
-    return { h: Math.min(1, v / 20), label: r, tip: `R${r}: ${v}`, color: "#5b8cff", faded: !b.curve[r - 1][0] };
-  }, false);
+  drawLineChart($("#chartRC"), rcRounds.map((r) => ({
+    r, w: b.curve[r - 1][0], med: val(r, 1), lo: b.curve[r - 1][3], hi: b.curve[r - 1][4],
+  })));
   const rounds = []; for (let r = 1; r <= last; r++) rounds.push(r);
   drawChart($("#chartLV"), rounds, (r) => {
     const v = val(r, 2);

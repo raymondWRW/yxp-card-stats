@@ -768,25 +768,26 @@ def write_output():
             if mb:
                 mboards[str(oc)] = mb
         # curves: WEIGHTED MEDIAN per round, precomputed per cumulative tier (medians
-        # can't be merged client-side). Entry [ti][round] = [w, medRerolls, medRealm];
+        # can't be merged client-side). Entry [ti][round] = [w, medRerolls, medRealm, p25Rerolls, p75Rerolls];
         # plain (lower) weighted median — the actual most-central integer value.
-        def wmed(hist):
+        def wq(hist, q=0.5):
             tot = sum(hist)
             if tot <= 0:
                 return 0
-            half = tot / 2; cum = 0.0
+            tgt = tot * q; cum = 0.0
             for v, n in enumerate(hist):
                 cum += n
-                if cum >= half:
+                if cum >= tgt:
                     return v
             return 0
+        wmed = wq
         curve = []
         for idxs in ((0, 1, 2), (1, 2), (2,)):     # tiers 3000 / 4000 / 6000
             trows = []
             for ri in range(CURVE_ROUNDS):
                 rch = [sum(b["rch"][i][ri][v] for i in idxs) for v in range(26)]
                 lvh = [sum(b["lvh"][i][ri][v] for i in idxs) for v in range(7)]
-                trows.append([r2(sum(rch)), wmed(rch), wmed(lvh)])
+                trows.append([r2(sum(rch)), wmed(rch), wmed(lvh), wq(rch, 0.25), wq(rch, 0.75)])  # [w, medRerolls, medRealm, p25Rerolls, p75Rerolls]
             curve.append(trows)
         # split combos live ONLY under their variant keys ("char_career|variant")
         builds_out[f"{char}_{career}" + (f"|{var}" if var else "")] = {

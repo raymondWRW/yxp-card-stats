@@ -224,3 +224,7 @@ footer{padding:18px 24px 40px;color:var(--muted);font-size:12px;border-top:1px s
 .muted{color:var(--muted)}
 
 footer #updated{margin-top:6px}
+
+.chart.linechart{display:block;height:auto;padding:6px 6px 4px}
+.chart.linechart svg{display:block;color:var(--text,inherit)}
+.lc-legend{font-size:11px;color:var(--muted);margin-top:2px;text-align:right}
