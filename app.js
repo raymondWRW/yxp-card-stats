@@ -492,10 +492,17 @@ function drawLineChart(host, pts, big) {
   pts.forEach((p, i) => { g += `<text x="${x(i)}" y="${H - 6 * k}" text-anchor="middle" font-size="${FS}" fill="currentColor" fill-opacity=".6">${p.r}</text>`; });
   const C = "#5b8cff";
   let dots = "";
+  const zh = S.lang === "zh", unit = zh ? "张换牌" : "rerolls";
+  // percentile dots first (so the median dot sits on top); each carries its own hover tooltip
+  [["hi", zh ? "75%分位" : "P75"], ["lo", zh ? "25%分位" : "P25"]].forEach(([key, nm]) => {
+    pts.forEach((p, i) => {
+      if (!(p.w > 0.001) || p[key] == null) return;
+      dots += `<circle cx="${x(i)}" cy="${y(p[key])}" r="${3 * k}" fill="${C}" fill-opacity=".45"><title>R${p.r} ${nm}: ${p[key]} ${unit}</title></circle>`;
+    });
+  });
   pts.forEach((p, i) => {
     if (!(p.w > 0.001)) return;
-    const q = p.lo != null ? ` (P25 ${p.lo} · P75 ${p.hi})` : "";
-    dots += `<circle cx="${x(i)}" cy="${y(p.med)}" r="${3 * k}" fill="${C}"><title>R${p.r}: ${p.med}${q}</title></circle>`;
+    dots += `<circle cx="${x(i)}" cy="${y(p.med)}" r="${3 * k}" fill="${C}"><title>R${p.r} ${zh ? "中位数" : "median"}: ${p.med} ${unit}</title></circle>`;
   });
   const hasQ = pts.some((p) => p.lo != null);
   const legend = `<div class="lc-legend"><span style="color:${C}">●</span> ${S.lang === "zh" ? "中位数" : "Median"}`
