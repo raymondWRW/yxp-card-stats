@@ -1010,7 +1010,7 @@ const VAR_EN = {
   "逆克": "Overcome", "定魂": "Soulstat",
   "纯水": "Mono Water", "纯火": "Mono Fire", "纯木": "Mono Wood", "纯土": "Mono Earth", "纯金": "Mono Metal",
   "狂剑": "Unrestrained Sword", "云剑": "Cloud Sword", "多段": "Multi-hit", "火木": "Fire & Wood", "答辩": "World Smash",
-  "木火": "Wood & Fire", "金水": "Metal & Water",
+  "木火": "Wood & Fire", "金水": "Metal & Water", "无极": "Limitless",
 };
 function wcVarLabel(v, ch, cr) {
   const rn = BS.season === 9 ? ((ch != null && VAR_RENAME[`${ch}_${cr}`]) || (ch != null && VAR_RENAME[String(ch)]) || null) : null;

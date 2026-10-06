@@ -23,6 +23,7 @@ Usage:
   python season9_builds.py local       # test on ./_new.tar.zst only
   python season9_builds.py full         # all new (season-9) shards via API diff
 """
+import copy
 import io
 import json
 import math
@@ -85,7 +86,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 10            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 11            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -227,12 +228,18 @@ def new_build():
 # signature over the card families of its R12+ boards (score > SIG_MIN_SCORE, else
 # 其他). Combos without signatures are not split. Regenerate the file with the
 # discovery tooling when the meta shifts (then bump SCHEMA).
-# One exception stays rule-based: 黎承云's 融剑/白板 split is defined by a FATE
-# (剑招融汇), which board signatures cannot see.
+# Two exceptions are rule-based on FATES, which board signatures cannot see:
+#   黎承云: 融剑/白板 by 剑招融汇.
+#   陆剑心 (every side-job): the 化神-phase heart fate -> 狂剑 / 云剑 / 无极, else 其他. At
+#   OUTPUT time (lujx_variant_map) a heart under LUJX_MIN_SHARE of its side-job's games
+#   folds into 其他, and a side-job left with fewer than two hearts isn't split at all.
 def _fate_tiers(base):
     return {base, base + 10000, base + 20000, base + 30000}
 WC_RONGHUI = _fate_tiers(192)   # 黎承云 天命 剑招融汇 -> 融剑
 CHAR_LICHY = 1000006
+CHAR_LUJX = 1000005             # 陆剑心
+LUJX_HEARTS = {10096: "狂剑", 20096: "云剑", 30096: "无极"}   # 狂剑之心 / 云剑之心 / 无极之心
+LUJX_MIN_SHARE = 0.10
 SIG_MIN_SCORE = 0.5
 
 try:
@@ -246,6 +253,11 @@ def classify_variant(char, career, talents, late_fams):
     """Per-game strategy label ('' = this combo is not split)."""
     if char == CHAR_LICHY:
         return "融剑" if set(talents) & WC_RONGHUI else "白板"
+    if char == CHAR_LUJX:
+        for t in talents:
+            if t in LUJX_HEARTS:
+                return LUJX_HEARTS[t]
+        return "其他"
     sigs = SIGS.get(f"{char}_{career}")
     if not sigs:
         return ""
@@ -778,7 +790,63 @@ def load_state(path=None):
 
 
 # ---- output ----------------------------------------------------------------
+def _acc_add(dst, src):
+    """Deep-add accumulator src into dst (dicts by key, lists element-wise, numbers summed).
+    Returns the merged value; dst may be None (then src is deep-copied)."""
+    if dst is None:
+        return copy.deepcopy(src)
+    if isinstance(src, dict):
+        for k, v in src.items():
+            dst[k] = _acc_add(dst.get(k), v)
+        return dst
+    if isinstance(src, list):
+        for i, v in enumerate(src):
+            dst[i] = _acc_add(dst[i], v)
+        return dst
+    return dst + src
+
+
+def lujx_variant_map():
+    """(career, rawLabel) -> output label for 陆剑心: hearts under LUJX_MIN_SHARE of the
+    side-job's weighted games fold into 其他; fewer than two hearts left -> no split ('')."""
+    gw = defaultdict(lambda: defaultdict(float))
+    for (char, career, var, band), tk in STATE["tier"].items():
+        if char == CHAR_LUJX:
+            gw[career][var] += tk["gw"]
+    out = {}
+    for career, by in gw.items():
+        tot = sum(by.values()) or 1.0
+        keep = {v for v in LUJX_HEARTS.values() if by.get(v, 0) / tot >= LUJX_MIN_SHARE}
+        for v in by:
+            out[(career, v)] = ("" if len(keep) < 2 else (v if v in keep else "其他"))
+    return out
+
+
+def output_view(acc, vmap):
+    """acc keyed (char, career, var, ...) with 陆剑心's labels remapped via vmap; entries
+    that land on the same key are merged. Other characters pass through untouched."""
+    if not vmap:
+        return acc
+    out = {}
+    for key, v in acc.items():
+        if key[0] == CHAR_LUJX and (key[1], key[2]) in vmap:
+            nk = (key[0], key[1], vmap[(key[1], key[2])]) + tuple(key[3:])
+            out[nk] = _acc_add(out.get(nk), v)
+        else:
+            out[key] = v
+    return out
+
+
 def write_output():
+    # 陆剑心's heart split is decided on the whole season's shares, then folded in a VIEW
+    # (STATE keeps the raw per-heart accumulators so the decision can change day to day).
+    vmap = lujx_variant_map()
+    V_BUILDS = output_view(STATE["builds"], vmap)
+    V_TIER = output_view(STATE["tier"], vmap)
+    V_WC = output_view(STATE["wc"], vmap)
+    V_FATES = output_view(STATE["fates"], vmap)
+    V_DERIVS = output_view(STATE["derivs"], vmap)
+    V_DAOYUN = output_view(STATE["daoyun"], vmap)
     mu = STATE["mu"]; tot = mu["kept"] + mu["dropped"]
     waiting = sum(len(v) for v in mu["pending"].values())
     dist = sorted(mu["dist"].items()); n = sum(c for _, c in dist); acc = 0; p999 = 0
@@ -817,7 +885,7 @@ def write_output():
         return out
 
     builds_out = {}
-    for (char, career, var), b in STATE["builds"].items():
+    for (char, career, var), b in V_BUILDS.items():
         # radar: per band [w_destinyRecvSum, w_roundSum] — the frontend divides after
         # summing its selected bands.
         rad = {k: [[r2(bb[0]), r2(bb[1])] for bb in v] for k, v in b["radar"].items()}
@@ -867,7 +935,7 @@ def write_output():
     # variants, so character-level views keep working unchanged.
     tiers_out = {}
     agg = {}
-    for (char, career, var, band), tk in STATE["tier"].items():
+    for (char, career, var, band), tk in V_TIER.items():
         key = f"{char}_{career}" + (f"|{var}" if var else "")
         tiers_out.setdefault(key, {})[band] = {
             "graw": tk["graw"], "g": r2(tk["gw"]), "place": [r2(p) for p in tk["place"]],
@@ -902,7 +970,7 @@ def write_output():
         return math.exp(h)
 
     wc_out = {}
-    for (char, career, var), wk in STATE["wc"].items():
+    for (char, career, var), wk in V_WC.items():
         ent = {}
         for tier, idxs in (("3000", (0, 1, 2)), ("4000", (1, 2)), ("6000", (2,))):
             raw = sum(wk["n"][i][1] for i in idxs)
@@ -965,9 +1033,9 @@ def write_output():
         out = {k: {str(sid): sorted(lst, key=lambda x: -sel_tot(x)) for sid, lst in sids.items()}
                for k, sids in grp.items()}
         return out, ids
-    fates_out, ids1 = emit_sel(STATE["fates"])
-    derivs_out, ids2 = emit_sel(STATE["derivs"])
-    daoyun_out, ids3 = emit_sel(STATE["daoyun"])
+    fates_out, ids1 = emit_sel(V_FATES)
+    derivs_out, ids2 = emit_sel(V_DERIVS)
+    daoyun_out, ids3 = emit_sel(V_DAOYUN)
     # fate bucket: innate if the fate is offered to only one character, else its wiki category
     char_of = defaultdict(set)
     for (char, career, var, sid, oid) in STATE["fates"]:
@@ -1007,7 +1075,7 @@ def write_output():
     # bot-exposure diagnostic: do some characters appear in bot-heavier lobbies (which
     # inflates placement, since bots fill the bottom seats)? Pair it with avg placement.
     place_sum, place_g = defaultdict(float), defaultdict(float)
-    for (char, career, var), b in STATE["builds"].items():
+    for (char, career, var), b in V_BUILDS.items():
         for i, p in enumerate(b["place"]):
             place_sum[char] += (i + 1) * p; place_g[char] += p
     diag = {}
