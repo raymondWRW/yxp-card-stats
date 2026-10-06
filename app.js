@@ -473,8 +473,9 @@ function drawChart(host, items, fn, isWr) {
 
 // line chart: median rerolls held per round (solid) + 25th / 75th percentile (lighter lines).
 // Fixed y-scale 0-20. Older data (no percentiles) draws the median line only.
-function drawLineChart(host, pts) {
-  const W = 600, H = 150, L = 24, R = 8, T = 8, B = 20, YMAX = 20;
+function drawLineChart(host, pts, big) {
+  const k = big ? 2 : 1;                        // zoomed popup: same drawing at 2x scale
+  const W = 600 * k, H = 150 * k * (big ? 1.6 : 1), L = 24 * k, R = 8 * k, T = 8 * k, B = 20 * k, YMAX = 20, FS = 9 * k;
   const x = (i) => L + (pts.length > 1 ? i * (W - L - R) / (pts.length - 1) : (W - L - R) / 2);
   const y = (v) => T + (1 - Math.min(YMAX, Math.max(0, v)) / YMAX) * (H - T - B);
   const line = (k, color, op, wd) => {
@@ -486,22 +487,44 @@ function drawLineChart(host, pts) {
   let g = "";
   for (let v = 0; v <= YMAX; v += 5) {
     g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="currentColor" stroke-opacity=".12"/>`
-      + `<text x="${L - 4}" y="${y(v) + 3}" text-anchor="end" font-size="9" fill="currentColor" fill-opacity=".6">${v}</text>`;
+      + `<text x="${L - 4}" y="${y(v) + 3}" text-anchor="end" font-size="${FS}" fill="currentColor" fill-opacity=".6">${v}</text>`;
   }
-  pts.forEach((p, i) => { g += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="currentColor" fill-opacity=".6">${p.r}</text>`; });
+  pts.forEach((p, i) => { g += `<text x="${x(i)}" y="${H - 6 * k}" text-anchor="middle" font-size="${FS}" fill="currentColor" fill-opacity=".6">${p.r}</text>`; });
   const C = "#5b8cff";
   let dots = "";
   pts.forEach((p, i) => {
     if (!(p.w > 0.001)) return;
     const q = p.lo != null ? ` (P25 ${p.lo} · P75 ${p.hi})` : "";
-    dots += `<circle cx="${x(i)}" cy="${y(p.med)}" r="3" fill="${C}"><title>R${p.r}: ${p.med}${q}</title></circle>`;
+    dots += `<circle cx="${x(i)}" cy="${y(p.med)}" r="${3 * k}" fill="${C}"><title>R${p.r}: ${p.med}${q}</title></circle>`;
   });
   const hasQ = pts.some((p) => p.lo != null);
   const legend = `<div class="lc-legend"><span style="color:${C}">●</span> ${S.lang === "zh" ? "中位数" : "Median"}`
     + (hasQ ? ` &nbsp; <span style="color:${C};opacity:.45">●</span> ${S.lang === "zh" ? "25% / 75% 分位" : "25th / 75th percentile"}` : "") + `</div>`;
   host.classList.add("linechart");
-  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">${g}${line("hi", C, .4, 1.5)}${line("lo", C, .4, 1.5)}${line("med", C, 1, 2.5)}${dots}</svg>${legend}`;
+  if (!big) {                                   // click the small chart -> zoomed popup
+    host.title = S.lang === "zh" ? "点击放大" : "Click to enlarge";
+    host.onclick = () => openChartPopup(pts);
+  }
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">${g}${line("hi", C, .4, 1.5 * k)}${line("lo", C, .4, 1.5 * k)}${line("med", C, 1, 2.5 * k)}${dots}</svg>${legend}`;
 }
+
+// zoomed popup: click the backdrop, the ✕ button or press Esc to close
+function openChartPopup(pts) {
+  closeChartPopup();
+  const ov = document.createElement("div");
+  ov.id = "chartPopup"; ov.className = "popup-bg";
+  ov.innerHTML = `<div class="popup-box"><button class="popup-x" aria-label="close">✕</button>`
+    + `<h3>${t("rerollsByRound")}</h3><div class="chart linechart"></div></div>`;
+  ov.addEventListener("click", (e) => { if (!e.target.closest(".popup-box") || e.target.closest(".popup-x")) closeChartPopup(); });
+  document.body.appendChild(ov);
+  drawLineChart(ov.querySelector(".chart"), pts, true);
+  document.addEventListener("keydown", chartPopupKey);
+}
+function closeChartPopup() {
+  const ov = document.getElementById("chartPopup"); if (ov) ov.remove();
+  document.removeEventListener("keydown", chartPopupKey);
+}
+function chartPopupKey(e) { if (e.key === "Escape") closeChartPopup(); }
 
 // ---- language --------------------------------------------------------------
 function applyLang() {
