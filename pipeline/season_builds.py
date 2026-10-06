@@ -85,7 +85,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 9             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 10            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -415,7 +415,12 @@ def destiny_profile(sides):
       - damage reduced below the formula (慈念曲, 云隐化身, 猫魂庇佑, 龙鳞...)
     Effective total E = 100 + extra = what the player would have needed to start with to end
     on the same destiny with no modifiers. Returns ({round: effective damage taken, scaled
-    to a 100-destiny pool}, E)."""
+    to a 100-destiny pool}, E).
+    The round the player is eliminated in is left OUT of the result (neither damage nor a
+    round): its overkill would inflate the phase, while capping it at the destiny left makes
+    it near-zero for death-prevention builds (谭舒雁/小布 化身 leave them at 1). A between-round
+    drop to exactly 0 is a forfeit (quitting zeroes destiny), not destiny spent, so it doesn't
+    lower E."""
     eff, extra = {}, 0
     prev_r = prev_life = None
     for rs, side, _, selfp in sides:
@@ -434,12 +439,15 @@ def destiny_profile(sides):
             extra += raw - (a - b)                             # reduction + in-round regain
             if rnd == 1 and a > 0:
                 extra += a - DESTINY_BASE                      # started above 100
-            elif prev_r == rnd - 1 and prev_life is not None and a - prev_life > DESTINY_GLITCH:
+            elif prev_r == rnd - 1 and prev_life is not None and a - prev_life > DESTINY_GLITCH                     and not (a == 0 and prev_life > 0):        # drop to 0 = forfeit, not spending
                 extra += a - prev_life                         # between rounds (gaps skipped)
             prev_r, prev_life = rnd, b
         else:
             extra += raw - recv; prev_r = None
         eff[rnd] = raw
+    last = sides[-1]
+    if (last[1]["publicData"].get("life") or 0) <= 0:         # eliminated: drop the death round
+        eff.pop(last[0].get("round") or 0, None)
     E = max(DESTINY_E_MIN, DESTINY_BASE + extra)
     return {r: v * DESTINY_BASE / E for r, v in eff.items()}, E
 
@@ -507,11 +515,12 @@ def process_record(d):
         # destiny (命) damage RECEIVED, normalised (destiny_profile): reductions count as
         # extra destiny rather than less damage, and every round is scaled to a 100-destiny
         # pool, so characters with destiny gains/mitigation aren't punished or flattered.
-        recv = eff_recv.get(rnd, 0)
         # radar axes = recency-weighted destiny received per round, per phase / turn-order slot
+        # (the elimination round isn't in eff_recv: it counts as neither damage nor a round)
         rad = b["radar"]
-        phase = "e" if rnd <= RADAR_EARLY_END else ("m" if rnd <= RADAR_MID_END else "l")
-        rad[phase][bi][1] += w; rad[phase][bi][0] += w * recv
+        if rnd in eff_recv:
+            phase = "e" if rnd <= RADAR_EARLY_END else ("m" if rnd <= RADAR_MID_END else "l")
+            rad[phase][bi][1] += w; rad[phase][bi][0] += w * eff_recv[rnd]
         if rnd >= WC_ROUND:                   # 先手率: share of late (R12+) rounds acting first
             fx = rad["fr"][bi]; fx[1] += w
             if first:
