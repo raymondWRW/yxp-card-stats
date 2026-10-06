@@ -236,3 +236,7 @@ footer #updated{margin-top:6px}
 .popup-box .chart.linechart{cursor:default}
 .popup-x{position:absolute;top:8px;right:8px;background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
 .popup-x:hover{color:var(--text)}
+.chart.linechart{position:relative}
+.lc-tip{position:absolute;pointer-events:none;background:#000;color:#fff;border-radius:6px;padding:6px 8px;font-size:12px;line-height:1.5;white-space:nowrap;z-index:5}
+.lc-tip[hidden]{display:none}
+.lc-hit:hover{fill:rgba(91,140,255,.12)}

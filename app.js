@@ -491,28 +491,37 @@ function drawLineChart(host, pts, big) {
   }
   pts.forEach((p, i) => { g += `<text x="${x(i)}" y="${H - 6 * k}" text-anchor="middle" font-size="${FS}" fill="currentColor" fill-opacity=".6">${p.r}</text>`; });
   const C = "#5b8cff";
-  let dots = "";
   const zh = S.lang === "zh", unit = zh ? "张换牌" : "rerolls";
-  // percentile dots first (so the median dot sits on top); each carries its own hover tooltip
-  [["hi", zh ? "75%分位" : "P75"], ["lo", zh ? "25%分位" : "P25"]].forEach(([key, nm]) => {
-    pts.forEach((p, i) => {
-      if (!(p.w > 0.001) || p[key] == null) return;
-      dots += `<circle cx="${x(i)}" cy="${y(p[key])}" r="${3 * k}" fill="${C}" fill-opacity=".45"><title>R${p.r} ${nm}: ${p[key]} ${unit}</title></circle>`;
-    });
-  });
+  let dots = "", hits = "";
   pts.forEach((p, i) => {
     if (!(p.w > 0.001)) return;
-    dots += `<circle cx="${x(i)}" cy="${y(p.med)}" r="${3 * k}" fill="${C}"><title>R${p.r} ${zh ? "中位数" : "median"}: ${p.med} ${unit}</title></circle>`;
+    [["hi", .45], ["lo", .45], ["med", 1]].forEach(([key, op]) => {
+      if (p[key] == null) return;
+      dots += `<circle cx="${x(i)}" cy="${y(p[key])}" r="${3 * k}" fill="${C}" fill-opacity="${op}" pointer-events="none"/>`;
+    });
+    const cw = (W - L - R) / Math.max(1, pts.length - 1);
+    const tip = `<b>R${p.r}</b>` + (p.hi != null ? `<br>${zh ? "75%分位" : "P75"}: ${p.hi} ${unit}` : "")
+      + `<br>${zh ? "中位数" : "Median"}: ${p.med} ${unit}` + (p.lo != null ? `<br>${zh ? "25%分位" : "P25"}: ${p.lo} ${unit}` : "");
+    hits += `<rect class="lc-hit" x="${x(i) - cw / 2}" y="${T}" width="${cw}" height="${H - T - B}" fill="transparent" data-i="${i}" data-tip="${tip.replace(/"/g, "&quot;")}"/>`;
   });
   const hasQ = pts.some((p) => p.lo != null);
   const legend = `<div class="lc-legend"><span style="color:${C}">●</span> ${S.lang === "zh" ? "中位数" : "Median"}`
     + (hasQ ? ` &nbsp; <span style="color:${C};opacity:.45">●</span> ${S.lang === "zh" ? "25% / 75% 分位" : "25th / 75th percentile"}` : "") + `</div>`;
   host.classList.add("linechart");
   if (!big) {                                   // click the small chart -> zoomed popup
-    host.title = S.lang === "zh" ? "点击放大" : "Click to enlarge";
     host.onclick = () => openChartPopup(pts);
   }
-  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">${g}${line("hi", C, .4, 1.5 * k)}${line("lo", C, .4, 1.5 * k)}${line("med", C, 1, 2.5 * k)}${dots}</svg>${legend}`;
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">${g}${line("hi", C, .4, 1.5 * k)}${line("lo", C, .4, 1.5 * k)}${line("med", C, 1, 2.5 * k)}${dots}${hits}</svg>${legend}<div class="lc-tip" hidden></div>`;
+  const tipEl = host.querySelector(".lc-tip");
+  host.onmousemove = (e) => {
+    const r = e.target.closest && e.target.closest(".lc-hit");
+    if (!r) { tipEl.hidden = true; return; }
+    tipEl.innerHTML = r.dataset.tip; tipEl.hidden = false;
+    const hb = host.getBoundingClientRect();
+    let lx = e.clientX - hb.left + 12; if (lx + tipEl.offsetWidth > hb.width) lx = e.clientX - hb.left - tipEl.offsetWidth - 12;
+    tipEl.style.left = lx + "px"; tipEl.style.top = Math.max(0, e.clientY - hb.top - tipEl.offsetHeight - 8) + "px";
+  };
+  host.onmouseleave = () => { tipEl.hidden = true; };
 }
 
 // zoomed popup: click the backdrop, the ✕ button or press Esc to close
