@@ -11,7 +11,7 @@ Outputs site/data/season<N>.json with character + (character,career) build stats
   - top-4 win rate (battleRank<=3), placement distribution, average placement
   - side-job popularity per character
   - popularity (games)
-  - power radar: 5 axes (early R1-7 / mid R8-13 / late R14+ / first / second),
+  - power radar: 5 axes (early R1-9 / mid R10-13 / late R14+ / first / second),
     each = avg destiny damage RECEIVED per round (damage dealt doesn't count, so
     mitigation effects like the musician's 慈念曲 are credited; lower = better)
   - popular boards per realm phase (L1-L5): top board archetypes (card families),
@@ -71,6 +71,8 @@ DL_WORKERS = 10
 TOP_BOARDS = 20
 TOP_MBOARDS = 8        # top boards kept per (build, opponent character)
 LATE_ROUND = 14        # "late game" = round >= 14 (matches radar 'late' axis)
+RADAR_EARLY_END = 9   # radar phases: early R1-9 / mid R10-13 / late R14+ (SCHEMA 9; was 7/13)
+RADAR_MID_END = 13
 WC_ROUND = 12          # 轮椅指数 (wheelchair index) looks at boards from this round on
 WC_MIN_RAW = 50        # min raw R12+ rounds for a build/tier to get a wheelchair entry
 CURVE_ROUNDS = 30      # per-round curves (rerolls held / realm level) track rounds 1..30
@@ -83,7 +85,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 8             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 9             # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -388,6 +390,60 @@ def mu_end_shard():
                 mu["dropped"] += len(evs)
 
 
+def destiny_formula(rnd, margin):
+    """Destiny (命) damage the round loser takes BEFORE any reduction, from the game's own
+    rule (post Immortal Relic season: rounds 1-9 deal 1 less). margin = final HP difference.
+    Verified on 410k S10 lost rounds: actual == formula 94.7%, actual < formula 5.3%
+    (destiny-damage reduction such as 慈念曲 / 龙鳞), actual > formula never."""
+    if margin <= 20:
+        d = rnd + 1 + math.ceil(margin / 5)
+    else:
+        d = rnd + 5 + min(math.ceil((margin - 20) / 10), 2 + rnd // 2)
+    return d - 1 if rnd <= 9 else d
+
+
+DESTINY_BASE = 100        # every player starts a game with 100 destiny
+DESTINY_GLITCH = -40      # between-round drops below this are data glitches, not spending
+DESTINY_E_MIN = 30        # floor for the effective total (heavy destiny spenders)
+
+
+def destiny_profile(sides):
+    """Normalise a game's destiny damage for destiny gained outside the damage formula.
+    Every change the plain rule can't explain counts as EXTRA destiny (can be negative):
+      - start above 100 · gains/costs between rounds (五行润扬, 修养生息, 稳固根基, absorbing
+        cards, destiny-cost effects...) · destiny regained inside a round
+      - damage reduced below the formula (慈念曲, 云隐化身, 猫魂庇佑, 龙鳞...)
+    Effective total E = 100 + extra = what the player would have needed to start with to end
+    on the same destiny with no modifiers. Returns ({round: effective damage taken, scaled
+    to a 100-destiny pool}, E)."""
+    eff, extra = {}, 0
+    prev_r = prev_life = None
+    for rs, side, _, selfp in sides:
+        rnd = rs.get("round") or 0
+        pd = side["publicData"]
+        a = (pd.get("lastRoundData") or {}).get("life")       # destiny entering the round
+        b = pd.get("life")                                     # destiny after it
+        ld = rs.get("lifeDamage") or 0
+        recv = -(ld if selfp == "p1" else -ld)
+        recv = recv if recv > 0 else 0
+        raw = 0
+        if recv:
+            margin = abs(rs.get("hpDelta") or 0)
+            raw = max(recv, destiny_formula(rnd, margin)) if margin else recv
+        if a is not None and b is not None:
+            extra += raw - (a - b)                             # reduction + in-round regain
+            if rnd == 1 and a > 0:
+                extra += a - DESTINY_BASE                      # started above 100
+            elif prev_r == rnd - 1 and prev_life is not None and a - prev_life > DESTINY_GLITCH:
+                extra += a - prev_life                         # between rounds (gaps skipped)
+            prev_r, prev_life = rnd, b
+        else:
+            extra += raw - recv; prev_r = None
+        eff[rnd] = raw
+    E = max(DESTINY_E_MIN, DESTINY_BASE + extra)
+    return {r: v * DESTINY_BASE / E for r, v in eff.items()}, E
+
+
 def process_record(d):
     """d is a season-9 mode-3 daoxin>=3000 SELF-record's data dict."""
     uid = d["uid"]
@@ -440,6 +496,7 @@ def process_record(d):
     wk = STATE["wc"][(char, career, var)]
     wpl = wk["pl"][bi]
     wpl[0] += w; wpl[1] += 1; wpl[2] += w * (rank + 1)
+    eff_recv, _ = destiny_profile(sides)  # per-round destiny taken, normalised for extra destiny
     opp_chars = {}                        # real opponents this game: uid -> characterId
     bot_uids = set()                      # distinct bot opponents (for bot-exposure diag)
     for rs, side, opp, selfp in sides:
@@ -447,15 +504,13 @@ def process_record(d):
         first = rs.get("firstPlayerId") == uid
         rnd = rs.get("round") or 0
         wwin = w if won else 0.0
-        # destiny (命) damage: round lifeDamage is signed from p1's view; flip for p2 so
-        # positive = self DEALT it (won the round), negative = self RECEIVED it (lost).
-        # The radar tracks only the RECEIVED side, so mitigation (e.g. 慈念曲) is credited.
-        ld = rs.get("lifeDamage") or 0
-        sd = ld if selfp == "p1" else -ld
-        recv = -sd if sd < 0 else 0
+        # destiny (命) damage RECEIVED, normalised (destiny_profile): reductions count as
+        # extra destiny rather than less damage, and every round is scaled to a 100-destiny
+        # pool, so characters with destiny gains/mitigation aren't punished or flattered.
+        recv = eff_recv.get(rnd, 0)
         # radar axes = recency-weighted destiny received per round, per phase / turn-order slot
         rad = b["radar"]
-        phase = "e" if rnd <= 7 else ("m" if rnd <= 13 else "l")
+        phase = "e" if rnd <= RADAR_EARLY_END else ("m" if rnd <= RADAR_MID_END else "l")
         rad[phase][bi][1] += w; rad[phase][bi][0] += w * recv
         if rnd >= WC_ROUND:                   # 先手率: share of late (R12+) rounds acting first
             fx = rad["fr"][bi]; fx[1] += w
@@ -883,6 +938,8 @@ def write_output():
     # axis is derived client-side from the wheelchair (wc) pool/slot entropies.
     heavy = {
         "v": 6,
+        "rs": [RADAR_EARLY_END, RADAR_MID_END],     # radar phase boundaries, so the site labels follow the data
+        "dn": 1,                                    # e/m/l = destiny taken normalised for extra destiny (destiny_profile)
         "builds": builds_out,
         "families": [{**m, "pop": r2(STATE["fam_pop"].get(m["i"], 0))} for m in STATE["fam_meta"]],
     }

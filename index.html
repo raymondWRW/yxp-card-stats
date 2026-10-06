@@ -22,8 +22,8 @@
 </header>
 
 <div id="tabbar">
-  <button class="tab on" data-tab="builds10" data-i18n="tabBuilds10">流派 · 百家之道</button>
-  <button class="tab" data-tab="builds9" data-i18n="tabBuilds9">流派 · 天衍万象</button>
+  <button class="tab on" data-tab="builds10" data-i18n="tabBuilds10">赛季 · 百家之道</button>
+  <button class="tab" data-tab="builds9" data-i18n="tabBuilds9">赛季 · 天衍万象</button>
   <button class="tab" data-tab="cards" data-i18n="tabCards">卡牌 · 天机刻印 / 临渊织梦</button>
   <div class="seg" id="lang">
     <button data-v="en">EN</button>
@@ -96,12 +96,13 @@
     </div>
     <div class="ctl" id="bsort-ctl">
       <label data-i18n="sortby">Sort by</label>
-      <select id="bsort">
+      <div class="selrow"><select id="bsort">
         <option value="power" data-i18n="powerScore">Power</option>
         <option value="place" data-i18n="avgplace">Avg placement</option>
         <option value="pop" data-i18n="popularity">Popularity</option>
         <option value="wheelchair" data-i18n="wheelchair">Wheelchair index</option>
-      </select>
+      </select><button type="button" id="sortinfo-btn" class="infobtn" aria-label="info">i</button></div>
+      <div id="sortinfo" class="infopop" hidden></div>
     </div>
   </div>
   <div id="builds-content"></div>

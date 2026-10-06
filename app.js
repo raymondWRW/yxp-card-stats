@@ -17,12 +17,20 @@ const UI = {
     all: "All", none: "None", allSel: "All", nSel: "selected", searchPh: "card name…",
     sect: "Sect", baseLevel: "base", overall: "overall",
     notEnough: "Not enough data to calculate win rate at this Min games.",
-    tabCards: "Cards · Tianji Sigil / Dream Weave", tabBuilds10: "Builds · Hundred Schools", tabBuilds9: "Builds · Heavenly Derivation", top4rate: "Top-4 win rate",
+    tabCards: "Cards · Tianji Sigil / Dream Weave", tabBuilds10: "Season · Hundred Schools", tabBuilds9: "Season · Heavenly Derivation", top4rate: "Top-4 win rate",
     avgplace: "Avg placement", sidejobs: "Side-jobs played", power: "Power profile",
     boards: "Popular boards", matchup: "Placement vs character", realm: "Realm",
     hhHigher: "finishes higher", youAbbr: "you", oppAbbr: "opp",
     games: "Games", topFinish: "Top-4 rate", placement: "Placement distribution",
     characters: "Characters", axisEarly: "Early", axisMid: "Mid", axisLate: "Late",
+    ri_e: "Early (R{a}–{b}): average destiny damage taken per round in rounds {a}–{b}, ranked against the top 50 character+side-job strategies. Bigger = takes less damage.",
+    ri_m: "Mid (R{c}–{d}): average destiny damage taken per round in rounds {c}–{d}, ranked against the top 50 strategies. Bigger = takes less damage.",
+    ri_l: "Late (R{e}+): average destiny damage taken per round from round {e} on, ranked against the top 50 strategies. Bigger = takes less damage.",
+    riNorm: "Normalized for extra destiny: destiny gained outside combat (fates, absorbed cards) and damage reductions (慈念曲, 龙鳞…) raise the player's effective starting destiny, and each round's damage (before reductions) is scaled to a 100-destiny pool.",
+    ri_pop: "Popularity: percentile of total games played with this character+side-job (shared by its sub-strategies). Bigger = more popular.",
+    ri_cx: "Simplicity (0–100): from R12 on, how small the effective card pool is and how few choices each slot has (percentile vs the top 50 strategies). Bigger = simpler deck.",
+    ri_f: "First: average destiny damage taken per round when acting first. Bigger = takes less.",
+    ri_s: "Second: average destiny damage taken per round when acting second. Bigger = takes less.",
     axisFirst: "First", axisSecond: "Second", axisPopularity: "Popularity", axisComplexity: "Simplicity", roundWR: "round WR",
     buildsNote: "Rank ≥ 3000 · top-4 placement = win. Absolute rates run high (winners record more) — compare characters relatively.",
     noBuildData: "Not enough games for this build yet.",
@@ -35,14 +43,19 @@ const UI = {
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "Rank ≥", notAtTier: "This build doesn't exist at this rank tier (no games).",
     wheelchair: "Wheelchair index", strategies: "strategies",
-    rerollsByRound: "Average rerolls held per round (median, with 25th / 75th percentile)", realmByRound: "Median realm by round",
+    rerollsByRound: "Average rerolls held per round (median, with 25th / 75th percentile)", realmByRound: "Round each realm is reached",
     wheelchairNote: "character+side-job builds that place well while always playing the same board from R12 on — combines avg final placement, effective card-pool size, and per-slot variety (all recency-weighted)",
+    infoTitle: "How each sort is calculated",
+    infoPower: "Power: average placement adjusted for player rank (so a character isn't inflated just because strong players pick it), then compared with all characters: 50 = average, about ±12 per standard deviation, higher = stronger. Characters with few games are pulled toward 50.",
+    infoPlace: "Avg placement: recency-weighted average final placement (1-8) of all games at the selected rank and above. Lower = better.",
+    infoPop: "Popularity: share of all games played with this character (recency-weighted, all characters add up to 100%). n = raw number of games.",
+    infoWc: "Wheelchair index (0-100): builds that place well AND play the same board from R12 on. Average of three percentiles: good final placement, small effective card pool, few card choices per slot.",
     wcPool: "eff. cards", wcSlot: "slot choices", wcWR: "R12+ WR",
     subBuilds10: "Hundred Schools · ranked builds (rank ≥ 3000) · recency-weighted (~4-day half-life)",
     subBuilds9: "Heavenly Derivation (ended) · DaoXin-ranked builds",
     buildsEmpty: "No ranked games recorded for this season yet — the site updates daily, check back soon.",
     arrangements: "arrangements",
-    fates: "Fates", tianyan: "天衍 (Derivations)", daoyun: "道韵 (Dao Rhyme)",
+    fates: "Fates", tianyan: "天衍 (Derivations)", daoyun: "道韵 (Dao Omen)",
     fatesHint: "top pick per phase by bucket · hover for all",
     tianyanHint: "top pick per phase · hover for all",
     daoyunHint: "most common pick (free pick ignored) · hover for all",
@@ -61,13 +74,21 @@ const UI = {
     all: "全部", none: "清空", allSel: "全部", nSel: "项已选", searchPh: "卡牌名称…",
     sect: "门派", baseLevel: "基础", overall: "总体",
     notEnough: "当前最少场次下数据不足，无法计算胜率。",
-    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabBuilds10: "流派 · 百家之道", tabBuilds9: "流派 · 天衍万象", top4rate: "前四胜率",
+    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabBuilds10: "赛季 · 百家之道", tabBuilds9: "赛季 · 天衍万象", top4rate: "前四胜率",
     avgplace: "平均名次", sidejobs: "搭配副职", power: "强度雷达",
     boards: "热门卡组", matchup: "对位名次", realm: "境界",
     hhHigher: "名次高于对方", youAbbr: "我", oppAbbr: "对方",
     games: "场次", topFinish: "前四率", placement: "名次分布",
     characters: "角色", axisEarly: "前期", axisMid: "中期", axisLate: "后期",
-    axisFirst: "先手", axisSecond: "后手", axisPopularity: "人气", axisComplexity: "卡组简易程度", roundWR: "回合胜率",
+    ri_e: "前期（第{a}–{b}回合）：第{a}–{b}回合每回合承受的命元伤害，与热门前50角色流派比较。数值越大 = 承伤越低。",
+    ri_m: "中期（第{c}–{d}回合）：第{c}–{d}回合每回合承受的命元伤害，与热门前50流派比较。数值越大 = 承伤越低。",
+    ri_l: "后期（第{e}回合起）：第{e}回合起每回合承受的命元伤害，与热门前50流派比较。数值越大 = 承伤越低。",
+    riNorm: "已按额外命元校正：战斗外获得的命元（天命、吸收卡牌等）与命元伤害减免（慈念曲、龙鳞等）计入有效初始命元，每回合（减免前的）伤害按 100 命元折算。",
+    ri_pop: "人气：该角色+副职总出场量的百分位（分支流派共享）。数值越大 = 越热门。",
+    ri_cx: "卡组简易程度（0–100）：12回合后有效卡池越小、各槽位选择越少得分越高（与热门前50流派比较的百分位）。数值越大 = 卡组越简单。",
+    ri_f: "先手：先手时每回合承受的命元伤害。数值越大 = 承伤越低。",
+    ri_s: "后手：后手时每回合承受的命元伤害。数值越大 = 承伤越低。",
+    axisFirst: "先手", axisSecond: "后手", axisPopularity: "人气", axisComplexity: "简易", roundWR: "回合胜率",
     buildsNote: "段位分≥3000 · 前四视为胜。绝对胜率偏高（赢家上传更多）——请横向比较角色。",
     noBuildData: "该流派样本不足。",
     selectCareer: "选择下方副职查看具体流派。",
@@ -79,8 +100,13 @@ const UI = {
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "段位分 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
     wheelchair: "轮椅指数", strategies: "策略",
-    rerollsByRound: "平均每回合持有换牌数（中位数，含25% / 75%分位）", realmByRound: "每回合境界中位数",
+    rerollsByRound: "平均每回合持有换牌数（中位数，含25% / 75%分位）", realmByRound: "各境界达成回合（中位数）",
     wheelchairNote: "名次好且12回合后卡组固定的角色+副职流派——综合平均名次、有效卡池大小、各槽位选择多样性（均近期加权）",
+    infoTitle: "各排序指标的计算方式",
+    infoPower: "强度：先按玩家段位校正平均名次（避免因高手偏爱而虚高），再与全部角色比较：50 = 平均水平，每个标准差约 ±12 分，越高越强；对局少的角色会向 50 回归。",
+    infoPlace: "平均名次：所选段位及以上所有对局最终名次（1–8）的近期加权平均，越低越好。",
+    infoPop: "使用率：该角色对局数占全部对局的比例（近期加权，所有角色合计 100%）。n = 原始对局数。",
+    infoWc: "轮椅指数（0–100）：名次好且 12 回合后始终打同一套卡组的流派得分高。取三项百分位的平均：最终名次好、有效卡池小、各槽位选择少。",
     wcPool: "有效卡池", wcSlot: "槽位选择", wcWR: "12+回合胜率",
     subBuilds10: "百家之道 · 排位流派（段位分≥3000）· 近期加权（约4天半衰期）",
     subBuilds9: "天衍万象（已结束）· 道心排位流派",
@@ -355,6 +381,7 @@ function render() {
   const frag = document.createDocumentFragment();
   for (const r of rows) frag.appendChild(tile(r));
   grid.appendChild(frag);
+  enter(grid);
 }
 function tile(r) {
   const c = r.c, col = wrColor(r.wr), name = cardName(c);
@@ -454,7 +481,25 @@ function renderModal() {
     const g = perW[r] + perL[r];
     return { h: g / maxPop, label: r, tip: `R${r}: ${g.toLocaleString()}`, color: "#5b8cff", faded: g === 0 };
   }, false);
+  enter($("#modal"));
 }
+// ---- entrance animations -------------------------------------------------------
+// The CSS plays an entrance keyframe on every freshly inserted chip / row / bar; this
+// only hands each item of a group an increasing --d (indexed per parent, capped so a
+// long list doesn't keep trickling in) so they rise one after another, not all at once.
+const STAGGER = [[".cchip", 22, 30], [".card", 14, 24], [".sjrow", 35, 14], [".board", 40, 12],
+                 [".mcell", 18, 30], [".fphase", 45, 10], [".pb", 30, 8], [".col", 12, 40], [".realmtbl tr", 40, 8]];
+function enter(host) {
+  if (!host) return;
+  for (const [sel, step, cap] of STAGGER) {
+    const seen = new Map();                       // parent -> items counted so far
+    host.querySelectorAll(sel).forEach((el) => {
+      const p = el.parentElement, i = seen.get(p) || 0; seen.set(p, i + 1);
+      el.style.setProperty("--d", Math.min(i, cap) * step + "ms");
+    });
+  }
+}
+
 function drawChart(host, items, fn, isWr) {
   host.innerHTML = "";
   for (const it of items) {
@@ -482,7 +527,7 @@ function drawLineChart(host, pts, big) {
     const ps = pts.filter((p) => p[k] != null && p.w > 0.001);
     if (ps.length < 1) return "";
     const d = ps.map((p) => `${x(pts.indexOf(p)).toFixed(1)},${y(p[k]).toFixed(1)}`).join(" ");
-    return `<polyline points="${d}" fill="none" stroke="${color}" stroke-opacity="${op}" stroke-width="${wd}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    return `<polyline class="lc-line lc-${k}" pathLength="1" points="${d}" fill="none" stroke="${color}" stroke-opacity="${op}" stroke-width="${wd}" stroke-linejoin="round" stroke-linecap="round"/>`;
   };
   let g = "";
   for (let v = 0; v <= YMAX; v += 5) {
@@ -497,7 +542,7 @@ function drawLineChart(host, pts, big) {
     if (!(p.w > 0.001)) return;
     [["hi", .45], ["lo", .45], ["med", 1]].forEach(([key, op]) => {
       if (p[key] == null) return;
-      dots += `<circle cx="${x(i)}" cy="${y(p[key])}" r="${3 * k}" fill="${C}" fill-opacity="${op}" pointer-events="none"/>`;
+      dots += `<circle class="lc-dot" cx="${x(i)}" cy="${y(p[key])}" r="${3 * k}" fill="${C}" fill-opacity="${op}" pointer-events="none"/>`;
     });
     const cw = (W - L - R) / Math.max(1, pts.length - 1);
     const tip = `<b>R${p.r}</b>` + (p.hi != null ? `<br>${zh ? "75%分位" : "P75"}: ${p.hi} ${unit}` : "")
@@ -712,6 +757,8 @@ async function ensureBuilds() {
   BS.v2 = (bd.v || 1) >= 2;
   BS.v3 = (bd.v || 1) >= 3;
   BS.v5 = (bd.v || 1) >= 5;                // curves are per-tier medians since v5
+  BS.rsplit = bd.rs || [7, 13];
+  BS.dnorm = !!bd.dn;                      // e/m/l damage normalised for extra destiny (destiny_profile)
   BS.v6 = (bd.v || 1) >= 6;                // radar = e/m/l dmg + first-rate + complexity since v6
   if (!BS.v3) {                          // v3 percentile pools are built per-tier on demand
     const axv = {}; RADAR_AXES_V5.forEach(([k]) => axv[k] = []);
@@ -957,12 +1004,12 @@ const VAR_RENAME = {                    // "char_career" or "char" -> {rawLabel:
   "1000006": { "其他": "白板" },       // 黎承云 (all side-jobs): the non-融剑 line is 白板
 };
 const VAR_EN = {
-  "其他": "Other", "白板": "Vanilla", "崩拳": "Crushing Fist", "百杀": "Hundred Kills",
+  "其他": "Other", "白板": "Vanilla", "崩拳": "Crash Fist", "百杀": "Realm Killing Palms",
   "玄奶": "Mystic Heal", "融剑": "Sword Fusion", "符防": "Talisman Guard",
   "符剑意": "Talisman Sword Intent", "田土": "Earth Field", "混元": "Primordial",
   "逆克": "Overcome", "定魂": "Soulstat",
-  "纯水": "Pure Water", "纯火": "Pure Fire", "纯木": "Pure Wood", "纯土": "Pure Earth", "纯金": "Pure Metal",
-  "狂剑": "Mad Sword", "云剑": "Cloud Sword", "多段": "Multi-hit", "火木": "Fire & Wood", "答辩": "World Smash",
+  "纯水": "Mono Water", "纯火": "Mono Fire", "纯木": "Mono Wood", "纯土": "Mono Earth", "纯金": "Mono Metal",
+  "狂剑": "Unrestrained Sword", "云剑": "Cloud Sword", "多段": "Multi-hit", "火木": "Fire & Wood", "答辩": "World Smash",
   "木火": "Wood & Fire", "金水": "Metal & Water",
 };
 function wcVarLabel(v, ch, cr) {
@@ -1015,6 +1062,7 @@ function renderBuilds() {
   if (BS.screen === "list") (BS.sort === "wheelchair" ? renderWheelchairList : renderCharList)(host);
   else if (BS.screen === "char") renderCharDetail(host);
   else renderBuildDetail(host);
+  enter(host);
 }
 function renderCrumbs() {
   const c = $("#crumbs"); c.innerHTML = "";
@@ -1037,12 +1085,14 @@ function renderCharList(host) {
     const pw = BS.power[r.id] || 0;
     const pct = r.g / totG * 100;
     const big = BS.sort === "place" ? r.avg.toFixed(2) : BS.sort === "pop" ? pct.toFixed(1) + "%" : pw;
-    const sub = BS.sort === "place" ? t("avgplace") : BS.sort === "pop" ? t("popularity") : t("powerScore");
+    const sub = BS.sort === "place" ? t("avgplace") : BS.sort === "pop" ? t("popularity") : "";
+    // n (raw games): shown with the 使用率 label; the 强度 view shows no label / n
+    const subTxt = BS.sort === "power" ? "" : `${sub} · n=${r.graw.toLocaleString()}`;
     const el = document.createElement("div"); el.className = "cchip";
     el.innerHTML = `<img loading="lazy" src="${charAvatar(r.id)}" onerror="this.style.visibility='hidden'">
       <div class="cn">${charName(r.id)}</div><div class="cs">${sectName(+String(r.id)[0])}</div>
       <div class="big" style="color:${BS.sort === 'power' ? powerColor(pw) : 'var(--text)'}">${big}</div>
-      <div class="sub2">${sub} · n=${r.graw.toLocaleString()}</div>`;
+      ${subTxt ? `<div class="sub2">${subTxt}</div>` : ""}`;
     el.onclick = () => { BS.char = r.id; BS.screen = "char"; renderBuilds(); };
     grid.appendChild(el);
   }
@@ -1118,7 +1168,7 @@ function renderCharDetail(host) {
   });
 }
 function radarSVG(b) {
-  const R = 76, cx = 130, cy = 110;
+  const R = 76, cx = 145, cy = 110;
   // shape = percentile of this build vs the comparison population (relative strength).
   // Damage axes (destiny dmg RECEIVED per round) are inverted — taking little damage
   // reads big; 人气 and 卡组简易程度 point outward as-is (bigger = more popular / simpler).
@@ -1137,7 +1187,7 @@ function radarSVG(b) {
   });
   const ang = (i) => (-90 + i * 72) * Math.PI / 180;
   const pt = (i, r) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r];
-  let svg = `<svg width="260" height="224" viewBox="0 0 260 224">`;
+  let svg = `<svg width="290" height="224" viewBox="0 0 290 224">`;
   [0.33, 0.66, 1].forEach((rr) => { svg += `<polygon points="${AX.map((_, i) => pt(i, rr).join(",")).join(" ")}" fill="none" stroke="#2c3445"/>`; });
   AX.forEach(([k, lk], i) => {
     const [x, y] = pt(i, 1); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3445"/>`;
@@ -1149,8 +1199,12 @@ function radarSVG(b) {
       : (v || 0).toFixed(1);
     svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle">
       <tspan x="${lx}">${t(lk)}</tspan><tspan x="${lx}" dy="12" fill="#cfd8e6" font-weight="700">${lab}</tspan></text>`;
+    // ⓘ next to the axis name: click for what this index means
+    const ix = lx + (t(lk).length * (S.lang === "zh" ? 11 : 6) / 2) + 9, iy = ly - 4;
+    svg += `<g class="rinfo" data-k="${k}" style="cursor:pointer"><circle cx="${ix}" cy="${iy}" r="7" fill="#222938" stroke="#5b8cff"/>`
+      + `<text x="${ix}" y="${iy + 3.5}" font-size="10" font-style="italic" font-weight="700" fill="#cfd8e6" text-anchor="middle">i</text></g>`;
   });
-  svg += `<polygon points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"/>`;
+  svg += `<polygon class="rshape" points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"/>`;
   return svg + `</svg>`;
 }
 function cardImgs(fidxs, imgs) {
@@ -1222,7 +1276,7 @@ function renderMatchupDetail(b, oc) {
     · ${t("avgplace")} ${t("youAbbr")} ${my.toFixed(2)} / ${t("oppAbbr")} ${op.toFixed(2)} (n=${m ? m[1] : 0})</span></div>`;
   html += boardListHTML(mb, BS.mShowAll);
   box.innerHTML = html;
-  wireExpand(box);
+  wireExpand(box); enter(box);
   const sm = box.querySelector(".showmore"); if (sm) sm.onclick = () => { BS.mShowAll = true; renderMatchupDetail(b, oc); };
 }
 function renderBoards(b) {
@@ -1230,10 +1284,10 @@ function renderBoards(b) {
   const realms = Object.keys(b.boards).filter((r) => b.boards[r].length).map(Number).sort((a, b) => a - b);
   if (!realms.length) { box.innerHTML = `<div class="empty" style="padding:14px">${t("noBuildData")}</div>`; return; }
   if (BS.realm == null || !realms.includes(BS.realm)) BS.realm = realms[realms.length - 1];
-  let html = `<div class="realmtabs">` + realms.map((r) => `<button class="${r === BS.realm ? 'on' : ''}" data-r="${r}">${t("realm")} ${r}</button>`).join("") + `</div>`;
+  let html = `<div class="realmtabs">` + realms.map((r) => `<button class="${r === BS.realm ? 'on' : ''}" data-r="${r}">${(S.lang === "zh" ? REALM_ZH : REALM_EN)[r - 1] || (t("realm") + " " + r)}</button>`).join("") + `</div>`;
   html += boardListHTML(b.boards[BS.realm], BS.boardsShowAll);
   box.innerHTML = html;
-  wireExpand(box);
+  wireExpand(box); enter(box);
   box.querySelectorAll(".realmtabs button").forEach((btn) => btn.onclick = () => { BS.realm = +btn.dataset.r; BS.boardsShowAll = false; renderBoards(b); });
   const sm = box.querySelector(".showmore"); if (sm) sm.onclick = () => { BS.boardsShowAll = true; renderBoards(b); };
 }
@@ -1256,7 +1310,7 @@ function renderBuildDetail(host) {
       </div></div>
       <div class="bh-sel">${fatesSectionHTML(key)}</div></div>
     <div class="bcols">
-      <div><div class="bsection"><h3>${t("power")} <span class="muted" style="font-size:12px">${t(BS.v6 ? "powerNote6" : "powerNote")}</span></h3>${radarSVG(b)}</div>
+      <div><div class="bsection"><h3>${t("power")} </h3>${radarSVG(b)}</div>
         <div class="bsection"><h3>${t("placement")}</h3>${placeBarsHTML(b.place, b.g)}</div>
         ${b.curve ? `<div class="bsection"><h3>${t("rerollsByRound")}</h3><div id="chartRC" class="chart"></div></div>
         <div class="bsection"><h3>${t("realmByRound")}</h3><div id="chartLV" class="chart"></div></div>` : ""}</div>
@@ -1278,11 +1332,18 @@ function renderCurves(b) {
   drawLineChart($("#chartRC"), rcRounds.map((r) => ({
     r, w: b.curve[r - 1][0], med: val(r, 1), lo: b.curve[r - 1][3], hi: b.curve[r - 1][4],
   })));
-  const rounds = []; for (let r = 1; r <= last; r++) rounds.push(r);
-  drawChart($("#chartLV"), rounds, (r) => {
-    const v = val(r, 2);
-    return { h: v / 5, label: r, tip: `R${r}: ${v}`, color: "#36c46b", faded: !b.curve[r - 1][0] };
-  }, false);
+  // realm timing table: first round where the median realm reaches each level
+  const zh = S.lang === "zh", names = zh ? REALM_ZH : REALM_EN;
+  const reach = {};
+  for (let r = 1; r <= last; r++) {
+    const c = b.curve[r - 1]; if (!(c[0] > 0.001)) continue;
+    for (let L = 1; L <= c[2]; L++) if (reach[L] == null) reach[L] = r;
+  }
+  const lv = $("#chartLV"); lv.className = "";
+  const maxL = Math.max(5, ...Object.keys(reach).map(Number));
+  let tb = `<table class="realmtbl"><tr><th>${t("realm")}</th><th>${zh ? "达成回合（中位数）" : "Round reached (median)"}</th></tr>`;
+  for (let L = 1; L <= maxL; L++) tb += `<tr><td>${names[L - 1] || (t("realm") + " " + L)}</td><td>${reach[L] != null ? (zh ? "第 " + reach[L] + " 回合" : "R" + reach[L]) : "–"}</td></tr>`;
+  lv.innerHTML = tb + `</table>`;
 }
 // ---- Fates & 天衍 -----------------------------------------------------------
 const FBUCKET_COLOR = { innate: "#c9a227", cultivation: "#5b8cff", other: "#36c46b" };
@@ -1292,7 +1353,8 @@ function dname(oid) { const e = (BS.data.dnames || {})[oid] || {}; return (S.lan
 function yname(oid) { const e = (BS.data.ynames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
 function selIconURL(oid, kind) {
   if (kind === "daoyun") return `${WIKI}${oid}_${S.lang}.webp`;   // 道韵 options are cards -> card art
-  const e = ((kind === "fate" ? BS.data.fnames : BS.data.dnames) || {})[oid] || {};
+  let e = ((kind === "fate" ? BS.data.fnames : BS.data.dnames) || {})[oid] || {};
+  if (kind === "fate" && BS.fateIconBy && e.cn && BS.fateIconBy[e.cn]) e = BS.fateIconBy[e.cn];   // same name as a phase-1 fate -> phase-1 icon
   // the wiki serves .webp only now; older data JSON may still carry .png icon names
   return e.icon ? (BS.iconBase + e.icon.replace(/\.png$/i, ".webp")) : "";
 }
@@ -1302,6 +1364,15 @@ function selIcon(oid, kind, cls) {
     : `<span class="${cls} noimg"></span>`;
 }
 // kind: "fate" (天命) | "deriv" (天衍) | "daoyun" (道韵)
+// phase labels: 天命 1-4 = realm names; 道韵 = 第N次; 天衍 keeps its number
+const REALM_ZH = ["练气", "筑基", "金丹", "元婴", "化神"];
+const REALM_EN = ["Meditation", "Foundation", "Virtuoso", "Immortality", "Incarnation"];
+function ordLabel(kind, n) {
+  const zh = S.lang === "zh";
+  if (kind === "fate") return (zh ? REALM_ZH : REALM_EN)[n] || n;           // fate phases 1-4 -> 筑基..化神
+  if (kind === "daoyun") return zh ? `第${n}次` : (n === 1 ? "1st" : n === 2 ? "2nd" : n + "th");
+  return n;
+}
 function fatePhaseHTML(rows, ord, kind) {
   rows = collapseSelRows(rows);
   if (!rows.length) return "";
@@ -1331,7 +1402,7 @@ function fatePhaseHTML(rows, ord, kind) {
       + `<td>${rate}</td><td style="color:${placeColorF(c ? pw2 / c : 0)}">${c ? (pw2 / c).toFixed(2) : "–"}</td></tr>`;
   }
   pop += `</table></div>`;
-  return `<div class="fphase"><div class="flabel">${ord}</div>
+  return `<div class="fphase"><div class="flabel">${ordLabel(kind, ord)}</div>
     <div class="fchip" style="border-color:${col}">${selIcon(oid, kind, "cicon")}<span class="fchip-t">${nm(oid)}</span>
       <span class="fstat" style="color:${placeColorF(avgPl)}">${avgPl.toFixed(2)}</span></div>${pop}</div>`;
 }
@@ -1341,7 +1412,10 @@ function fatesSectionHTML(key) {
   let h = "";
   if (F) {
     h += `<div class="bsection"><h3>${t("fates")} <span class="muted" style="font-size:12px">${t("fatesHint")}</span></h3><div class="fphases">`;
-    Object.keys(F).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(F[sid], i + 1, "fate"); });
+    const sids = Object.keys(F).sort((a, b) => +a - +b);
+    BS.fateIconBy = {};                    // fate name -> its phase-1 entry (icon)
+    for (const r of collapseSelRows(F[sids[0]] || [])) { const fe = (BS.data.fnames || {})[r[0]]; if (fe && fe.cn && fe.icon && !BS.fateIconBy[fe.cn]) BS.fateIconBy[fe.cn] = fe; }
+    sids.forEach((sid, i) => { h += fatePhaseHTML(F[sid], i + 1, "fate"); });
     h += `</div></div>`;
   }
   if (D) {
@@ -1372,6 +1446,27 @@ function wireBuilds() {
       BS.active = false;
       if (!CARDS_INIT) { CARDS_INIT = true; loadThreshold(4000); }
     }
+  });
+  // ⓘ next to the sort box: explains how every sort index is calculated (current one highlighted)
+  const sinfo = $("#sortinfo");
+  const fillSortInfo = () => {
+    const cur = $("#bsort").value;
+    sinfo.innerHTML = `<b>${t("infoTitle")}</b>` + [["power", "infoPower"], ["place", "infoPlace"], ["pop", "infoPop"], ["wheelchair", "infoWc"]]
+      .map(([k, key]) => `<p class="${k === cur ? "cur" : ""}">${t(key)}</p>`).join("");
+  };
+  $("#sortinfo-btn").addEventListener("click", (e) => { e.stopPropagation(); fillSortInfo(); sinfo.hidden = !sinfo.hidden; });
+  document.addEventListener("click", (e) => { if (!e.target.closest("#sortinfo")) sinfo.hidden = true; });
+  // radar axis ⓘ: popover explaining that index
+  document.addEventListener("click", (e) => {
+    document.querySelectorAll(".rpop").forEach((p) => p.remove());
+    const g = e.target.closest && e.target.closest(".rinfo"); if (!g) return;
+    e.stopPropagation();
+    const p = document.createElement("div"); p.className = "rpop"; const sp = BS.rsplit || [7, 13];   // phase boundaries come from the data (S9 frozen = 7/13, S10 = 9/13)
+    p.textContent = t("ri_" + g.dataset.k).replace(/\{a\}/g, 1).replace(/\{b\}/g, sp[0]).replace(/\{c\}/g, sp[0] + 1).replace(/\{d\}/g, sp[1]).replace(/\{e\}/g, sp[1] + 1) + (BS.dnorm && "eml".includes(g.dataset.k) ? " " + t("riNorm") : "");
+    document.body.appendChild(p);
+    const r = g.getBoundingClientRect();
+    p.style.left = Math.max(8, Math.min(r.left + scrollX - 20, scrollX + innerWidth - p.offsetWidth - 8)) + "px";
+    p.style.top = (r.bottom + scrollY + 8) + "px";
   });
   $("#bsort").addEventListener("change", (e) => { BS.sort = e.target.value; renderBuilds(); });
   seg("tier", (v) => { BS.tier = +v; computePower(BS.tier); renderBuilds(); });

@@ -240,3 +240,57 @@ footer #updated{margin-top:6px}
 .lc-tip{position:absolute;pointer-events:none;background:#000;color:#fff;border-radius:6px;padding:6px 8px;font-size:12px;line-height:1.5;white-space:nowrap;z-index:5}
 .lc-tip[hidden]{display:none}
 .lc-hit:hover{fill:rgba(91,140,255,.12)}
+
+.selrow{display:flex;align-items:center;gap:6px}
+.infobtn{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font:italic bold 12px serif;cursor:pointer;padding:0;line-height:1}
+.infobtn:hover{color:var(--text);border-color:var(--accent)}
+.infopop{position:absolute;top:100%;left:0;margin-top:6px;z-index:50;width:min(340px,86vw);background:var(--panel);border:1px solid var(--accent);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.55;color:var(--text);box-shadow:0 6px 22px #000a}
+.infopop[hidden]{display:none}
+.infopop p{margin:6px 0 0;color:var(--muted)}
+.infopop p.cur{color:var(--text)}
+
+.rpop{position:absolute;z-index:60;width:min(300px,86vw);background:var(--panel);border:1px solid var(--accent);border-radius:10px;padding:9px 12px;font-size:12px;line-height:1.55;color:var(--text);box-shadow:0 6px 22px #000a}
+.rinfo:hover circle{fill:#2f3b55}
+
+.realmtbl{border-collapse:collapse;width:100%;max-width:360px;font-size:13px}
+.realmtbl th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;padding:4px 10px 4px 0;border-bottom:1px solid var(--line)}
+.realmtbl td{padding:5px 10px 5px 0;border-bottom:1px solid var(--line)}
+.realmtbl td:last-child{font-weight:700}
+
+/* ===== entrance animations (none at all when the OS asks for reduced motion) ===== */
+@media (prefers-reduced-motion: no-preference){
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes pop{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes drop{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+  @keyframes growx{from{transform:scaleX(0)}to{transform:none}}
+  @keyframes growy{from{transform:scaleY(0)}to{transform:none}}
+  @keyframes radar{from{opacity:0;transform:scale(.25)}to{opacity:1;transform:none}}
+  @keyframes draw{from{stroke-dasharray:1;stroke-dashoffset:1}to{stroke-dasharray:1;stroke-dashoffset:0}}
+  @keyframes avatar{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+  /* page load + tab switch */
+  header{animation:fade .45s backwards}
+  #tabbar{animation:fade .45s .08s backwards}
+  section:not([hidden]){animation:fade .3s backwards}
+  /* staggered groups: enter() in app.js hands each item its --d. fill-mode is
+     backwards so the hover lift on chips/cards takes over once the entrance ends. */
+  .cchip,.card,.sjrow,.board,.mcell,.fphase,.realmtbl tr,.mdh{animation:rise .38s cubic-bezier(.2,.7,.2,1) var(--d,0ms) backwards}
+  .realmtbl tr{animation-name:fade}
+  .bh,.bsection,.wcnote{animation:fade .35s backwards}
+  .bh img.av{animation:avatar .45s cubic-bezier(.2,.8,.2,1) backwards}
+  /* bars grow in just after their row / card has landed (--d inherited from it) */
+  .sjrow .barwrap>i,.card .bar>i{transform-origin:left;animation:growx .5s cubic-bezier(.2,.7,.2,1) calc(var(--d,0ms) + .12s) backwards}
+  .placebars .pb i,.col i{transform-origin:bottom;animation:growy .45s cubic-bezier(.2,.7,.2,1) calc(var(--d,0ms) + .1s) backwards}
+  /* radar shape scales out of its centre; reroll lines draw left to right, dots after */
+  .rshape{transform-box:view-box;transform-origin:145px 110px;animation:radar .55s cubic-bezier(.2,.8,.2,1) .15s backwards}
+  .lc-line{animation:draw .9s cubic-bezier(.4,0,.2,1) backwards}
+  .lc-line.lc-lo,.lc-line.lc-hi{animation-delay:.25s}
+  .lc-dot{animation:fade .3s .7s backwards}
+  /* overlays and popovers */
+  .modal:not([hidden]) .modal-bg,.popup-bg{animation:fade .2s backwards}
+  .modal:not([hidden]) .modal-card,.popup-box{animation:pop .26s cubic-bezier(.2,.8,.2,1) backwards}
+  .infopop:not([hidden]),.ms-panel:not([hidden]),.rpop,.sjvars:not([hidden]),.board-vars:not([hidden]){animation:drop .18s cubic-bezier(.2,.7,.2,1) backwards}
+  /* hover popover slides down a touch as it fades in */
+  .fpop{transform:translateY(-4px);transition:opacity .12s,transform .12s}
+  .fphase:hover .fpop{transform:none}
+}
