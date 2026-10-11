@@ -27,8 +27,8 @@ const UI = {
     ri_m: "Mid (R{c}–{d}): average destiny damage taken per round in rounds {c}–{d}, compared with the top 50 strategies as a z-score (dashed ring = average, each ring = 1 sd). Bigger = takes less damage.",
     ri_l: "Late (R{e}+): average destiny damage taken per round from round {e} on, compared with the top 50 strategies as a z-score (dashed ring = average, each ring = 1 sd). Bigger = takes less damage.",
     riNorm: "Normalized for extra destiny: destiny gained outside combat (fates, absorbed cards) and damage reductions (慈念曲, 龙鳞…) raise the player's effective starting destiny, and each round's damage (before reductions) is scaled to a 100-destiny pool.",
-    ri_pop: "Popularity: the number is this character+side-job's share of all games (shared by its sub-strategies). The shape is the z-score of its log game count vs the top 50 combos (dashed ring = average, each ring = 1 sd). Bigger = more popular.",
-    ri_cx: "Simplicity (σ): from R12 on, how small the effective card pool is and how few choices each slot has, as a z-score vs the top 50 strategies (log scale; dashed ring = average, each ring = 1 sd). Bigger = simpler deck.",
+    ri_pop: "Popularity: the number is this character+side-job's percentile rank (0–100) by games played among the top 50 combos (shared by its sub-strategies). The shape is the z-score of its log game count in that group (dashed ring = average, each ring = 1 sd). Bigger = more popular.",
+    ri_cx: "Simplicity (0–100): from R12 on, how small the effective card pool is and how few choices each slot has. The number is a percentile rank vs the top 50 strategies; the shape is the z-score (log scale; dashed ring = average, each ring = 1 sd). Bigger = simpler deck.",
     ri_f: "First: average destiny damage taken per round when acting first. Bigger = takes less.",
     ri_s: "Second: average destiny damage taken per round when acting second. Bigger = takes less.",
     axisFirst: "First", axisSecond: "Second", axisPopularity: "Popularity", axisComplexity: "Simplicity", roundWR: "round WR",
@@ -84,8 +84,8 @@ const UI = {
     ri_m: "中期（第{c}–{d}回合）：第{c}–{d}回合每回合承受的命元伤害，与热门前50角色流派以 z 分数比较（虚线圈 = 平均，每圈 = 1 个标准差）。数值越大 = 承伤越低。",
     ri_l: "后期（第{e}回合起）：第{e}回合起每回合承受的命元伤害，与热门前50角色流派以 z 分数比较（虚线圈 = 平均，每圈 = 1 个标准差）。数值越大 = 承伤越低。",
     riNorm: "已按额外命元校正：战斗外获得的命元（天命、吸收卡牌等）与命元伤害减免（慈念曲、龙鳞等）计入有效初始命元，每回合（减免前的）伤害按 100 命元折算。",
-    ri_pop: "人气：数字 = 该角色+副职占全部对局的比例（分支流派共享）；形状 = 对局数（对数）相对热门前50组合的 z 分数（虚线圈 = 平均，每圈 = 1 个标准差）。越大 = 越热门。",
-    ri_cx: "简易（σ）：12回合后有效卡池越小、各槽位选择越少得分越高，以对数尺度相对热门前50流派的 z 分数表示（虚线圈 = 平均，每圈 = 1 个标准差）。越大 = 卡组越简单。",
+    ri_pop: "人气：数字 = 该角色+副职在热门前50组合中按对局数的百分位排名（0–100，分支流派共享）；形状 = 对局数（对数）在该组中的 z 分数（虚线圈 = 平均，每圈 = 1 个标准差）。越大 = 越热门。",
+    ri_cx: "简易（0–100）：12回合后有效卡池越小、各槽位选择越少得分越高。数字 = 相对热门前50流派的百分位排名；形状 = z 分数（对数尺度；虚线圈 = 平均，每圈 = 1 个标准差）。越大 = 卡组越简单。",
     ri_f: "先手：先手时每回合承受的命元伤害。数值越大 = 承伤越低。",
     ri_s: "后手：后手时每回合承受的命元伤害。数值越大 = 承伤越低。",
     axisFirst: "先手", axisSecond: "后手", axisPopularity: "人气", axisComplexity: "简易", roundWR: "回合胜率",
@@ -708,11 +708,19 @@ function popPool() {
   return BS.popCache[BS.tier] = combos.map((c) => Math.log(1 + comboPopularity(c)));
 }
 function popZ(key) { return zOf(popPool(), Math.log(1 + comboPopularity(comboOf(key)))); }
-// share of all games at the current tier (the number under the 人气 axis)
-function popShare(key) {
-  let tot = 0;
-  for (const k in BS.data.tiers) if (k.indexOf("|") < 0) tot += comboPopularity(k);
-  return tot ? comboPopularity(comboOf(key)) / tot : 0;
+// The NUMBERS under 人气 / 简易 stay the familiar 0-100 percentile ranks against the same
+// group (only the SHAPE is z-based): 人气 = share of combos with <= this combo's games;
+// 简易 = mean of (1 - pct(pool)) and (1 - pct(slot choices)).
+const pctOf = (arr, v) => { let c = 0; for (const x of arr) if (x <= v) c++; return arr.length ? c / arr.length : 0; };
+function popPct(key) {
+  const vals = popPool(); if (!vals.length) return null;
+  return Math.round(100 * pctOf(vals, Math.log(1 + comboPopularity(comboOf(key)))));
+}
+function cxPct(key) {
+  const e = BS.data.wc && BS.data.wc[key] && BS.data.wc[key][String(BS.tier)];
+  if (!e || !(e[3] > 0) || !(e[4] > 0)) return null;
+  const { pools, slots } = cxPools(); if (!pools.length) return null;
+  return Math.round(100 * ((1 - pctOf(pools, Math.log(e[3]))) + (1 - pctOf(slots, Math.log(e[4])))) / 2);
 }
 
 // One independent view state per season tab; BS always points at the active season's.
@@ -921,7 +929,7 @@ function collapseBuild(b, key) {
   if (!BS.v3) return b;
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
   const radar = {}; for (const k in b.radar) { const [num, den] = sumBands(b.radar[k], idxs); radar[k] = den ? num / den : 0; }
-  if (BS.v6) { radar.cx = cxZ(key); radar.pop = popZ(key); radar.popShare = popShare(key); }
+  if (BS.v6) { radar.cx = cxZ(key); radar.pop = popZ(key); radar.cxPct = cxPct(key); radar.popPct = popPct(key); }
   const cb = (lst) => lst.map(([fidxs, s3, vars, imgs]) => {
     const [raw, w, ww] = sumBands(s3, idxs);
     const cvars = vars.map(([vf, vs3, vimgs]) => { const [vr, vw, vww] = sumBands(vs3, idxs); return [vf, vr, vw, vww, vimgs]; }).filter((v) => v[1] > 0);
@@ -1210,11 +1218,11 @@ function radarSVG(b) {
   AX.forEach(([k, lk], i) => {
     const [x, y] = pt(i, 1); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3445"/>`;
     const [lx, ly] = pt(i, 1.28);
-    // damage axes: actual dmg/round; 人气: share of games; 简易: z in sd; v1 legacy: WR%
+    // numbers: damage axes = actual dmg/round; 人气 / 简易 = 0-100 percentile rank; v1 legacy: WR%
     const v = b.radar[k];
+    const pv = k === "pop" ? b.radar.popPct : k === "cx" ? b.radar.cxPct : null;
     const lab = !BS.v2 ? Math.round((v || 0) * 100) + "%"
-      : k === "pop" ? (b.radar.popShare != null ? (b.radar.popShare * 100).toFixed(1) + "%" : "–")
-      : k === "cx" ? (v == null ? "–" : (v >= 0 ? "+" : "") + v.toFixed(1) + "σ")
+      : (k === "cx" || k === "pop") ? (pv == null ? "–" : String(pv))
       : (v || 0).toFixed(1);
     svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle">
       <tspan x="${lx}">${t(lk)}</tspan><tspan x="${lx}" dy="12" fill="#cfd8e6" font-weight="700">${lab}</tspan></text>`;
