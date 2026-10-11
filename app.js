@@ -23,12 +23,12 @@ const UI = {
     hhHigher: "finishes higher", youAbbr: "you", oppAbbr: "opp",
     games: "Games", topFinish: "Top-4 rate", placement: "Placement distribution",
     characters: "Characters", axisEarly: "Early", axisMid: "Mid", axisLate: "Late",
-    ri_e: "Early (R{a}–{b}): average destiny damage taken per round in rounds {a}–{b}, ranked against the top 50 character+side-job strategies. Bigger = takes less damage.",
-    ri_m: "Mid (R{c}–{d}): average destiny damage taken per round in rounds {c}–{d}, ranked against the top 50 strategies. Bigger = takes less damage.",
-    ri_l: "Late (R{e}+): average destiny damage taken per round from round {e} on, ranked against the top 50 strategies. Bigger = takes less damage.",
+    ri_e: "Early (R{a}–{b}): average destiny damage taken per round in rounds {a}–{b}, compared with the top 50 character+side-job strategies as a z-score (dashed ring = their average, each ring = 1 standard deviation). Bigger = takes less damage.",
+    ri_m: "Mid (R{c}–{d}): average destiny damage taken per round in rounds {c}–{d}, compared with the top 50 strategies as a z-score (dashed ring = average, each ring = 1 sd). Bigger = takes less damage.",
+    ri_l: "Late (R{e}+): average destiny damage taken per round from round {e} on, compared with the top 50 strategies as a z-score (dashed ring = average, each ring = 1 sd). Bigger = takes less damage.",
     riNorm: "Normalized for extra destiny: destiny gained outside combat (fates, absorbed cards) and damage reductions (慈念曲, 龙鳞…) raise the player's effective starting destiny, and each round's damage (before reductions) is scaled to a 100-destiny pool.",
-    ri_pop: "Popularity: percentile of total games played with this character+side-job (shared by its sub-strategies). Bigger = more popular.",
-    ri_cx: "Simplicity (0–100): from R12 on, how small the effective card pool is and how few choices each slot has (percentile vs the top 50 strategies). Bigger = simpler deck.",
+    ri_pop: "Popularity: the number is this character+side-job's share of all games (shared by its sub-strategies). The shape is the z-score of its log game count vs the top 50 combos (dashed ring = average, each ring = 1 sd). Bigger = more popular.",
+    ri_cx: "Simplicity (σ): from R12 on, how small the effective card pool is and how few choices each slot has, as a z-score vs the top 50 strategies (log scale; dashed ring = average, each ring = 1 sd). Bigger = simpler deck.",
     ri_f: "First: average destiny damage taken per round when acting first. Bigger = takes less.",
     ri_s: "Second: average destiny damage taken per round when acting second. Bigger = takes less.",
     axisFirst: "First", axisSecond: "Second", axisPopularity: "Popularity", axisComplexity: "Simplicity", roundWR: "round WR",
@@ -80,12 +80,12 @@ const UI = {
     hhHigher: "名次高于对方", youAbbr: "我", oppAbbr: "对方",
     games: "场次", topFinish: "前四率", placement: "名次分布",
     characters: "角色", axisEarly: "前期", axisMid: "中期", axisLate: "后期",
-    ri_e: "前期（第{a}–{b}回合）：第{a}–{b}回合每回合承受的命元伤害，与热门前50角色流派比较。数值越大 = 承伤越低。",
-    ri_m: "中期（第{c}–{d}回合）：第{c}–{d}回合每回合承受的命元伤害，与热门前50流派比较。数值越大 = 承伤越低。",
-    ri_l: "后期（第{e}回合起）：第{e}回合起每回合承受的命元伤害，与热门前50流派比较。数值越大 = 承伤越低。",
+    ri_e: "前期（第{a}–{b}回合）：第{a}–{b}回合每回合承受的命元伤害，与热门前50角色流派以 z 分数比较（虚线圈 = 平均，每圈 = 1 个标准差）。数值越大 = 承伤越低。",
+    ri_m: "中期（第{c}–{d}回合）：第{c}–{d}回合每回合承受的命元伤害，与热门前50角色流派以 z 分数比较（虚线圈 = 平均，每圈 = 1 个标准差）。数值越大 = 承伤越低。",
+    ri_l: "后期（第{e}回合起）：第{e}回合起每回合承受的命元伤害，与热门前50角色流派以 z 分数比较（虚线圈 = 平均，每圈 = 1 个标准差）。数值越大 = 承伤越低。",
     riNorm: "已按额外命元校正：战斗外获得的命元（天命、吸收卡牌等）与命元伤害减免（慈念曲、龙鳞等）计入有效初始命元，每回合（减免前的）伤害按 100 命元折算。",
-    ri_pop: "人气：该角色+副职总出场量的百分位（分支流派共享）。数值越大 = 越热门。",
-    ri_cx: "卡组简易程度（0–100）：12回合后有效卡池越小、各槽位选择越少得分越高（与热门前50流派比较的百分位）。数值越大 = 卡组越简单。",
+    ri_pop: "人气：数字 = 该角色+副职占全部对局的比例（分支流派共享）；形状 = 对局数（对数）相对热门前50组合的 z 分数（虚线圈 = 平均，每圈 = 1 个标准差）。越大 = 越热门。",
+    ri_cx: "简易（σ）：12回合后有效卡池越小、各槽位选择越少得分越高，以对数尺度相对热门前50流派的 z 分数表示（虚线圈 = 平均，每圈 = 1 个标准差）。越大 = 卡组越简单。",
     ri_f: "先手：先手时每回合承受的命元伤害。数值越大 = 承伤越低。",
     ri_s: "后手：后手时每回合承受的命元伤害。数值越大 = 承伤越低。",
     axisFirst: "先手", axisSecond: "后手", axisPopularity: "人气", axisComplexity: "简易", roundWR: "回合胜率",
@@ -668,39 +668,51 @@ function comboPopularity(combo) {
   let g = 0; for (const bd of tierBands(BS.tier)) if (tk[bd]) g += tk[bd].g;
   return g;
 }
-// 卡组简易程度 / 人气 are both 0-100 RANK scores against radarPopulation() (not raw
-// magnitude) -- a handful of extreme-variety decks or a few blockbuster-popular combos
-// are heavy-tailed, and percentile rank is immune to that by construction.
+// Radar axes are Z-SCORES against radarPopulation() (mean 0, sd 1 within that group).
+// 人气 and the two deck-variety measures are heavy-tailed (a few blockbuster combos / a few
+// extreme-variety decks), so they are standardised on a LOG scale; otherwise those few
+// outliers would set the scale and squash everyone else.
+function zOf(arr, v) {
+  if (v == null || !arr.length) return null;
+  const m = arr.reduce((s, x) => s + x, 0) / arr.length;
+  const sd = Math.sqrt(arr.reduce((s, x) => s + (x - m) ** 2, 0) / arr.length) || 1;
+  return (v - m) / sd;
+}
+// 简易: z of -(z(log pool) + z(log slot)) / 2, re-standardised so it is a true z-score
+// (smaller pool / fewer choices per slot = simpler = positive).
 function cxPools() {
   BS.cxCache = BS.cxCache || {};
   if (BS.cxCache[BS.tier]) return BS.cxCache[BS.tier];
-  const tier = String(BS.tier), pools = [], slots = [];
+  const tier = String(BS.tier), rows = [];
   for (const key of radarPopulation()) {
     const e = BS.data.wc && BS.data.wc[key] && BS.data.wc[key][tier];
-    if (e) { pools.push(e[3]); slots.push(e[4]); }
+    if (e && e[3] > 0 && e[4] > 0) rows.push([Math.log(e[3]), Math.log(e[4])]);
   }
-  pools.sort((a, b) => a - b); slots.sort((a, b) => a - b);
-  return BS.cxCache[BS.tier] = { pools, slots };
+  const pools = rows.map((r) => r[0]), slots = rows.map((r) => r[1]);
+  const raw = rows.map(([p, s]) => -(zOf(pools, p) + zOf(slots, s)) / 2);
+  return BS.cxCache[BS.tier] = { pools, slots, raw };
 }
-function cxScore(key) {
+function cxZ(key) {
   const e = BS.data.wc && BS.data.wc[key] && BS.data.wc[key][String(BS.tier)];
-  if (!e) return null;
-  const { pools, slots } = cxPools();
-  const pct = (arr, v) => { let c = 0; for (const x of arr) if (x <= v) c++; return c / arr.length; };
-  return Math.round(100 * ((1 - pct(pools, e[3])) + (1 - pct(slots, e[4]))) / 2);
+  if (!e || !(e[3] > 0) || !(e[4] > 0)) return null;
+  const { pools, slots, raw } = cxPools();
+  if (!raw.length) return null;
+  return zOf(raw, -(zOf(pools, Math.log(e[3])) + zOf(slots, Math.log(e[4]))) / 2);
 }
+// 人气: z of log(weighted games) of the parent combo; each combo counts ONCE in the
+// group (split combos used to be counted once per named sub-strategy).
 function popPool() {
   BS.popCache = BS.popCache || {};
   if (BS.popCache[BS.tier]) return BS.popCache[BS.tier];
-  const vals = radarPopulation().map((k) => comboPopularity(comboOf(k)));
-  vals.sort((a, b) => a - b);
-  return BS.popCache[BS.tier] = vals;
+  const combos = [...new Set(radarPopulation().map(comboOf))];
+  return BS.popCache[BS.tier] = combos.map((c) => Math.log(1 + comboPopularity(c)));
 }
-function popScore(key) {
-  const v = comboPopularity(comboOf(key));
-  const vals = popPool(); if (!vals.length) return null;
-  let c = 0; for (const x of vals) if (x <= v) c++;
-  return Math.round(100 * c / vals.length);
+function popZ(key) { return zOf(popPool(), Math.log(1 + comboPopularity(comboOf(key)))); }
+// share of all games at the current tier (the number under the 人气 axis)
+function popShare(key) {
+  let tot = 0;
+  for (const k in BS.data.tiers) if (k.indexOf("|") < 0) tot += comboPopularity(k);
+  return tot ? comboPopularity(comboOf(key)) / tot : 0;
 }
 
 // One independent view state per season tab; BS always points at the active season's.
@@ -909,7 +921,7 @@ function collapseBuild(b, key) {
   if (!BS.v3) return b;
   const idxs = BAND_IDX[BS.tier] || [0, 1, 2];
   const radar = {}; for (const k in b.radar) { const [num, den] = sumBands(b.radar[k], idxs); radar[k] = den ? num / den : 0; }
-  if (BS.v6) { radar.cx = cxScore(key); radar.pop = popScore(key); }
+  if (BS.v6) { radar.cx = cxZ(key); radar.pop = popZ(key); radar.popShare = popShare(key); }
   const cb = (lst) => lst.map(([fidxs, s3, vars, imgs]) => {
     const [raw, w, ww] = sumBands(s3, idxs);
     const cvars = vars.map(([vf, vs3, vimgs]) => { const [vr, vw, vww] = sumBands(vs3, idxs); return [vf, vr, vw, vww, vimgs]; }).filter((v) => v[1] > 0);
@@ -957,7 +969,7 @@ function getAxv() {
     let g = 0; for (const bd of tierBands(BS.tier)) if (tk[bd]) g += tk[bd].g;
     if (g < 20) continue;
     radarAxes().forEach(([k]) => {
-      if (k === "cx" || k === "pop") return;   // rank scores already computed, no pool needed here
+      if (k === "cx" || k === "pop") return;   // z-scores computed separately (cxZ / popZ)
       const [num, den] = sumBands(b.radar[k], idxs); if (den) axv[k].push(num / den);
     });
   }
@@ -1169,33 +1181,40 @@ function renderCharDetail(host) {
 }
 function radarSVG(b) {
   const R = 76, cx = 145, cy = 110;
-  // shape = percentile of this build vs the comparison population (relative strength).
+  // shape = Z-SCORE of this build vs the comparison population: radius 0.5 + z/4, so the
+  // dashed middle ring is the group average, each ring is 1 sd and the rim is +2 sd.
   // Damage axes (destiny dmg RECEIVED per round) are inverted — taking little damage
-  // reads big; 人气 and 卡组简易程度 point outward as-is (bigger = more popular / simpler).
+  // reads big; 人气 and 简易 point outward as-is (bigger = more popular / simpler).
   const AX = radarAxes();
   const axv = getAxv();
   const INV = { e: 1, m: 1, l: 1, f: 1, s: 1 };
+  const zr = (z) => (z == null ? 0 : Math.max(0, Math.min(1, 0.5 + z / 4)));
+  const zs = {};
   const vals = AX.map(([k]) => {
     const v = b.radar[k];
-    if (k === "cx" || k === "pop") return v == null ? 0 : v / 100;   // already rank scores
-    const arr = axv[k];
-    if (!arr || !arr.length || v == null) return 0;
-    let c = 0;
-    for (let i = 0; i < arr.length; i++) if (arr[i] <= v) c++;
-    const p = c / arr.length;
-    return BS.v2 && INV[k] ? 1 - p : p;
+    let z;
+    if (k === "cx" || k === "pop") z = v;                               // already z-scores
+    else {
+      const arr = axv[k];
+      z = arr && arr.length && v != null ? zOf(arr, v) : null;
+      if (z != null && BS.v2 && INV[k]) z = -z;
+    }
+    zs[k] = z;
+    return zr(z);
   });
   const ang = (i) => (-90 + i * 72) * Math.PI / 180;
   const pt = (i, r) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r];
   let svg = `<svg width="290" height="224" viewBox="0 0 290 224">`;
-  [0.33, 0.66, 1].forEach((rr) => { svg += `<polygon points="${AX.map((_, i) => pt(i, rr).join(",")).join(" ")}" fill="none" stroke="#2c3445"/>`; });
+  // rings at -1 / 0 (group average, dashed) / +1 / +2 sd
+  [0.25, 0.5, 0.75, 1].forEach((rr) => { svg += `<polygon points="${AX.map((_, i) => pt(i, rr).join(",")).join(" ")}" fill="none" stroke="${rr === 0.5 ? "#4a5570" : "#2c3445"}"${rr === 0.5 ? ' stroke-dasharray="3 3"' : ""}/>`; });
   AX.forEach(([k, lk], i) => {
     const [x, y] = pt(i, 1); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2c3445"/>`;
     const [lx, ly] = pt(i, 1.28);
-    // damage axes: actual dmg/round; pop/cx: 0-100 rank score; v1 legacy: WR%
+    // damage axes: actual dmg/round; 人气: share of games; 简易: z in sd; v1 legacy: WR%
     const v = b.radar[k];
     const lab = !BS.v2 ? Math.round((v || 0) * 100) + "%"
-      : (k === "cx" || k === "pop") ? (v == null ? "–" : v.toFixed(0))
+      : k === "pop" ? (b.radar.popShare != null ? (b.radar.popShare * 100).toFixed(1) + "%" : "–")
+      : k === "cx" ? (v == null ? "–" : (v >= 0 ? "+" : "") + v.toFixed(1) + "σ")
       : (v || 0).toFixed(1);
     svg += `<text x="${lx}" y="${ly}" fill="#94a0b4" font-size="11" text-anchor="middle">
       <tspan x="${lx}">${t(lk)}</tspan><tspan x="${lx}" dy="12" fill="#cfd8e6" font-weight="700">${lab}</tspan></text>`;
@@ -1204,7 +1223,8 @@ function radarSVG(b) {
     svg += `<g class="rinfo" data-k="${k}" style="cursor:pointer"><circle cx="${ix}" cy="${iy}" r="7" fill="#222938" stroke="#5b8cff"/>`
       + `<text x="${ix}" y="${iy + 3.5}" font-size="10" font-style="italic" font-weight="700" fill="#cfd8e6" text-anchor="middle">i</text></g>`;
   });
-  svg += `<polygon class="rshape" points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"/>`;
+  // hover the shape: every axis' z-score
+  svg += `<polygon class="rshape" points="${vals.map((v, i) => pt(i, Math.max(0.04, v)).join(",")).join(" ")}" fill="rgba(91,140,255,.35)" stroke="#5b8cff" stroke-width="2"><title>${AX.map(([k, lk]) => `${t(lk)}: ${zs[k] == null ? "–" : (zs[k] >= 0 ? "+" : "") + zs[k].toFixed(2) + "σ"}`).join("\n")}</title></polygon>`;
   return svg + `</svg>`;
 }
 function cardImgs(fidxs, imgs) {
