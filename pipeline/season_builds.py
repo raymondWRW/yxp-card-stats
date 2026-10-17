@@ -86,7 +86,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 11            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 12            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -136,6 +136,17 @@ try:
     DERIV_EN = _ty.get("en", {})
 except Exception:
     pass
+
+# 百家之道 仙命 registry (season 10's in-game picks, privateData.xianMoData): option ids are
+# pool*1000 + n (XianMoStrategyConfig); ids < 1000 are "skip". Built by build_xianmo_map.py
+# into xianmo_map.json = {"byId": {id: {cn, en, icon, pool, poolCn, poolEn}}}.
+XM_SKIP = 999                     # every skip choice (ids < 1000) is folded into this one option
+XM_ICON_BASE = "https://sharpobject.github.io/yxp_wiki/assets/hundred-schools/icons/"
+try:
+    with open(os.path.join(HERE, "xianmo_map.json"), encoding="utf-8") as f:
+        XIANMO = json.load(f).get("byId", {})
+except Exception:
+    XIANMO = {}
 
 # wiki icon CDN base; fate icons are Icon_Talent_<id>.webp, derivation icons use their
 # registry icon field (mix of Icon_FateStrategy_/Icon_Talent_/Card_). The wiki serves
@@ -307,6 +318,7 @@ STATE = {
     "fates": defaultdict(_sel3),   # fate picks (talentSelectionDatas)
     "derivs": defaultdict(_sel3),  # 天衍 picks (fateStrategyData.strategies)
     "daoyun": defaultdict(_sel3),  # 道韵 picks (daoYunSelectionDatas)
+    "xianmo": defaultdict(_sel3),  # 仙命 picks (百家之道, xianMoData.strategies), slots 1-3
     "mu": new_mu(),
     "botexp": defaultdict(_botexp),       # char -> [records, sum_bot_opps, sum_real_opps]
     "done": set(),                        # shard ids folded into this state
@@ -314,7 +326,7 @@ STATE = {
     "schema": SCHEMA, "season": SEASON, "ref": 0,   # ref = the T_REF the weights are relative to
 }
 # STATE members holding recency-weighted accumulators (what rescale_state touches)
-WEIGHTED = ("builds", "wc", "char", "tier", "fam_pop", "fates", "derivs", "daoyun")
+WEIGHTED = ("builds", "wc", "char", "tier", "fam_pop", "fates", "derivs", "daoyun", "xianmo")
 
 
 def fam_index(cid):
@@ -595,6 +607,15 @@ def process_record(d):
     for s in priv.get("daoYunSelectionDatas") or []:
         slot = 1 if (s.get("id") or 0) <= 9 else 2
         record_selection(STATE["daoyun"], char, career, var, s, w, placew, bi, sid=slot)
+    # 仙命 (百家之道): a pick at round 1, then two more at varying rounds (3-13). Keyed by
+    # pick ORDER (slot 1-3), since the later rounds differ game to game. Each offer is 3
+    # options + a skip (ids < 1000, folded into XM_SKIP); a skip turns a later visit into
+    # 狻猊's 3-option offer, which is simply that slot's pick.
+    xm = (priv.get("xianMoData") or {}).get("strategies") or []
+    for slot, e in enumerate(xm[:3], 1):
+        fold = lambda o: o if (o or 0) >= 1000 else XM_SKIP
+        s2 = {"selected": fold(e.get("selected")), "pendings": [fold(o) for o in (e.get("pendings") or [])]}
+        record_selection(STATE["xianmo"], char, career, var, s2, w, placew, bi, sid=slot)
 
 
 def record_selection(acc, char, career, var, s, w, placew, bi, sid=None):
@@ -847,6 +868,7 @@ def write_output():
     V_FATES = output_view(STATE["fates"], vmap)
     V_DERIVS = output_view(STATE["derivs"], vmap)
     V_DAOYUN = output_view(STATE["daoyun"], vmap)
+    V_XIANMO = output_view(STATE["xianmo"], vmap)
     mu = STATE["mu"]; tot = mu["kept"] + mu["dropped"]
     waiting = sum(len(v) for v in mu["pending"].values())
     dist = sorted(mu["dist"].items()); n = sum(c for _, c in dist); acc = 0; p999 = 0
@@ -1036,6 +1058,7 @@ def write_output():
     fates_out, ids1 = emit_sel(V_FATES)
     derivs_out, ids2 = emit_sel(V_DERIVS)
     daoyun_out, ids3 = emit_sel(V_DAOYUN)
+    xianmo_out, ids4 = emit_sel(V_XIANMO)
     # fate bucket: innate if the fate is offered to only one character, else its wiki category
     char_of = defaultdict(set)
     for (char, career, var, sid, oid) in STATE["fates"]:
@@ -1064,12 +1087,23 @@ def write_output():
         cn = CN_NAME.get(str(i), "")
         ynames[str(i)] = {"cn": cn, "en": CN2EN.get(cn, ""),
                           "free": 1 if (i == 27 or cn == "自在随心") else 0}
+    # 仙命 names from the wiki-matched registry; unnamed ids (options the wiki doesn't list)
+    # get just their pool so the site can label them "<pool> #n".
+    xnames = {}
+    for i in ids4:
+        if i == XM_SKIP:
+            xnames[str(i)] = {"cn": "跳过", "en": "Skip", "skip": 1}
+            continue
+        e = XIANMO.get(str(i), {})
+        xnames[str(i)] = {"cn": e.get("cn", ""), "en": e.get("en", ""), "icon": e.get("icon", ""),
+                          "pool": i // 1000, "poolCn": e.get("poolCn", ""), "poolEn": e.get("poolEn", "")}
     fates_file = {
         "v": 5,   # v3: per-band rows; v4: strategy-variant keys; v5: raw counts appended
         "meta": {"season": SEASON, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
-                 "selfRecords": STATE["self"], "iconBase": ICON_BASE, "generated": generated},
-        "fates": fates_out, "derivations": derivs_out, "daoyun": daoyun_out,
-        "names": names, "dnames": dnames, "ynames": ynames,
+                 "selfRecords": STATE["self"], "iconBase": ICON_BASE, "xmIconBase": XM_ICON_BASE,
+                 "generated": generated},
+        "fates": fates_out, "derivations": derivs_out, "daoyun": daoyun_out, "xianmo": xianmo_out,
+        "names": names, "dnames": dnames, "ynames": ynames, "xnames": xnames,
     }
 
     # bot-exposure diagnostic: do some characters appear in bot-heavier lobbies (which

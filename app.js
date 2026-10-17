@@ -55,9 +55,10 @@ const UI = {
     subBuilds9: "Heavenly Derivation (ended) · DaoXin-ranked builds",
     buildsEmpty: "No ranked games recorded for this season yet — the site updates daily, check back soon.",
     arrangements: "arrangements",
-    fates: "Fates", tianyan: "天衍 (Derivations)", daoyun: "道韵 (Dao Omen)",
+    fates: "Fates", tianyan: "Heavenly Derivation Fates", xianmo: "Hundred Schools Fates", daoyun: "道韵 (Dao Omen)",
     fatesHint: "top pick per phase by bucket · hover for all",
     tianyanHint: "top pick per phase · hover for all",
+    xianmoHint: "top pick at round 1 and at the two later visits (skip ignored) · hover for all",
     daoyunHint: "most common pick (free pick ignored) · hover for all",
     fateName: "Fate", picks: "picks", pickRate: "pick %", winTop4: "top-4",
     loading: "Loading…", updating: "Matchup data is refreshing — check back shortly.",
@@ -112,9 +113,10 @@ const UI = {
     subBuilds9: "天衍万象（已结束）· 道心排位流派",
     buildsEmpty: "本赛季暂无排位对局数据——每日自动更新，敬请期待。",
     arrangements: "种排列",
-    fates: "天命", tianyan: "天衍", daoyun: "道韵",
+    fates: "天命", tianyan: "天衍仙命", xianmo: "仙命", daoyun: "道韵",
     fatesHint: "各阶段最热门选择",
     tianyanHint: "各阶段热门选择 · 悬停查看全部",
+    xianmoHint: "第1轮与之后两次选择的热门选项（忽略跳过）· 悬停查看全部",
     daoyunHint: "最常见选择（忽略自在随心）· 悬停查看全部",
     fateName: "天命", picks: "次数", pickRate: "选取率", winTop4: "前四率",
     loading: "加载中…", updating: "对位数据更新中，请稍后刷新查看。",
@@ -793,6 +795,8 @@ async function ensureBuilds() {
     const fd = await fetch(`data/season${BS.season}_fates.json`).then((r) => r.json());
     BS.data.fates = fd.fates; BS.data.derivations = fd.derivations; BS.data.fnames = fd.names; BS.data.dnames = fd.dnames;
     BS.data.daoyun = fd.daoyun; BS.data.ynames = fd.ynames;
+    BS.data.xianmo = fd.xianmo; BS.data.xnames = fd.xnames;   // 百家之道 仙命 (season 10+)
+    BS.xmIconBase = (fd.meta && fd.meta.xmIconBase) || "https://sharpobject.github.io/yxp_wiki/assets/hundred-schools/icons/";
     BS.fv3 = (fd.v || 1) >= 3;           // selection rows are per-DaoXin-band since v3
     BS.iconBase = (fd.meta && fd.meta.iconBase) || "https://sharpobject.github.io/yxp_wiki/assets/fates/";
   } catch (e) { /* no fate data yet — the Fates/天衍 sections just won't render */ }
@@ -1375,12 +1379,24 @@ function renderCurves(b) {
 }
 // ---- Fates & 天衍 -----------------------------------------------------------
 const FBUCKET_COLOR = { innate: "#c9a227", cultivation: "#5b8cff", other: "#36c46b" };
-const KIND_COLOR = { deriv: "#5b8cff", daoyun: "#b06fd8" };
+const KIND_COLOR = { deriv: "#5b8cff", daoyun: "#b06fd8", xianmo: "#d9a441" };
 function fname(oid) { const e = (BS.data.fnames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
 function dname(oid) { const e = (BS.data.dnames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
+// 仙命 options the wiki doesn't list have no name -> "<visitor pool> #n"
+function xname(oid) {
+  const e = (BS.data.xnames || {})[oid] || {};
+  const nm = (S.lang === "zh" ? e.cn : e.en) || e.cn;
+  if (nm) return nm;
+  const pool = ((S.lang === "zh" ? e.poolCn : e.poolEn) || "").split("·")[0].trim();
+  return `${pool || "#" + Math.floor(oid / 1000)} #${oid % 1000}`;
+}
 function yname(oid) { const e = (BS.data.ynames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
 function selIconURL(oid, kind) {
   if (kind === "daoyun") return `${WIKI}${oid}_${S.lang}.webp`;   // 道韵 options are cards -> card art
+  if (kind === "xianmo") {                                        // 仙命: the wiki's hundred-schools art
+    const x = (BS.data.xnames || {})[oid] || {};
+    return x.icon ? `${BS.xmIconBase}${x.icon}.webp` : "";
+  }
   let e = ((kind === "fate" ? BS.data.fnames : BS.data.dnames) || {})[oid] || {};
   if (kind === "fate" && BS.fateIconBy && e.cn && BS.fateIconBy[e.cn]) e = BS.fateIconBy[e.cn];   // same name as a phase-1 fate -> phase-1 icon
   // the wiki serves .webp only now; older data JSON may still carry .png icon names
@@ -1391,21 +1407,21 @@ function selIcon(oid, kind, cls) {
   return u ? `<img class="${cls}" src="${u}" loading="lazy" onerror="this.style.visibility='hidden'">`
     : `<span class="${cls} noimg"></span>`;
 }
-// kind: "fate" (天命) | "deriv" (天衍) | "daoyun" (道韵)
+// kind: "fate" (天命) | "deriv" (天衍仙命) | "daoyun" (道韵) | "xianmo" (仙命, 百家之道)
 // phase labels: 天命 1-4 = realm names; 道韵 = 第N次; 天衍 keeps its number
 const REALM_ZH = ["练气", "筑基", "金丹", "元婴", "化神"];
 const REALM_EN = ["Meditation", "Foundation", "Virtuoso", "Immortality", "Incarnation"];
 function ordLabel(kind, n) {
   const zh = S.lang === "zh";
   if (kind === "fate") return (zh ? REALM_ZH : REALM_EN)[n] || n;           // fate phases 1-4 -> 筑基..化神
-  if (kind === "daoyun") return zh ? `第${n}次` : (n === 1 ? "1st" : n === 2 ? "2nd" : n + "th");
+  if (kind === "daoyun" || kind === "xianmo") return zh ? `第${n}次` : (n === 1 ? "1st" : n === 2 ? "2nd" : n === 3 ? "3rd" : n + "th");
   return n;
 }
 function fatePhaseHTML(rows, ord, kind) {
   rows = collapseSelRows(rows);
   if (!rows.length) return "";
   const N = BS.data.fnames || {};
-  const nm = kind === "fate" ? fname : kind === "deriv" ? dname : yname;
+  const nm = kind === "fate" ? fname : kind === "deriv" ? dname : kind === "xianmo" ? xname : yname;
   let pick;
   if (kind === "fate") {              // highest-appeared fate of the highest-selected bucket
     const bt = {};
@@ -1415,10 +1431,13 @@ function fatePhaseHTML(rows, ord, kind) {
   } else if (kind === "daoyun") {     // most-chosen real pick — the free 自在随心 is skipped
     const Y = BS.data.ynames || {};
     pick = rows.find((r) => r[1] > 0 && !(Y[r[0]] || {}).free) || rows[0];
+  } else if (kind === "xianmo") {     // most-chosen real pick — skipping is ignored
+    const X = BS.data.xnames || {};
+    pick = rows.find((r) => r[1] > 0 && !(X[r[0]] || {}).skip) || rows[0];
   } else { pick = rows[0]; }          // most-chosen derivation
   const [oid, ch, , pw] = pick; const avgPl = ch ? pw / ch : 0;
   const col = kind === "fate" ? (FBUCKET_COLOR[(N[oid] || {}).bucket] || "#888") : KIND_COLOR[kind];
-  let pop = `<div class="fpop"><table><tr><th>${t(kind === "daoyun" ? "daoyun" : "fateName")}</th><th>${t("picks")}</th><th>${t("pickRate")}</th><th>${t("avgplace")}</th></tr>`;
+  let pop = `<div class="fpop"><table><tr><th>${t(kind === "daoyun" ? "daoyun" : kind === "xianmo" ? "xianmo" : "fateName")}</th><th>${t("picks")}</th><th>${t("pickRate")}</th><th>${t("avgplace")}</th></tr>`;
   for (const [o, c, of_, pw2, craw, ofraw] of rows) {
     if (c <= 0 && of_ <= 0) continue;
     const bc = kind === "fate" ? (FBUCKET_COLOR[(N[o] || {}).bucket] || "#888") : KIND_COLOR[kind];
@@ -1436,7 +1455,8 @@ function fatePhaseHTML(rows, ord, kind) {
 }
 function fatesSectionHTML(key) {
   const F = (BS.data.fates || {})[key], D = (BS.data.derivations || {})[key], Y = (BS.data.daoyun || {})[key];
-  if (!F && !D && !Y) return "";
+  const X = (BS.data.xianmo || {})[key];
+  if (!F && !D && !Y && !X) return "";
   let h = "";
   if (F) {
     h += `<div class="bsection"><h3>${t("fates")} <span class="muted" style="font-size:12px">${t("fatesHint")}</span></h3><div class="fphases">`;
@@ -1449,6 +1469,11 @@ function fatesSectionHTML(key) {
   if (D) {
     h += `<div class="bsection"><h3>${t("tianyan")} <span class="muted" style="font-size:12px">${t("tianyanHint")}</span></h3><div class="fphases">`;
     Object.keys(D).sort((a, b) => +a - +b).forEach((sid, i) => { h += fatePhaseHTML(D[sid], i + 1, "deriv"); });
+    h += `</div></div>`;
+  }
+  if (X) {
+    h += `<div class="bsection"><h3>${t("xianmo")} <span class="muted" style="font-size:12px">${t("xianmoHint")}</span></h3><div class="fphases">`;
+    Object.keys(X).sort((a, b) => +a - +b).forEach((sid) => { h += fatePhaseHTML(X[sid], +sid, "xianmo"); });
     h += `</div></div>`;
   }
   if (Y) {

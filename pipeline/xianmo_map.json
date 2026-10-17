@@ -1,0 +1,5684 @@
+{
+"byId": {
+"2001": {
+"cn": "命元底蕴",
+"en": "Destiny Reserve",
+"icon": "Icon_FateStrategy_3",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2002": {
+"cn": "境界感悟",
+"en": "Phase Insight",
+"icon": "Icon_FateStrategy_4",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2003": {
+"cn": "勤修",
+"en": "Diligent Training",
+"icon": "Icon_FateStrategy_5",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2004": {
+"cn": "斩道之法",
+"en": "Dao Severing Method",
+"icon": "Icon_FateStrategy_7",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2005": {
+"cn": "另辟蹊径",
+"en": "Blaze a New Trail",
+"icon": "Icon_FateStrategy_11",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2007": {
+"cn": "三思抉择",
+"en": "Thrice-Pondered Choice",
+"icon": "Icon_FateStrategy_13",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2008": {
+"cn": "根骨奇佳",
+"en": "Exceptional Roots",
+"icon": "Icon_FateStrategy_14",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2009": {
+"cn": "稳定突破",
+"en": "Stable Breakthrough",
+"icon": "Icon_FateStrategy_15",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2011": {
+"cn": "广结善缘",
+"en": "Build Good Karma",
+"icon": "Icon_FateStrategy_21",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2012": {
+"cn": "临阵顿悟",
+"en": "Battlefield Epiphany",
+"icon": "Icon_FateStrategy_22",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2013": {
+"cn": "强身健体",
+"en": "Strengthen the Body",
+"icon": "Icon_FateStrategy_23",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2014": {
+"cn": "无中生有",
+"en": "Out Of Nothing",
+"icon": "Icon_FateStrategy_401",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2015": {
+"cn": "承载之躯",
+"en": "Carrier Body",
+"icon": "Icon_FateStrategy_39",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2016": {
+"cn": "境界专精",
+"en": "Phase Mastery",
+"icon": "Icon_FateStrategy_40",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2017": {
+"cn": "云剑修行",
+"en": "Cloud Sword Practice",
+"icon": "Icon_FateStrategy_24",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2018": {
+"cn": "狂剑修行",
+"en": "Unrestrained Sword Practice",
+"icon": "Icon_FateStrategy_34",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2019": {
+"cn": "剑阵修行",
+"en": "Sword Formation Practice",
+"icon": "Icon_FateStrategy_42",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2020": {
+"cn": "剑意修行",
+"en": "Sword Intent Practice",
+"icon": "Icon_FateStrategy_43",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2021": {
+"cn": "连击修行",
+"en": "Combo Practice",
+"icon": "Icon_FateStrategy_44",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2022": {
+"cn": "星弈修行",
+"en": "Astral Move Practice",
+"icon": "Icon_FateStrategy_45",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2023": {
+"cn": "卦象修行",
+"en": "Hexagram Practice",
+"icon": "Icon_FateStrategy_46",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2024": {
+"cn": "雷法修行",
+"en": "Thunder Practice",
+"icon": "Icon_FateStrategy_47",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2025": {
+"cn": "后招修行",
+"en": "Post Action Practice",
+"icon": "Icon_FateStrategy_48",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2026": {
+"cn": "生命修行",
+"en": "HP Practice",
+"icon": "Icon_FateStrategy_49",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2027": {
+"cn": "木灵修行",
+"en": "Wood Spirit Practice",
+"icon": "Icon_FateStrategy_50",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2028": {
+"cn": "火灵修行",
+"en": "Fire Spirit Practice",
+"icon": "Icon_FateStrategy_51",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2029": {
+"cn": "土灵修行",
+"en": "Earth Spirit Practice",
+"icon": "Icon_FateStrategy_52",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2030": {
+"cn": "金灵修行",
+"en": "Metal Spirit Practice",
+"icon": "Icon_FateStrategy_53",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2031": {
+"cn": "水灵修行",
+"en": "Water Spirit Practice",
+"icon": "Icon_FateStrategy_54",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2032": {
+"cn": "崩拳修行",
+"en": "Crash Fist Practice",
+"icon": "Icon_FateStrategy_56",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2033": {
+"cn": "气势修行",
+"en": "Force Practice",
+"icon": "Icon_FateStrategy_57",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2034": {
+"cn": "体魄修行",
+"en": "Physique Practice",
+"icon": "Icon_FateStrategy_58",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2035": {
+"cn": "身法修行",
+"en": "Agility Practice",
+"icon": "Icon_FateStrategy_59",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2036": {
+"cn": "炼气强化",
+"en": "Meditation Enhancement",
+"icon": "Icon_FateStrategy_274",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2037": {
+"cn": "远虑",
+"en": "Foresight",
+"icon": "Icon_FateStrategy_400",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2038": {
+"cn": "灵气修行",
+"en": "Qi Practice",
+"icon": "Icon_FateStrategy_60",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"2039": {
+"cn": "防御修行",
+"en": "Defense Practice",
+"icon": "Icon_FateStrategy_61",
+"pool": 2,
+"poolCn": "剑灵的仙命池 1 · 前期通用效果",
+"poolEn": "Sword Spirit’s pool 1 · Early general effects"
+},
+"26002": {
+"cn": "太虚熔炉",
+"en": "Furnace of Void",
+"icon": "Icon_XianMoStrategy_26002",
+"pool": 26,
+"poolCn": "剑灵的仙命池 2 · 特殊法宝之力",
+"poolEn": "Sword Spirit’s pool 2 · Special artifact powers"
+},
+"26003": {
+"cn": "星图画镜",
+"en": "Mirror of Stars",
+"icon": "Icon_XianMoStrategy_26003",
+"pool": 26,
+"poolCn": "剑灵的仙命池 2 · 特殊法宝之力",
+"poolEn": "Sword Spirit’s pool 2 · Special artifact powers"
+},
+"26004": {
+"cn": "万卷书阁",
+"en": "Shelf of Wisdom",
+"icon": "Icon_XianMoStrategy_26004",
+"pool": 26,
+"poolCn": "剑灵的仙命池 2 · 特殊法宝之力",
+"poolEn": "Sword Spirit’s pool 2 · Special artifact powers"
+},
+"26005": {
+"cn": "玄冥玉壶",
+"en": "Pot of Xuanming",
+"icon": "Icon_XianMoStrategy_26005",
+"pool": 26,
+"poolCn": "剑灵的仙命池 2 · 特殊法宝之力",
+"poolEn": "Sword Spirit’s pool 2 · Special artifact powers"
+},
+"15001": {
+"cn": "副职大师",
+"en": "Side Job Master",
+"icon": "Icon_FateStrategy_10",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15002": {
+"cn": "云剑大师",
+"en": "Cloud Sword Master",
+"icon": "Icon_FateStrategy_25",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15003": {
+"cn": "剑阵大师",
+"en": "Sword Formation Master",
+"icon": "Icon_FateStrategy_35",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15004": {
+"cn": "五行大师",
+"en": "Five Elements Master",
+"icon": "Icon_FateStrategy_55",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15005": {
+"cn": "灵剑大师",
+"en": "Spirit Sword Master",
+"icon": "Icon_FateStrategy_264",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15006": {
+"cn": "剑意大师",
+"en": "Sword Intent Master",
+"icon": "Icon_FateStrategy_265",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15007": {
+"cn": "混元大师",
+"en": "Primordial Master",
+"icon": "Icon_FateStrategy_266",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15008": {
+"cn": "星弈大师",
+"en": "Astral Move Master",
+"icon": "Icon_FateStrategy_267",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15009": {
+"cn": "卦象大师",
+"en": "Hexagram Master",
+"icon": "Icon_FateStrategy_268",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15010": {
+"cn": "崩拳大师",
+"en": "Crash Fist Master",
+"icon": "Icon_FateStrategy_269",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15011": {
+"cn": "体魄大师",
+"en": "Physique Master",
+"icon": "Icon_FateStrategy_270",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15012": {
+"cn": "修玄大师",
+"en": "Mystery Cultivation Master",
+"icon": "Icon_FateStrategy_271",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15013": {
+"cn": "再动大师",
+"en": "Chase Master",
+"icon": "Icon_FateStrategy_272",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15014": {
+"cn": "元婴修行",
+"en": "Immortality Practice",
+"icon": "Icon_FateStrategy_62",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15015": {
+"cn": "天衍-休养生息",
+"en": "Heavenly Derivation - Recuperate",
+"icon": "Icon_Talent_8",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15016": {
+"cn": "道韵气息",
+"en": "Daoist Rhyme Aura",
+"icon": "Card_46",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15018": {
+"cn": "徐如林",
+"en": "Calm as a Forest",
+"icon": "Icon_FateStrategy_27",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15019": {
+"cn": "铜镜",
+"en": "Bronze Mirror",
+"icon": "Icon_FateStrategy_352",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15020": {
+"cn": "随心悟道",
+"en": "Spontaneous Enlightenment",
+"icon": "Icon_FateStrategy_273",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15021": {
+"cn": "静心悟道",
+"en": "Calm Enlightenment",
+"icon": "Icon_FateStrategy_28",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15022": {
+"cn": "记忆案卷",
+"en": "Memory Archive",
+"icon": "Icon_FateStrategy_6",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15023": {
+"cn": "探索未知",
+"en": "Explore the Unknown",
+"icon": "Icon_FateStrategy_355",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15024": {
+"cn": "百宝箱",
+"en": "Treasure Chest",
+"icon": "Icon_FateStrategy_356",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15025": {
+"cn": "生命底蕴",
+"en": "Life Reserve",
+"icon": "Icon_FateStrategy_1",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"15026": {
+"cn": "换牌底蕴",
+"en": "Card Exchange Reserve",
+"icon": "Icon_FateStrategy_2",
+"pool": 15,
+"poolCn": "剑灵的仙命池 3 · 后期通用效果",
+"poolEn": "Sword Spirit’s pool 3 · Late general effects"
+},
+"20001": {
+"cn": "梦•灵气灌注",
+"en": "Dream: Qi Perfusion",
+"icon": "Card_1000006",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20002": {
+"cn": "梦•云剑点星",
+"en": "Dream: Cloud Sword Pierce the Star",
+"icon": "Card_1000027",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20003": {
+"cn": "梦•云剑极意",
+"en": "Dream: Cloud Sword - Riddle",
+"icon": "Card_1000015",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20004": {
+"cn": "梦•飞牙剑",
+"en": "Dream: Flying Fang Sword",
+"icon": "Card_1000021",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20005": {
+"cn": "梦•云舞诀",
+"en": "Dream: Cloud Dance Rhythm",
+"icon": "Card_1000031",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20006": {
+"cn": "梦•万法归灵剑",
+"en": "Dream: Dharma Spirit Sword",
+"icon": "Card_1000045",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20007": {
+"cn": "梦•狂剑零式",
+"en": "Dream: Unrestrained Sword Zero",
+"icon": "Card_1000066",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20008": {
+"cn": "梦•灵犀剑阵",
+"en": "Dream: Consonance Sword Formation",
+"icon": "Card_1000033",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20009": {
+"cn": "梦•云剑厚土",
+"en": "Dream: Cloud Sword - Touch Earth",
+"icon": "Card_1000003",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20010": {
+"cn": "梦•反身剑",
+"en": "Dream: Reflexive Sword",
+"icon": "Card_1000008",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20011": {
+"cn": "梦•御空剑阵",
+"en": "Dream: Rule Sky Sword Formation",
+"icon": "Card_1000025",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20013": {
+"cn": "梦•凝意诀",
+"en": "Dream: Contemplate Spirits Rhythm",
+"icon": "Card_1000017",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20014": {
+"cn": "梦•云剑汇灵",
+"en": "Dream: Cloud Sword - Spirit Coercion",
+"icon": "Card_1000063",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20015": {
+"cn": "梦•引气剑",
+"en": "Dream: Spiritage Sword",
+"icon": "Card_1000024",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20016": {
+"cn": "梦•星弈挡",
+"en": "Dream: Astral Move - Block",
+"icon": "Card_4000011",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20017": {
+"cn": "梦•轰雷掣电",
+"en": "Dream: Thunder And Lightning",
+"icon": "Card_4000063",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20018": {
+"cn": "梦•两仪阵",
+"en": "Dream: Yin Yang Formation",
+"icon": "Card_4000040",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20019": {
+"cn": "梦•落花有意",
+"en": "Dream: Flower Sentient",
+"icon": "Card_4000021",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20020": {
+"cn": "梦•黄雀在后",
+"en": "Dream: Hunter Hunting Hunter",
+"icon": "Card_4000066",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20022": {
+"cn": "梦•斗转星移",
+"en": "Dream: Shifting Stars",
+"icon": "Card_4000023",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20023": {
+"cn": "梦•离卦",
+"en": "Dream: Flame Hexagram",
+"icon": "Card_4000034",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20024": {
+"cn": "梦•杯弓蛇影",
+"en": "Dream: Snake in Reflection",
+"icon": "Card_4000059",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20025": {
+"cn": "梦•气疗术",
+"en": "Dream: Qi Therapy",
+"icon": "Card_4000017",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20026": {
+"cn": "梦•星罗棋布",
+"en": "Dream: Dotted Around",
+"icon": "Card_4000008",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20027": {
+"cn": "梦•白蛇吐信",
+"en": "Dream: White Snake",
+"icon": "Card_4000031",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20028": {
+"cn": "梦•乾卦",
+"en": "Dream: Heaven Hexagram",
+"icon": "Card_4000026",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20029": {
+"cn": "梦•枯木逢春",
+"en": "Dream: Revitalized",
+"icon": "Card_4000042",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20030": {
+"cn": "梦•御雷卦诀",
+"en": "Dream: Thunder Hexagram Rhythm",
+"icon": "Card_4000068",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20031": {
+"cn": "梦•金灵阵",
+"en": "Dream: Metal Spirit Formation",
+"icon": "Card_7000016",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20032": {
+"cn": "梦•浑天印",
+"en": "Dream: Cosmos Seal",
+"icon": "Card_7000014",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20033": {
+"cn": "梦•水灵波澜",
+"en": "Dream: Water Spirit Billows",
+"icon": "Card_7000019",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20035": {
+"cn": "梦•混元无极阵",
+"en": "Dream: Primordial Infinity Formation",
+"icon": "Card_7000058",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20036": {
+"cn": "梦•水灵泉涌",
+"en": "Dream: Water Spirit Spring",
+"icon": "Card_7000059",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20037": {
+"cn": "梦•木灵阵",
+"en": "Dream: Wood Spirit Formation",
+"icon": "Card_7000036",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20038": {
+"cn": "梦•火灵灼心",
+"en": "Dream: Fire Spirit Heart Fire",
+"icon": "Card_7000039",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20039": {
+"cn": "梦•火灵瞬燃",
+"en": "Dream: Fire Spirit Flash Fire",
+"icon": "Card_7000038",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20040": {
+"cn": "梦•金灵铁骨",
+"en": "Dream: Metal Spirit Iron Bone",
+"icon": "Card_7000035",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20041": {
+"cn": "梦•土灵绝壁",
+"en": "Dream: Earth Spirit Steep",
+"icon": "Card_7000040",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20042": {
+"cn": "梦•五行天髓诀",
+"en": "Dream: Five Elements Heavenly Marrow Rhythm",
+"icon": "Card_7000073",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20043": {
+"cn": "梦•木灵芽",
+"en": "Dream: Wood Spirit Bud",
+"icon": "Card_7000004",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20044": {
+"cn": "梦•火灵阵",
+"en": "Dream: Fire Spirit Formation",
+"icon": "Card_7000031",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20045": {
+"cn": "梦•土灵断崖",
+"en": "Dream: Earth Spirit Cliff",
+"icon": "Card_7000062",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20047": {
+"cn": "梦•水灵汹涌",
+"en": "Dream: Water Spirit Turbulent",
+"icon": "Card_7000037",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20048": {
+"cn": "梦•灵玄迷踪步",
+"en": "Dream: Elusive Footwork",
+"icon": "Card_10000050",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20049": {
+"cn": "梦•修罗吼",
+"en": "Dream: Shura Roar",
+"icon": "Card_10000041",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20050": {
+"cn": "梦•崩拳封",
+"en": "Dream: Crash Fist Block",
+"icon": "Card_10000002",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20051": {
+"cn": "梦•锻神开海",
+"en": "Dream: Exercise Soul",
+"icon": "Card_10000048",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20052": {
+"cn": "梦•冲霄破浪",
+"en": "Dream: Surging Waves",
+"icon": "Card_10000042",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20053": {
+"cn": "梦•崩拳突",
+"en": "Dream: Crash Fist Blitz",
+"icon": "Card_10000015",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20054": {
+"cn": "梦•冥影身法",
+"en": "Dream: Styx Agility",
+"icon": "Card_10000039",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20055": {
+"cn": "梦•朝气蓬勃",
+"en": "Dream: Vigorous Force",
+"icon": "Card_10000011",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20056": {
+"cn": "梦•劈山掌",
+"en": "Dream: Mountain-Cleaving Palms",
+"icon": "Card_10000005",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20057": {
+"cn": "梦•崩天步",
+"en": "Dream: Crash Footwork",
+"icon": "Card_10000026",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20058": {
+"cn": "梦•荷重前行",
+"en": "Dream: Bearing the Load",
+"icon": "Card_10000031",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20059": {
+"cn": "梦•磅礴之势",
+"en": "Dream: Overwhelming Force",
+"icon": "Card_10000043",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20060": {
+"cn": "梦•锻拳",
+"en": "Dream: Exercise Fist",
+"icon": "Card_10000004",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"20061": {
+"cn": "梦•落雷术",
+"en": "Dream: Falling Thunder",
+"icon": "Card_4000030",
+"pool": 20,
+"poolCn": "龙瑛的仙命池 1 · 梦境门派牌奖励",
+"poolEn": "Long Ying’s pool 1 · Dream sect-card rewards"
+},
+"3001": {
+"cn": "龙威震慑",
+"en": "Awe of the Dragon",
+"icon": "Icon_XianMoStrategy_3001",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3002": {
+"cn": "龙鳞护体",
+"en": "Dragon Scale Guard",
+"icon": "Icon_XianMoStrategy_3002",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3003": {
+"cn": "龙息强攻",
+"en": "Dragon Breath Assault",
+"icon": "Icon_XianMoStrategy_3003",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3004": {
+"cn": "龙影潜遁",
+"en": "Dragon Shadow Dive",
+"icon": "Icon_XianMoStrategy_3004",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3005": {
+"cn": "龙行破空",
+"en": "Dragon Rend the Sky",
+"icon": "Icon_XianMoStrategy_3005",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3006": {
+"cn": "梦•空间灵田",
+"en": "Dream: Space Spiritual Field",
+"icon": "Card_9000015",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3007": {
+"cn": "梦•天音困仙曲",
+"en": "Dream: Predicament for Immortals",
+"icon": "Card_5000015",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3008": {
+"cn": "梦•天命重现",
+"en": "Dream: Heavenly Time Recurring",
+"icon": "Card_11000012",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3009": {
+"cn": "梦•回响阵纹",
+"en": "Dream: Echo Formation",
+"icon": "Card_8000012",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3010": {
+"cn": "梦•神来之笔",
+"en": "Dream: Divine Brush",
+"icon": "Card_6000011",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3011": {
+"cn": "龙吟聚灵",
+"en": "Dragon Chant Gathering Qi",
+"icon": "Icon_XianMoStrategy_3011",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3012": {
+"cn": "龙鳞御防",
+"en": "Dragon Scale Defense",
+"icon": "Icon_XianMoStrategy_3012",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"3013": {
+"cn": "龙魂战意",
+"en": "Dragon Soul Battle Will",
+"icon": "Icon_XianMoStrategy_3013",
+"pool": 3,
+"poolCn": "龙瑛的仙命池 2 · 战斗强化与梦境副职牌",
+"poolEn": "Long Ying’s pool 2 · Combat boosts and dream side-job cards"
+},
+"4019": {
+"cn": "狂剑道韵",
+"en": "Omen of Unrestrained Sword",
+"icon": "Card_1000035",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4020": {
+"cn": "云剑道韵",
+"en": "Omen of Cloud Sword",
+"icon": "Card_1000040",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4021": {
+"cn": "灵剑道韵",
+"en": "Omen of Spirit Sword",
+"icon": "Card_1000036",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4022": {
+"cn": "剑意道韵",
+"en": "Omen of Sword Intent",
+"icon": "Card_1000037",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4023": {
+"cn": "剑阵道韵",
+"en": "Omen of Sword Formation",
+"icon": "Card_1000064",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4024": {
+"cn": "木灵道韵",
+"en": "Omen of Wood Spirit",
+"icon": "Card_7000061",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4025": {
+"cn": "火灵道韵",
+"en": "Omen of Fire Spirit",
+"icon": "Card_7000038",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4026": {
+"cn": "土灵道韵",
+"en": "Omen of Earth Spirit",
+"icon": "Card_7000033",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4027": {
+"cn": "金灵道韵",
+"en": "Omen of Metal Spirit",
+"icon": "Card_7000034",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4028": {
+"cn": "水灵道韵",
+"en": "Omen of Water Spirit",
+"icon": "Card_7000030",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4029": {
+"cn": "混元道韵",
+"en": "Omen of Primordial",
+"icon": "Card_7000066",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4030": {
+"cn": "星弈道韵",
+"en": "Omen of Astral Move",
+"icon": "Card_4000039",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4031": {
+"cn": "卦象道韵",
+"en": "Omen of Hexagram",
+"icon": "Card_4000014",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4032": {
+"cn": "生机道韵",
+"en": "Omen of Vitality",
+"icon": "Card_4000027",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4033": {
+"cn": "后招道韵",
+"en": "Omen of Post Action",
+"icon": "Card_4000036",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4034": {
+"cn": "内伤道韵",
+"en": "Omen of Internal Injury",
+"icon": "Card_4000059",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4035": {
+"cn": "锻体道韵",
+"en": "Omen of Body Forging",
+"icon": "Card_10000037",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4036": {
+"cn": "崩拳道韵",
+"en": "Omen of Crash Fist",
+"icon": "Card_10000044",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4037": {
+"cn": "气势道韵",
+"en": "Omen of Force",
+"icon": "Card_10000042",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4038": {
+"cn": "冥玄道韵",
+"en": "Omen of Styx Mystery",
+"icon": "Card_10000068",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4039": {
+"cn": "身法道韵",
+"en": "Omen of Agility",
+"icon": "Card_10000039",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4042": {
+"cn": "我命由我",
+"en": "My Fate, My Choice",
+"icon": "Icon_FateStrategy_12",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4043": {
+"cn": "道韵随心",
+"en": "Dao Rhyme as You Wish",
+"icon": "Icon_XianMoStrategy_4043",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4045": {
+"cn": "双重道韵",
+"en": "Double Daoist Rhyme",
+"icon": "Icon_FateStrategy_18",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4001": {
+"cn": "命途-机缘造化",
+"en": "Fate Path - Fortunes and Luck",
+"icon": "Icon_Talent_53",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4002": {
+"cn": "命途-陨星淬体",
+"en": "Fate Path - Meteor Quench",
+"icon": "Icon_Talent_59",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4003": {
+"cn": "命途-云巅雷劫",
+"en": "Fate Path - Thunder Tribulation",
+"icon": "Icon_Talent_9",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4004": {
+"cn": "命途-变换之道",
+"en": "Fate Path - The Way of Adaptation",
+"icon": "Icon_Talent_6",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4005": {
+"cn": "命途-储纳灵气",
+"en": "Fate Path - Store Qi",
+"icon": "Icon_Talent_13",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4041": {
+"cn": "命途-顿悟",
+"en": "Fate Path - Epiphany",
+"icon": "Icon_Talent_12",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4044": {
+"cn": "命途-副职兼修",
+"en": "Fate Path - Additional Side Job",
+"icon": "Icon_Talent_188",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4006": {
+"cn": "命途-狂之执念",
+"en": "Fate Path - Mad Obsession",
+"icon": "Icon_Talent_70",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4007": {
+"cn": "命途-云之道",
+"en": "Fate Path - Rule Of The Cloud",
+"icon": "Icon_Talent_69",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4008": {
+"cn": "命途-剑韵修炼",
+"en": "Fate Path - Sword Rhyme Cultivate",
+"icon": "Icon_Talent_16",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4009": {
+"cn": "命途-剑阵守护",
+"en": "Fate Path - Sword Formation Guard",
+"icon": "Icon_Talent_57",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4010": {
+"cn": "命途-卜卦",
+"en": "Fate Path - Divination",
+"icon": "Icon_Talent_30",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4011": {
+"cn": "命途-观星",
+"en": "Fate Path - Stargaze",
+"icon": "Icon_Talent_31",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4012": {
+"cn": "命途-妙手回春",
+"en": "Fate Path - Rejuvenation",
+"icon": "Icon_Talent_120",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4040": {
+"cn": "命途-星蚀",
+"en": "Fate Path - Astral Eclipse",
+"icon": "Icon_Talent_103",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4013": {
+"cn": "命途-五行循环",
+"en": "Fate Path - Cycle Of Five Elements",
+"icon": "Icon_Talent_102",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4014": {
+"cn": "命途-五行专一",
+"en": "Fate Path - Concentrated Element",
+"icon": "Icon_Talent_128",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4015": {
+"cn": "命途-体修入道",
+"en": "Fate Path - Physique Master",
+"icon": "Icon_Talent_146",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4016": {
+"cn": "命途-气势充沛",
+"en": "Fate Path - Full of Force",
+"icon": "Icon_Talent_145",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4017": {
+"cn": "命途-冥心烙印",
+"en": "Fate Path - Mark of Dark Heart",
+"icon": "Icon_Talent_150",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"4018": {
+"cn": "命途-再生之躯",
+"en": "Fate Path - Regenerating Body",
+"icon": "Icon_Talent_149",
+"pool": 4,
+"poolCn": "丹歌的仙命池 1 · 仙命与道韵选择",
+"poolEn": "Dan Ge’s pool 1 · Immortal Fate and Daoist Rhyme choices"
+},
+"10001": {
+"cn": "奇招之卷",
+"en": "Cunning Move Scroll",
+"icon": "Icon_XianMoStrategy_10001",
+"pool": 10,
+"poolCn": "玄巳的仙命池 1 · 奇招之卷",
+"poolEn": "Xuan Si’s pool 1 · Special scrolls"
+},
+"10002": {
+"cn": "逆命之卷",
+"en": "Scroll of Reversed Fate",
+"icon": "Icon_XianMoStrategy_10002",
+"pool": 10,
+"poolCn": "玄巳的仙命池 1 · 奇招之卷",
+"poolEn": "Xuan Si’s pool 1 · Special scrolls"
+},
+"10003": {
+"cn": "门派之卷",
+"en": "Sect Scroll",
+"icon": "Icon_XianMoStrategy_10003",
+"pool": 10,
+"poolCn": "玄巳的仙命池 1 · 奇招之卷",
+"poolEn": "Xuan Si’s pool 1 · Special scrolls"
+},
+"22001": {
+"cn": "回收之卷•命元",
+"en": "Recycle Scroll - Destiny",
+"icon": "Icon_XianMoStrategy_22001",
+"pool": 22,
+"poolCn": "玄巳的仙命池 2 · 炼化回收之卷",
+"poolEn": "Xuan Si’s pool 2 · Absorption/recycling scrolls"
+},
+"22002": {
+"cn": "回收之卷•换牌",
+"en": "Recycle Scroll - Exchange",
+"icon": "Icon_XianMoStrategy_22002",
+"pool": 22,
+"poolCn": "玄巳的仙命池 2 · 炼化回收之卷",
+"poolEn": "Xuan Si’s pool 2 · Absorption/recycling scrolls"
+},
+"22003": {
+"cn": "回收之卷•生命",
+"en": "Recycle Scroll - HP",
+"icon": "Icon_XianMoStrategy_22003",
+"pool": 22,
+"poolCn": "玄巳的仙命池 2 · 炼化回收之卷",
+"poolEn": "Xuan Si’s pool 2 · Absorption/recycling scrolls"
+},
+"18001": {
+"cn": "换牌之卷",
+"en": "Exchange Scroll",
+"icon": "Icon_XianMoStrategy_18001",
+"pool": 18,
+"poolCn": "玄巳的仙命池 3 · 命元换资源",
+"poolEn": "Xuan Si’s pool 3 · Destiny-for-resources trades"
+},
+"18002": {
+"cn": "生命之卷",
+"en": "HP Scroll",
+"icon": "Icon_XianMoStrategy_18002",
+"pool": 18,
+"poolCn": "玄巳的仙命池 3 · 命元换资源",
+"poolEn": "Xuan Si’s pool 3 · Destiny-for-resources trades"
+},
+"18003": {
+"cn": "招式之卷",
+"en": "Technique Scroll",
+"icon": "Icon_XianMoStrategy_18003",
+"pool": 18,
+"poolCn": "玄巳的仙命池 3 · 命元换资源",
+"poolEn": "Xuan Si’s pool 3 · Destiny-for-resources trades"
+},
+"18004": {
+"cn": "悟道之卷",
+"en": "Enlightenment Scroll",
+"icon": "Icon_XianMoStrategy_18004",
+"pool": 18,
+"poolCn": "玄巳的仙命池 3 · 命元换资源",
+"poolEn": "Xuan Si’s pool 3 · Destiny-for-resources trades"
+},
+"18005": {
+"cn": "变换之卷",
+"en": "Shift Scroll",
+"icon": "Icon_XianMoStrategy_18005",
+"pool": 18,
+"poolCn": "玄巳的仙命池 3 · 命元换资源",
+"poolEn": "Xuan Si’s pool 3 · Destiny-for-resources trades"
+},
+"19001": {
+"cn": "逍遥修行•命元",
+"en": "Carefree Practice - Destiny",
+"icon": "Icon_XianMoStrategy_19001",
+"pool": 19,
+"poolCn": "白衣老者的仙命池 1 · 逍遥修行奖励",
+"poolEn": "The old man in white’s pool 1 · Carefree practice rewards"
+},
+"19002": {
+"cn": "逍遥修行•换牌",
+"en": "Carefree Practice - Exchange",
+"icon": "Icon_XianMoStrategy_19002",
+"pool": 19,
+"poolCn": "白衣老者的仙命池 1 · 逍遥修行奖励",
+"poolEn": "The old man in white’s pool 1 · Carefree practice rewards"
+},
+"19003": {
+"cn": "逍遥修行•生命",
+"en": "Carefree Practice - HP",
+"icon": "Icon_XianMoStrategy_19003",
+"pool": 19,
+"poolCn": "白衣老者的仙命池 1 · 逍遥修行奖励",
+"poolEn": "The old man in white’s pool 1 · Carefree practice rewards"
+},
+"19004": {
+"cn": "逍遥修行•逍遥曲",
+"en": "Carefree Practice - Carefree Tune",
+"icon": "Icon_XianMoStrategy_19004",
+"pool": 19,
+"poolCn": "白衣老者的仙命池 1 · 逍遥修行奖励",
+"poolEn": "The old man in white’s pool 1 · Carefree practice rewards"
+},
+"5001": {
+"cn": "逍遥刻纹",
+"en": "Carefree Engraving",
+"icon": "Icon_XianMoStrategy_5001",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5002": {
+"cn": "逍遥游",
+"en": "The Untrammeled Traveler",
+"icon": "Card_0",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5003": {
+"cn": "逍遥探寻",
+"en": "Carefree Exploration",
+"icon": "Icon_XianMoStrategy_5003",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5004": {
+"cn": "逍遥步法",
+"en": "Carefree Footwork",
+"icon": "Icon_XianMoStrategy_5004",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5005": {
+"cn": "逍遥连音",
+"en": "Carefree Echo",
+"icon": "Icon_XianMoStrategy_5005",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5006": {
+"cn": "偷师学艺",
+"en": "Learn from Opponent",
+"icon": "Icon_FateStrategy_38",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5007": {
+"cn": "逍遥护身诀",
+"en": "Free Spirit Shield",
+"icon": "Icon_FateStrategy_33",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5008": {
+"cn": "逍遥神力掌",
+"en": "Free Spirit Power Palm",
+"icon": "Icon_FateStrategy_36",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5009": {
+"cn": "双生刻纹",
+"en": "Twin Engraving",
+"icon": "Icon_XianMoStrategy_5009",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"5010": {
+"cn": "轮回之术",
+"en": "Samsara Arts",
+"icon": "Icon_XianMoStrategy_5010",
+"pool": 5,
+"poolCn": "白衣老者的仙命池 2 · 普通攻击与逍遥牌",
+"poolEn": "The old man in white’s pool 2 · Normal Attacks and Carefree cards"
+},
+"13001": {
+"cn": "淬毒刻纹",
+"en": "Poison Engraving",
+"icon": "Icon_XianMoStrategy_13001",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13002": {
+"cn": "驱邪刻纹",
+"en": "Ward Engraving",
+"icon": "Icon_XianMoStrategy_13002",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13003": {
+"cn": "画龙刻纹",
+"en": "Dragon-Drawing Engraving",
+"icon": "Icon_XianMoStrategy_13003",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13004": {
+"cn": "疗愈刻纹",
+"en": "Healing Engraving",
+"icon": "Icon_XianMoStrategy_13004",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13005": {
+"cn": "混元刻纹",
+"en": "Primordial Engraving",
+"icon": "Icon_XianMoStrategy_13005",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13006": {
+"cn": "追击刻纹",
+"en": "Chase Engraving",
+"icon": "Icon_XianMoStrategy_13006",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13007": {
+"cn": "厄劫刻纹",
+"en": "Calamity Engraving",
+"icon": "Icon_XianMoStrategy_13007",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13008": {
+"cn": "护体刻纹",
+"en": "Guard Engraving",
+"icon": "Icon_XianMoStrategy_13008",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13009": {
+"cn": "水月刻纹",
+"en": "Moon Water Engraving",
+"icon": "Icon_XianMoStrategy_13009",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13010": {
+"cn": "移星刻纹",
+"en": "Star-Shifting Engraving",
+"icon": "Icon_XianMoStrategy_13010",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13011": {
+"cn": "五行刻纹",
+"en": "Five Elements Engraving",
+"icon": "Icon_XianMoStrategy_13011",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13012": {
+"cn": "气势刻纹",
+"en": "Force Engraving",
+"icon": "Icon_XianMoStrategy_13012",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13013": {
+"cn": "两仪刻纹",
+"en": "Yin-Yang Engraving",
+"icon": "Icon_XianMoStrategy_13013",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13014": {
+"cn": "坚体刻纹",
+"en": "Endurance Engraving",
+"icon": "Icon_XianMoStrategy_13014",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13015": {
+"cn": "灰烬刻纹",
+"en": "Ash Engraving",
+"icon": "Icon_XianMoStrategy_13015",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13016": {
+"cn": "剑意刻纹",
+"en": "Sword Intent Engraving",
+"icon": "Icon_XianMoStrategy_13016",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13017": {
+"cn": "灵蛇刻纹",
+"en": "Spirit Snake Engraving",
+"icon": "Icon_XianMoStrategy_13017",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13018": {
+"cn": "水木刻纹",
+"en": "Wood Water Engraving",
+"icon": "Icon_XianMoStrategy_13018",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"13019": {
+"cn": "玄疗刻纹",
+"en": "Mystic Healing Engraving",
+"icon": "Icon_XianMoStrategy_13019",
+"pool": 13,
+"poolCn": "墨明鬼的仙命池 1 · 格子附魔",
+"poolEn": "Mo Minggui’s pool 1 · Slot enchantments"
+},
+"6001": {
+"cn": "云剑•晚霞",
+"en": "Cloud Sword - Sunset Glow",
+"icon": "Card_47",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6002": {
+"cn": "青龙剑阵",
+"en": "Azure Dragon Sword Formation",
+"icon": "Card_48",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6003": {
+"cn": "百兽灵剑阵",
+"en": "Beast Spirit Sword Formation",
+"icon": "Card_49",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6004": {
+"cn": "狂龙吞云",
+"en": "Dragon Devours Clouds",
+"icon": "Card_50",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6005": {
+"cn": "灵卦术",
+"en": "Spiritual Hexagram Divination",
+"icon": "Card_51",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6006": {
+"cn": "摘花飞叶",
+"en": "Throw Petals",
+"icon": "Card_52",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6007": {
+"cn": "星弈•双飞燕",
+"en": "Astral Move - Twin Swallows",
+"icon": "Card_53",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6008": {
+"cn": "滴水穿石",
+"en": "Water Drop Erosion",
+"icon": "Card_54",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6009": {
+"cn": "野渡之印",
+"en": "Wild Crossing Seal",
+"icon": "Card_55",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6010": {
+"cn": "熔岩之印",
+"en": "Lava Seal",
+"icon": "Card_56",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6011": {
+"cn": "滚石之印",
+"en": "Boulder Seal",
+"icon": "Card_57",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6012": {
+"cn": "斩浪之印",
+"en": "Wave Cutter Seal",
+"icon": "Card_58",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6013": {
+"cn": "玄灵附身",
+"en": "Dark Spirit Possession",
+"icon": "Card_336",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6014": {
+"cn": "崩拳•伏虎",
+"en": "Crash Fist - Tiger Subdue",
+"icon": "Card_337",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6015": {
+"cn": "瞬影击",
+"en": "Instant Shadow Strike",
+"icon": "Card_338",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6016": {
+"cn": "逍遥无影拳",
+"en": "Carefree Shadowless Fist",
+"icon": "Card_339",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6017": {
+"cn": "凌剑心法",
+"en": "Apex Sword Citta-Dharma",
+"icon": "Card_1000053",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6018": {
+"cn": "步月登云",
+"en": "Step Moon Into Cloud",
+"icon": "Card_1000057",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6019": {
+"cn": "星弈•屠龙",
+"en": "Astral Move - Dragon Slay",
+"icon": "Card_4000051",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6020": {
+"cn": "雷霆心法",
+"en": "Thunder Citta-Dharma",
+"icon": "Card_4000064",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6021": {
+"cn": "木灵•燃火",
+"en": "Wood Spirit - Rhythm Fire",
+"icon": "Card_7000051",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6022": {
+"cn": "土灵•韵金",
+"en": "Earth Spirit - Rhythm Metal",
+"icon": "Card_7000047",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6023": {
+"cn": "崩拳•双影",
+"en": "Crash Fist - Double",
+"icon": "Card_10000060",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"6024": {
+"cn": "幽冥三点手",
+"en": "Styx Three Hit",
+"icon": "Card_10000067",
+"pool": 6,
+"poolCn": "墨非命的仙命池 1 · 秘传专属牌奖励",
+"poolEn": "Mo Feiming’s pool 1 · Esoteric personal-card rewards"
+},
+"14001": {
+"cn": "迅影飞剑",
+"en": "Swift Shadow Flying Sword",
+"icon": "Card_1000094",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14002": {
+"cn": "云剑•追风",
+"en": "Cloud Sword - Chase Wind",
+"icon": "Card_1000098",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14003": {
+"cn": "灵枢剑阵",
+"en": "Spirit Pivot Sword Formation",
+"icon": "Card_1000092",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14004": {
+"cn": "弯弓射虎",
+"en": "Drawing the Bow at the Tiger",
+"icon": "Card_4000097",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14005": {
+"cn": "星弈•劫争",
+"en": "Astral Move - Ko Fight",
+"icon": "Card_4000094",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14006": {
+"cn": "灵蛇绕柱",
+"en": "Spirit Snake Coiling Pillar",
+"icon": "Card_4000095",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14007": {
+"cn": "土灵•遁地",
+"en": "Earth Spirit - Burrow",
+"icon": "Card_7000096",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14008": {
+"cn": "木灵•春风拂",
+"en": "Wood Spirit - Spring Breeze",
+"icon": "Card_7000097",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14009": {
+"cn": "水灵•乘风浪",
+"en": "Water Spirit - Ride the Waves",
+"icon": "Card_7000100",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14010": {
+"cn": "金灵•回锋刃",
+"en": "Metal Spirit - Returning Edge",
+"icon": "Card_7000099",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14011": {
+"cn": "火灵•焚脉诀",
+"en": "Fire Spirit - Vein Burn Rhythm",
+"icon": "Card_7000098",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14012": {
+"cn": "混元化灵",
+"en": "Primordial Spirit Transmutation",
+"icon": "Card_7000101",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14013": {
+"cn": "玄灵愈体",
+"en": "Mystic Spirit Healing",
+"icon": "Card_10000091",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14014": {
+"cn": "崩拳•碎骨",
+"en": "Crash Fist - Shatter",
+"icon": "Card_10000093",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14015": {
+"cn": "万魂破军",
+"en": "Thousand Souls Strike",
+"icon": "Card_10000094",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14016": {
+"cn": "血影遁术",
+"en": "Blood Shadow Escape",
+"icon": "Card_10000095",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14017": {
+"cn": "飞豹灵剑",
+"en": "Flying Leopard Spirit Sword",
+"icon": "Card_1000090",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14018": {
+"cn": "剑影结界",
+"en": "Sword Shadow Barrier",
+"icon": "Card_1000095",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14019": {
+"cn": "星弈•长",
+"en": "Astral Move - Extend",
+"icon": "Card_4000093",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14020": {
+"cn": "折枝点穴",
+"en": "Branch Break Acupressure",
+"icon": "Card_4000096",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14021": {
+"cn": "凌空飞扫",
+"en": "Aerial Sweep",
+"icon": "Card_10000092",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"14022": {
+"cn": "醉拳架势",
+"en": "Drunken Fist Stance",
+"icon": "Card_10000090",
+"pool": 14,
+"poolCn": "墨非命的仙命池 2 · 赛季轮换牌",
+"poolEn": "Mo Feiming’s pool 2 · Seasonal rotation cards"
+},
+"23001": {
+"cn": "道途-云剑月影",
+"en": "Dao Path - Cloud Sword Moon Shadow",
+"icon": "Card_1000040",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23002": {
+"cn": "道途-飞灵闪影剑",
+"en": "Dao Path - Flying Spirit Shade Sword",
+"icon": "Card_1000043",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23003": {
+"cn": "道途-百鸟灵剑诀",
+"en": "Dao Path - Hundred Birds Spirit Sword Art",
+"icon": "Card_1000065",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23004": {
+"cn": "道途-狂剑二式",
+"en": "Dao Path - Unrestrained Sword II",
+"icon": "Card_1000035",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23005": {
+"cn": "道途-御空剑阵",
+"en": "Dao Path - Aerial Sword Formation",
+"icon": "Card_1000025",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23006": {
+"cn": "道途-天元心法",
+"en": "Dao Path - Primal Heart Art",
+"icon": "Card_4000045",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23007": {
+"cn": "道途-乾卦",
+"en": "Dao Path - Qian Hexagram",
+"icon": "Card_4000026",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23008": {
+"cn": "道途-黄雀在后",
+"en": "Dao Path - Hidden Bane",
+"icon": "Card_4000066",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23009": {
+"cn": "道途-气吞山河",
+"en": "Dao Path - Commanding Presence",
+"icon": "Card_4000060",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23010": {
+"cn": "道途-杯弓蛇影",
+"en": "Dao Path - False Alarm",
+"icon": "Card_4000059",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23011": {
+"cn": "道途-木灵暗香",
+"en": "Dao Path - Wood Spirit Hidden Fragrance",
+"icon": "Card_7000061",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23012": {
+"cn": "道途-火灵烈燎原",
+"en": "Dao Path - Fire Spirit Prairie",
+"icon": "Card_7000056",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23013": {
+"cn": "道途-土灵合八荒",
+"en": "Dao Path - Earth Spirit Eight Wastes",
+"icon": "Card_7000053",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23014": {
+"cn": "道途-金灵巨鼎落",
+"en": "Dao Path - Metal Spirit Giant Cauldron",
+"icon": "Card_7000042",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23015": {
+"cn": "道途-水灵腾浪",
+"en": "Dao Path - Water Spirit Surging Waves",
+"icon": "Card_7000030",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23016": {
+"cn": "道途-混元无极阵",
+"en": "Dao Path - Primordial Limitless Formation",
+"icon": "Card_7000058",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23017": {
+"cn": "道途-百杀破境掌",
+"en": "Dao Path - Hundred Slaughter Break Realm Palm",
+"icon": "Card_10000047",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23018": {
+"cn": "道途-崩灭心法",
+"en": "Dao Path - Crash Heart Art",
+"icon": "Card_10000044",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23019": {
+"cn": "道途-冲霄破浪",
+"en": "Dao Path - Break Waves",
+"icon": "Card_10000042",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23020": {
+"cn": "道途-玄心斩魄",
+"en": "Dao Path - Dark Heart Soul-Sever",
+"icon": "Card_10000068",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23021": {
+"cn": "道途-鹤步",
+"en": "Dao Path - Crane Step",
+"icon": "Card_10000038",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23022": {
+"cn": "道途-锻神开海",
+"en": "Dao Path - Exercise Soul",
+"icon": "Card_10000048",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23023": {
+"cn": "道途-轰雷掣电",
+"en": "Dao Path - Thunder And Lighting",
+"icon": "Card_4000063",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23024": {
+"cn": "道途-剑意激荡",
+"en": "Dao Path - Sword Intent Surge",
+"icon": "Card_1000044",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23037": {
+"cn": "天衍-云雾变幻",
+"en": "Heavenly Derivation - Shift As Cloud",
+"icon": "Icon_Talent_18",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23038": {
+"cn": "潜龙道途",
+"en": "Hidden Dragon Dao Path",
+"icon": "Icon_Talent_218",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23039": {
+"cn": "天衍-龙脉传承",
+"en": "Heavenly Derivation - Dragon Lineage",
+"icon": "Icon_Talent_24",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23040": {
+"cn": "天衍-好奇心",
+"en": "Heavenly Derivation - Curiosity",
+"icon": "Icon_Talent_129",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23041": {
+"cn": "潜能觉醒",
+"en": "Latent Potential Awakening",
+"icon": "Icon_XianMoStrategy_23041",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23042": {
+"cn": "天衍-飞砂",
+"en": "Heavenly Derivation - Flying Sand",
+"icon": "Card_36",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23043": {
+"cn": "以战淬剑",
+"en": "Temper Sword in Battle",
+"icon": "Icon_XianMoStrategy_23043",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23044": {
+"cn": "悟剑合一",
+"en": "Sword Self-Unity",
+"icon": "Icon_XianMoStrategy_23044",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23045": {
+"cn": "淬剑-灵气",
+"en": "Tempered Blade - Qi",
+"icon": "Icon_FateStrategy_100",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23046": {
+"cn": "天衍-勤学苦练",
+"en": "Heavenly Derivation - Study Hard",
+"icon": "Icon_Talent_29",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23047": {
+"cn": "天衍-血脉威能",
+"en": "Heavenly Derivation - Bloodline Power",
+"icon": "Icon_Talent_114",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23048": {
+"cn": "天衍-先天灵躯",
+"en": "Heavenly Derivation - Innate Spirit Body",
+"icon": "Icon_Talent_37",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23049": {
+"cn": "天衍-运筹帷幄",
+"en": "Heavenly Derivation - Strategize",
+"icon": "Icon_Talent_48",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23051": {
+"cn": "天衍-风行天上",
+"en": "Heavenly Derivation - Wind in Sky",
+"icon": "Icon_Talent_194",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23052": {
+"cn": "天衍-战斗历练",
+"en": "Heavenly Derivation - Battle Training",
+"icon": "Icon_Talent_80",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23053": {
+"cn": "天衍-先天灵阵",
+"en": "Heavenly Derivation - Innate Spirit Formation",
+"icon": "Icon_Talent_111",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23054": {
+"cn": "有缘人",
+"en": "Fated One",
+"icon": "Icon_FateStrategy_410",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23055": {
+"cn": "天衍-桃花印",
+"en": "Heavenly Derivation - Peach Blossom Seal",
+"icon": "Icon_Talent_98",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23056": {
+"cn": "土金修行",
+"en": "Earth-Metal Practice",
+"icon": "Icon_XianMoStrategy_23056",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23057": {
+"cn": "秘印转换",
+"en": "Secret Seal Shift",
+"icon": "Icon_XianMoStrategy_23057",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23058": {
+"cn": "天衍-五行玉瓶",
+"en": "Heavenly Derivation - Five Elements Pure Vase",
+"icon": "Icon_Talent_199",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23059": {
+"cn": "精打细算",
+"en": "Meticulous Calculation",
+"icon": "Icon_FateStrategy_420",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23060": {
+"cn": "天衍-锻躯之道",
+"en": "Heavenly Derivation - Forge Body",
+"icon": "Icon_Talent_170",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23061": {
+"cn": "天衍-疯魔",
+"en": "Heavenly Derivation - Gone Crazy",
+"icon": "Icon_Talent_180",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23062": {
+"cn": "天衍-禅心锻身",
+"en": "Heavenly Derivation - Zen Mind Forging Body",
+"icon": "Icon_Talent_183",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23063": {
+"cn": "天衍-拆招",
+"en": "Heavenly Derivation - Counter Move",
+"icon": "Icon_Talent_205",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23064": {
+"cn": "天衍-双节棍",
+"en": "Heavenly Derivation - Double Stick",
+"icon": "Card_219",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23065": {
+"cn": "天衍-灵羽",
+"en": "Heavenly Derivation - Spirit Feather",
+"icon": "Card_381",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23066": {
+"cn": "木虎",
+"en": "Wood Tiger",
+"icon": "Icon_FateStrategy_412",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23067": {
+"cn": "囤囤鼠",
+"en": "Hoarding Rat",
+"icon": "Icon_XianMoStrategy_23067",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23068": {
+"cn": "天衍-磨砺不止",
+"en": "Heavenly Derivation - Unyielding Learning",
+"icon": "Icon_Talent_151",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23069": {
+"cn": "黯星伤魂",
+"en": "Dark Star Soul Injury",
+"icon": "Icon_FateStrategy_399",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23070": {
+"cn": "天衍-阴符玉简",
+"en": "Heavenly Derivation - Jade Scroll of Yin Symbol",
+"icon": "Icon_Talent_196",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23071": {
+"cn": "天衍-悠然葫芦",
+"en": "Heavenly Derivation - Gourd Of Leisurely",
+"icon": "Icon_Talent_81",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23072": {
+"cn": "天衍-天降甘霖",
+"en": "Heavenly Derivation - Heavenly Rain",
+"icon": "Icon_Talent_201",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23073": {
+"cn": "云狂修行",
+"en": "Cloud-Frenzy Practice",
+"icon": "Icon_XianMoStrategy_23073",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23074": {
+"cn": "化炎",
+"en": "Flame Conversion",
+"icon": "Icon_FateStrategy_415",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23075": {
+"cn": "天衍-云影化身",
+"en": "Heavenly Derivation - Cloud Shadow Avatar",
+"icon": "Icon_Talent_7",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23076": {
+"cn": "天衍-阴晴圆缺",
+"en": "Heavenly Derivation - Wax and Wane",
+"icon": "Icon_Talent_178",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23077": {
+"cn": "天衍-观壁悟道",
+"en": "Heavenly Derivation - Wall-Gazing Epiphany",
+"icon": "Icon_Talent_190",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23078": {
+"cn": "天衍-记忆碎片",
+"en": "Heavenly Derivation - Memory Fragments",
+"icon": "Icon_Talent_186",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23079": {
+"cn": "料敌机先",
+"en": "Anticipate Enemy's Move",
+"icon": "Icon_FateStrategy_330",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23080": {
+"cn": "相生灵阵",
+"en": "Generating Spirit Formation",
+"icon": "Icon_FateStrategy_133",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23081": {
+"cn": "拳锻修行",
+"en": "Fist-Tempering Practice",
+"icon": "Icon_XianMoStrategy_23081",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23082": {
+"cn": "驭风修行",
+"en": "Wind-Riding Practice",
+"icon": "Icon_XianMoStrategy_23082",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23083": {
+"cn": "雷卦修行",
+"en": "Thunder Hexagram Practice",
+"icon": "Icon_XianMoStrategy_23083",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23084": {
+"cn": "踏雪修行",
+"en": "Snow-Treading Practice",
+"icon": "Icon_XianMoStrategy_23084",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"23050": {
+"cn": "天衍-算无遗策",
+"en": "Heavenly Derivation - Perfectly Planned",
+"icon": "Icon_Talent_104",
+"pool": 23,
+"poolCn": "公输矩的仙命池 1 · 卡牌道途与前期专属选项",
+"poolEn": "Gongshu Ju’s pool 1 · Card paths and early personal options"
+},
+"17001": {
+"cn": "云剑•龙泉",
+"en": "Cloud Sword - Dragon Spring",
+"icon": "Card_1",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17002": {
+"cn": "云剑•雪影飞",
+"en": "Cloud Sword - Flying Snow Shade",
+"icon": "Card_3",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17003": {
+"cn": "百鸟玲珑镯",
+"en": "CentiBird Delicate Bracelet",
+"icon": "Card_16",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17004": {
+"cn": "狂剑•猫爪",
+"en": "Unrestrained Sword - Cat Claw",
+"icon": "Card_8",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17005": {
+"cn": "澄心剑阵",
+"en": "Clear Heart Sword Formation",
+"icon": "Card_1000025",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17006": {
+"cn": "百鸟曳影诀",
+"en": "CentiBird Swift Shadow Art",
+"icon": "Card_213",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17007": {
+"cn": "瑞雪迎春",
+"en": "Traces Revitalized",
+"icon": "Card_12",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17008": {
+"cn": "天元无极盘",
+"en": "Polaris Ultimate Base",
+"icon": "Card_28",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17009": {
+"cn": "灯影蚀焰",
+"en": "Suspicious Flame Flutter",
+"icon": "Card_6",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17010": {
+"cn": "千星天爆",
+"en": "Thousand Star Explosion",
+"icon": "Card_10",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17011": {
+"cn": "星月六爻扇",
+"en": "Star Moon Six Lines Fan",
+"icon": "Card_23",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17012": {
+"cn": "星弈•治孤",
+"en": "Astral Move - Rescue",
+"icon": "Card_215",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17013": {
+"cn": "天髓葫芦",
+"en": "Heavenly Marrow Gourd",
+"icon": "Card_13",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17014": {
+"cn": "混元逆克阵",
+"en": "Primordial Reverse Overcome Formation",
+"icon": "Card_32",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17015": {
+"cn": "木灵•万物生",
+"en": "Wood Spirit - All Things Grow",
+"icon": "Card_17",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17016": {
+"cn": "锟铻熔火环",
+"en": "Kun Wu Molten Ring",
+"icon": "Card_38",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17017": {
+"cn": "水火交融",
+"en": "Harmony of Water and Fire",
+"icon": "Card_7000072",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17018": {
+"cn": "五行忘忧梦",
+"en": "Five Elements Carefree Dream",
+"icon": "Card_218",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17019": {
+"cn": "浩荡不息",
+"en": "Unceasing Universe",
+"icon": "Card_45",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17020": {
+"cn": "玄心盛气掌",
+"en": "Soul Overwhelming Palm",
+"icon": "Card_70",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17021": {
+"cn": "冥夜迷踪步",
+"en": "Styx Night Footwork",
+"icon": "Card_74",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17022": {
+"cn": "崩拳•返玄",
+"en": "Crash Fist - Return to Xuan",
+"icon": "Card_81",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17023": {
+"cn": "闪转腾挪",
+"en": "Dodge and Weave",
+"icon": "Card_222",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17024": {
+"cn": "冯虚御风",
+"en": "Riding the Wind",
+"icon": "Card_383",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17025": {
+"cn": "云剑•狂炎",
+"en": "Cloud Sword - Wildfire",
+"icon": "Card_2",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17026": {
+"cn": "云剑•猫影",
+"en": "Cloud Sword - Cat Shadow",
+"icon": "Card_9",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17027": {
+"cn": "雷闪二度",
+"en": "Thunder Flash Twice",
+"icon": "Card_29",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17028": {
+"cn": "火灵•焚花印",
+"en": "Fire Spirit - Blossom Burn Seal",
+"icon": "Card_20",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17029": {
+"cn": "疯魔架势",
+"en": "Mad Demon Stance",
+"icon": "Card_73",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17030": {
+"cn": "万玄锻灵",
+"en": "Myriad Mystery Forge Spirit",
+"icon": "Card_82",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17031": {
+"cn": "水灵•劲浪",
+"en": "Water Spirit - Surge Wave",
+"icon": "Card_18",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17032": {
+"cn": "紫芒星爆",
+"en": "Purple Starburst",
+"icon": "Card_10",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17033": {
+"cn": "阴符绝阵",
+"en": "Yin Fu Formacide",
+"icon": "Card_214",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17034": {
+"cn": "极•云剑柔心",
+"en": "Ultimate: Cloud Sword - Softheart",
+"icon": "Card_1000026",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17035": {
+"cn": "极•暗鸦灵剑",
+"en": "Ultimate: Raven Spirit Sword",
+"icon": "Card_1000020",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17036": {
+"cn": "极•静气心法",
+"en": "Ultimate: Stillness Citta-Dharma",
+"icon": "Card_4000027",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17037": {
+"cn": "极•两仪阵",
+"en": "Ultimate: Yin Yang Formation",
+"icon": "Card_4000040",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17038": {
+"cn": "极•水灵阵",
+"en": "Ultimate: Water Spirit Formation",
+"icon": "Card_7000029",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17039": {
+"cn": "极•木灵巡林",
+"en": "Ultimate: Wood Spirit - Forest Guard",
+"icon": "Card_7000028",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17040": {
+"cn": "极•崩天步",
+"en": "Ultimate: Crash Footwork",
+"icon": "Card_10000026",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17041": {
+"cn": "极•迎风掌",
+"en": "Ultimate: Windward Palms",
+"icon": "Card_10000028",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17042": {
+"cn": "极•狂剑一式",
+"en": "Ultimate: Unrestrained Sword One",
+"icon": "Card_1000022",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17043": {
+"cn": "极•灵犀剑阵",
+"en": "Ultimate: Consonance Sword Formation",
+"icon": "Card_1000033",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17044": {
+"cn": "极•六爻绝阵",
+"en": "Ultimate: Six Lines Formacide",
+"icon": "Card_4000014",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17045": {
+"cn": "极•螳螂捕蝉",
+"en": "Ultimate: Hunter Becomes Preyer",
+"icon": "Card_4000043",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17046": {
+"cn": "极•金灵阵",
+"en": "Ultimate: Metal Spirit Formation",
+"icon": "Card_7000016",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17047": {
+"cn": "极•五行灵击",
+"en": "Ultimate: Five Elements Spirit Strike",
+"icon": "Card_7000095",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17048": {
+"cn": "极•锻骨",
+"en": "Ultimate: Exercise Bones",
+"icon": "Card_10000027",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17049": {
+"cn": "极•夜鬼啸",
+"en": "Ultimate: Ghost Howling",
+"icon": "Card_10000019",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17050": {
+"cn": "极•水灵春雨",
+"en": "Ultimate: Water Spirit Spring Rain",
+"icon": "Card_17",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17051": {
+"cn": "极•锟铻金环",
+"en": "Ultimate: Kun Wu Metal Ring",
+"icon": "Card_38",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17052": {
+"cn": "极•盛气凌人",
+"en": "Ultimate: Overwhelming Power",
+"icon": "Card_70",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17053": {
+"cn": "极•飞鸿踏雪",
+"en": "Ultimate: Only Traces",
+"icon": "Card_12",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17057": {
+"cn": "御浪冲霄",
+"en": "Ride Waves to the Heavens",
+"icon": "Card_10000042",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17058": {
+"cn": "狂剑•云寂",
+"en": "Unrestrained Sword - Cloudstill",
+"icon": "Card_1",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17059": {
+"cn": "云剑•星空",
+"en": "Cloud Sword - Starry Sky",
+"icon": "Card_1000027",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17060": {
+"cn": "金灵•流星",
+"en": "Metal Spirit - Meteor",
+"icon": "Card_7000033",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17061": {
+"cn": "御龙狂影",
+"en": "Dragon Command Phantom",
+"icon": "Icon_FateStrategy_383",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17062": {
+"cn": "星空棋局",
+"en": "Starry Sky Chessboard",
+"icon": "Icon_FateStrategy_403",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17063": {
+"cn": "剑阵之心",
+"en": "Heart of the Formation",
+"icon": "Icon_XianMoStrategy_17063",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17064": {
+"cn": "极•灯焰飞舞",
+"en": "Ultimate: Flame Flutter",
+"icon": "Card_6",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17065": {
+"cn": "极•锻体不息",
+"en": "Ultimate: Unceasing Exercising",
+"icon": "Card_45",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17066": {
+"cn": "极•双鸳逆克",
+"en": "Ultimate: Overcome with each other",
+"icon": "Card_32",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17067": {
+"cn": "剑阵秘术",
+"en": "Sword Formation Secret Enchantment",
+"icon": "Icon_FateStrategy_391",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17068": {
+"cn": "孤舟平澜",
+"en": "Lonely Boat Calming Waves",
+"icon": "Icon_XianMoStrategy_17068",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17069": {
+"cn": "极•云剑猫爪",
+"en": "Ultimate: Cloud Sword Cat Paw",
+"icon": "Card_8",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17070": {
+"cn": "极•镇印心法",
+"en": "Ultimate: Seal Heart Art",
+"icon": "Card_7000094",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17072": {
+"cn": "极•冥心入玄",
+"en": "Ultimate: Meditation of Xuan",
+"icon": "Card_81",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17073": {
+"cn": "极•灵羽",
+"en": "Ultimate: Spirit Feather",
+"icon": "Card_381",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17074": {
+"cn": "流沙秘印",
+"en": "Quicksand Secret Seal",
+"icon": "Card_7000070",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17075": {
+"cn": "凝意生机诀",
+"en": "Contemplate Spirits Vitality Rhythm",
+"icon": "Card_1000017",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17076": {
+"cn": "云剑•空明",
+"en": "Cloud Sword - Void Clarity",
+"icon": "Card_1000028",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17077": {
+"cn": "狂剑•降神",
+"en": "Unrestrained Sword - Descending God",
+"icon": "Card_1000066",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17078": {
+"cn": "天机•地煞",
+"en": "Heavenly Secret - Earth Sha",
+"icon": "Card_1000030",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17079": {
+"cn": "弯弓惊雀",
+"en": "Startle the Bird",
+"icon": "Card_4000097",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17080": {
+"cn": "春雷霹雳曲",
+"en": "Thunderbolt Tune",
+"icon": "Card_4000030",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17081": {
+"cn": "浮光掠影",
+"en": "Fleeting Glimpse",
+"icon": "Card_4000035",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17082": {
+"cn": "星弈•跳",
+"en": "Astral Move - Jump",
+"icon": "Card_4000038",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17083": {
+"cn": "浑天运笔",
+"en": "Cosmos Brush",
+"icon": "Card_7000014",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17084": {
+"cn": "五行灵田",
+"en": "Five Elements Spiritual Field",
+"icon": "Card_7000058",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17085": {
+"cn": "木灵天罡阵",
+"en": "Wood Spirit Forceage Formation",
+"icon": "Card_7000036",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17086": {
+"cn": "灵气锻身",
+"en": "Spiritage And Exercise",
+"icon": "Card_10000027",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17087": {
+"cn": "锻龙诀",
+"en": "Exercise To The Utmost",
+"icon": "Card_10000048",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17088": {
+"cn": "势灵阵",
+"en": "Force Spiritage Formation",
+"icon": "Card_10000051",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17089": {
+"cn": "崩拳•夺星",
+"en": "Crash Fist - Star Seizing",
+"icon": "Card_10000024",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17090": {
+"cn": "灵玄不息",
+"en": "Endless Spirit Mystery",
+"icon": "Card_45",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17091": {
+"cn": "气吞星河",
+"en": "Great Galaxy",
+"icon": "Card_4000062",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17092": {
+"cn": "水灵•悠然",
+"en": "Water Spirit - Leisurely",
+"icon": "Card_13",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17093": {
+"cn": "极•霸王举鼎",
+"en": "Ultimate: Overlord's Cauldron Lift",
+"icon": "Card_10000102",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17094": {
+"cn": "极•火灵轰爆",
+"en": "Ultimate: Fire Spirit Blast",
+"icon": "Card_7000032",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17095": {
+"cn": "修罗玄龙棍",
+"en": "Asura Black Dragon Staff",
+"icon": "Card_220",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17096": {
+"cn": "云剑•月旋",
+"en": "Cloud Sword - Moon Spin",
+"icon": "Card_1000106",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17097": {
+"cn": "天髓逆克诀",
+"en": "Heavenly Marrow Reverse Overcome",
+"icon": "Card_32",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17098": {
+"cn": "浮云连环步",
+"en": "Floating Cloud Chain Steps",
+"icon": "Card_1000105",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17099": {
+"cn": "云剑•追影",
+"en": "Cloud Sword - Shadow Chase",
+"icon": "Card_1000098",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17100": {
+"cn": "星弈•渡",
+"en": "Astral Move - Ferry",
+"icon": "Card_12",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"17101": {
+"cn": "星弈•镇",
+"en": "Astral Move - Subduing",
+"icon": "Card_4000044",
+"pool": 17,
+"poolCn": "公输钥的仙命池 1 · 专属融汇与极牌",
+"poolEn": "Gongshu Yao’s pool 1 · Personal fusion and Ultimate cards"
+},
+"7003": {
+"cn": "天衍-炎舞",
+"en": "Heavenly Derivation - Flame Dance",
+"icon": "Icon_Talent_22",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7004": {
+"cn": "天衍-崩雪",
+"en": "Heavenly Derivation - Avalanche",
+"icon": "Icon_Talent_23",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7006": {
+"cn": "天衍-九霄玲珑镯",
+"en": "Heavenly Derivation - Sky Delicate Bracelet",
+"icon": "Icon_Talent_86",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7007": {
+"cn": "天衍-唤雨",
+"en": "Heavenly Derivation - Pray Rain",
+"icon": "Icon_Talent_85",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7008": {
+"cn": "天衍-玲珑剑阵",
+"en": "Heavenly Derivation - Exquisite Sword Formation",
+"icon": "Icon_Talent_219",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7009": {
+"cn": "天衍-灵猫乱剑",
+"en": "Heavenly Derivation - Spirit Cat Chaos Sword",
+"icon": "Icon_Talent_46",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7010": {
+"cn": "天衍-灵猫踏云",
+"en": "Heavenly Derivation - Lithe As Cat",
+"icon": "Icon_Talent_15",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7011": {
+"cn": "剑心演武",
+"en": "Sword Heart Martial Display",
+"icon": "Icon_FateStrategy_99",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7012": {
+"cn": "地火锻心",
+"en": "Earthfire Forging Heart",
+"icon": "Icon_FateStrategy_323",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7013": {
+"cn": "剑招修行",
+"en": "Sword Arts Practice",
+"icon": "Icon_FateStrategy_105",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7014": {
+"cn": "剑影互通",
+"en": "Sword Shadow Exchange",
+"icon": "Icon_FateStrategy_106",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7015": {
+"cn": "天衍-悟剑天赋",
+"en": "Heavenly Derivation - Swordplay Talent",
+"icon": "Icon_Talent_189",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7016": {
+"cn": "天衍-曳影剑阵",
+"en": "Heavenly Derivation - Swift Shadow Sword Formation",
+"icon": "Icon_Talent_193",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7018": {
+"cn": "天衍-瓮中捉鳖",
+"en": "Heavenly Derivation - Within Reach",
+"icon": "Icon_Talent_35",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7019": {
+"cn": "天衍-狂雷电闪",
+"en": "Heavenly Derivation - Fury Thunder",
+"icon": "Icon_Talent_122",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7020": {
+"cn": "天衍-旋灯占卦",
+"en": "Heavenly Derivation - Rotary Divination Hexagram",
+"icon": "Icon_Talent_40",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7021": {
+"cn": "天衍-七星定魂",
+"en": "Heavenly Derivation - Heptastar Soulstat",
+"icon": "Icon_Talent_52",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7022": {
+"cn": "七星伤魂",
+"en": "Seven Stars Soul Wound",
+"icon": "Icon_FateStrategy_121",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7023": {
+"cn": "天衍-星月折扇",
+"en": "Heavenly Derivation - Star Moon Folding Fan",
+"icon": "Icon_Talent_106",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7024": {
+"cn": "天衍-卜卦",
+"en": "Heavenly Derivation - Divination",
+"icon": "Icon_Talent_30",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7025": {
+"cn": "水灵•悠然",
+"en": "Water Spirit - Leisurely",
+"icon": "Card_13",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7027": {
+"cn": "天衍-五行传承",
+"en": "Heavenly Derivation - Inheritance of Five Elements",
+"icon": "Icon_Talent_123",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7028": {
+"cn": "天衍-先天印记",
+"en": "Heavenly Derivation - Innate Mark",
+"icon": "Icon_Talent_110",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7029": {
+"cn": "天衍-先天五行",
+"en": "Heavenly Derivation - Innate Element",
+"icon": "Icon_Talent_109",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7030": {
+"cn": "天衍-双鸳逆克",
+"en": "Heavenly Derivation - Overcome with each other",
+"icon": "Icon_Talent_124",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7031": {
+"cn": "灵阵回响",
+"en": "Spirit Formation Echo",
+"icon": "Icon_FateStrategy_135",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7032": {
+"cn": "凝水化刃",
+"en": "Condensed Water Blade",
+"icon": "Icon_FateStrategy_137",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7033": {
+"cn": "天衍-山崩",
+"en": "Heavenly Derivation - Landslide",
+"icon": "Icon_Talent_100",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7034": {
+"cn": "天衍-刚劲",
+"en": "Heavenly Derivation - Vigorous",
+"icon": "Icon_Talent_91",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7035": {
+"cn": "荆棘伴生",
+"en": "Thorn Companion",
+"icon": "Icon_FateStrategy_148",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7036": {
+"cn": "灵香缭绕",
+"en": "Incense Swirl",
+"icon": "Icon_FateStrategy_151",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7037": {
+"cn": "天衍-崩裂之拳",
+"en": "Heavenly Derivation - Cracking Fist",
+"icon": "Icon_Talent_174",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7038": {
+"cn": "掌法感悟",
+"en": "Palm Technique Insight",
+"icon": "Icon_FateStrategy_155",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7039": {
+"cn": "天衍-冥夜",
+"en": "Heavenly Derivation - Styx Night",
+"icon": "Icon_Talent_181",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7040": {
+"cn": "天衍-冥月蟾光",
+"en": "Heavenly Derivation - Styx Moon's Glow",
+"icon": "Icon_Talent_182",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7041": {
+"cn": "天衍-万玄破魔掌",
+"en": "Heavenly Derivation - Wan Xuan Demon Breaking Palm",
+"icon": "Icon_Talent_187",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7043": {
+"cn": "天衍-转势",
+"en": "Heavenly Derivation - Shift Stance",
+"icon": "Icon_Talent_207",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7044": {
+"cn": "背孤击虚",
+"en": "Strike the Void from Behind",
+"icon": "Icon_FateStrategy_301",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7045": {
+"cn": "天衍-五行刀斩",
+"en": "Heavenly Derivation - Five Elements Blade Slash",
+"icon": "Icon_Talent_264",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7046": {
+"cn": "天衍-御风飞闪",
+"en": "Heavenly Derivation - Wind-Riding Flash",
+"icon": "Icon_Talent_269",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7048": {
+"cn": "天衍-五行聚灵",
+"en": "Heavenly Derivation - Five Elements Gather Qi",
+"icon": "Icon_Talent_202",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7049": {
+"cn": "琴心剑胆",
+"en": "Heart of Melody, Valor of the Sword",
+"icon": "Icon_FateStrategy_319",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7050": {
+"cn": "霜寒水月",
+"en": "Frost Chill Moon Water",
+"icon": "Icon_FateStrategy_320",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7051": {
+"cn": "玲珑游",
+"en": "Delicate Explorer",
+"icon": "Icon_FateStrategy_321",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7052": {
+"cn": "狂剑聚灵",
+"en": "Unrestrained Sword Qi Gathering",
+"icon": "Icon_FateStrategy_325",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7053": {
+"cn": "雁栖",
+"en": "Goose Perch",
+"icon": "Icon_FateStrategy_326",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7054": {
+"cn": "恃风雷",
+"en": "Thunderstorm Embrace",
+"icon": "Icon_FateStrategy_327",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7056": {
+"cn": "七星连珠",
+"en": "Seven Stars Alignment",
+"icon": "Icon_FateStrategy_331",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7057": {
+"cn": "引虚",
+"en": "Draw Void",
+"icon": "Icon_FateStrategy_332",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7058": {
+"cn": "百草织霞",
+"en": "Hundred Herbs Knitting the Clouds",
+"icon": "Icon_FateStrategy_334",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7059": {
+"cn": "风灵展翼",
+"en": "Wind Spirit Spread Wings",
+"icon": "Icon_FateStrategy_336",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7060": {
+"cn": "灵之羽",
+"en": "Spirit Feather",
+"icon": "Icon_FateStrategy_337",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7061": {
+"cn": "天衍-孤虚金书",
+"en": "Heavenly Derivation - Solitary Void Golden Scroll",
+"icon": "Icon_Talent_198",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7062": {
+"cn": "天衍-斩断俗尘",
+"en": "Heavenly Derivation - Cut Off Mundane",
+"icon": "Icon_Talent_42",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7063": {
+"cn": "灯焰催心",
+"en": "Flame Flutter Heart Torment",
+"icon": "Icon_FateStrategy_342",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7064": {
+"cn": "朱雀之泪",
+"en": "Vermilion Bird's Tear",
+"icon": "Icon_FateStrategy_344",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7065": {
+"cn": "盈月飞影",
+"en": "Full Moon Flying Shadow",
+"icon": "Icon_FateStrategy_348",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7066": {
+"cn": "天衍-木灵印记",
+"en": "Heavenly Derivation - Mark of Wood Spirit",
+"icon": "Icon_Talent_255",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7068": {
+"cn": "飞火流霞",
+"en": "Flying Fire Sunset Glow",
+"icon": "Icon_FateStrategy_381",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7069": {
+"cn": "天衍-兴云布雨",
+"en": "Heavenly Derivation - Cloud and Rain",
+"icon": "Icon_Talent_220",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7070": {
+"cn": "喵喵喵？",
+"en": "Meow Meow Meow?",
+"icon": "Icon_FateStrategy_386",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7071": {
+"cn": "剑气掌控",
+"en": "Sword Qi Mastery",
+"icon": "Icon_FateStrategy_387",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7072": {
+"cn": "铸剑-云",
+"en": "Sword Forging - Cloud",
+"icon": "Icon_FateStrategy_389",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7073": {
+"cn": "悟剑演练",
+"en": "Sword Comprehension Drill",
+"icon": "Icon_FateStrategy_390",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7075": {
+"cn": "秋去春来",
+"en": "Autumn Goes Spring Comes",
+"icon": "Icon_FateStrategy_392",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7076": {
+"cn": "天衍-雪羽清风",
+"en": "Heavenly Derivation - Birdie Wind",
+"icon": "Icon_Talent_64",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7077": {
+"cn": "无尽卦衍",
+"en": "Endless Hexagram Derivation",
+"icon": "Icon_FateStrategy_395",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7078": {
+"cn": "灯灵星耀",
+"en": "Lantern Spirit Star Shine",
+"icon": "Icon_FateStrategy_397",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7079": {
+"cn": "星渊",
+"en": "Abyss of Stars",
+"icon": "Icon_FateStrategy_402",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7080": {
+"cn": "虚灵归流",
+"en": "Void Spirit Reflux",
+"icon": "Icon_FateStrategy_405",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7081": {
+"cn": "五行转化",
+"en": "Five Elements Conversion",
+"icon": "Icon_FateStrategy_406",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7082": {
+"cn": "天髓归一",
+"en": "Heavenly Marrow Returns to One",
+"icon": "Card_7000073",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7083": {
+"cn": "灵树庇佑",
+"en": "Spirit Tree Blessing",
+"icon": "Icon_FateStrategy_409",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7084": {
+"cn": "雨润大地",
+"en": "Rain Nourishes the Earth",
+"icon": "Icon_FateStrategy_411",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7085": {
+"cn": "混元玉瓶",
+"en": "Primal Pure Vase",
+"icon": "Icon_FateStrategy_417",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7086": {
+"cn": "灵草栽培",
+"en": "Spirit Herb Cultivation",
+"icon": "Icon_FateStrategy_418",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7087": {
+"cn": "气盖山河",
+"en": "Spirit Covers Mountains and Rivers",
+"icon": "Icon_FateStrategy_423",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7088": {
+"cn": "月魂爪",
+"en": "Moon Soul Claw",
+"icon": "Icon_FateStrategy_424",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7089": {
+"cn": "迅身掌",
+"en": "Swift Agility Palm",
+"icon": "Icon_FateStrategy_427",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7091": {
+"cn": "天衍-风灵锻躯",
+"en": "Heavenly Derivation - Wind Spirit Forge Body",
+"icon": "Icon_Talent_267",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7092": {
+"cn": "灵灌崩拳",
+"en": "Spirit Infused Crash Fist",
+"icon": "Icon_FateStrategy_432",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7093": {
+"cn": "七星借命",
+"en": "Seven Stars Borrow Life",
+"icon": "Card_4",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7095": {
+"cn": "天衍-土灵印记",
+"en": "Heavenly Derivation - Mark of Earth Spirit",
+"icon": "Icon_Talent_88",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7096": {
+"cn": "天衍-金灵印记",
+"en": "Heavenly Derivation - Mark of Metal Spirit",
+"icon": "Icon_Talent_254",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7097": {
+"cn": "培土生金",
+"en": "Earth Generates Metal",
+"icon": "Icon_XianMoStrategy_7097",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7098": {
+"cn": "天衍-火灵印记",
+"en": "Heavenly Derivation - Mark of Fire Spirit",
+"icon": "Icon_Talent_253",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7099": {
+"cn": "蹴鞠飞袭",
+"en": "Cuju Flying Strike",
+"icon": "Icon_FateStrategy_416",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7101": {
+"cn": "灵烟化爪",
+"en": "Spirit Smoke Claws",
+"icon": "Icon_FateStrategy_152",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7102": {
+"cn": "魂体不竭",
+"en": "Inexhaustible Soul Body",
+"icon": "Icon_FateStrategy_149",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7103": {
+"cn": "天衍-猛虎之躯",
+"en": "Heavenly Derivation - The Body of Fierce Tiger",
+"icon": "Icon_Talent_125",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7104": {
+"cn": "截拳式",
+"en": "Intercepting Fist Style",
+"icon": "Icon_FateStrategy_430",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7105": {
+"cn": "天衍-入冥",
+"en": "Heavenly Derivation - Entering Styx",
+"icon": "Icon_Talent_179",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7107": {
+"cn": "天衍-灯灵觉醒",
+"en": "Heavenly Derivation - Lamp Spirit Awakening",
+"icon": "Icon_Talent_28",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7108": {
+"cn": "天衍-计出万全",
+"en": "Heavenly Derivation - Best Choice",
+"icon": "Icon_Talent_141",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7109": {
+"cn": "天衍-无忧灵酿",
+"en": "Heavenly Derivation - Carefree Spirit Brew",
+"icon": "Icon_Talent_261",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7110": {
+"cn": "谋定后动",
+"en": "Plan Before Acting",
+"icon": "Icon_FateStrategy_329",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7111": {
+"cn": "无尽棍势",
+"en": "Endless Staff Stance",
+"icon": "Icon_FateStrategy_335",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7112": {
+"cn": "乘雁而行",
+"en": "Ride the Wild Goose",
+"icon": "Icon_FateStrategy_340",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7113": {
+"cn": "拳风破空",
+"en": "Fist Wind Breaks the Sky",
+"icon": "Icon_FateStrategy_349",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7114": {
+"cn": "天衍-秘印亲和",
+"en": "Heavenly Derivation - Secret Seal Affinity",
+"icon": "Icon_Talent_136",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7115": {
+"cn": "以冥化灵",
+"en": "Styx to Qi Conversion",
+"icon": "Icon_FateStrategy_160",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7116": {
+"cn": "老鼠偷油",
+"en": "Rat Steals Oil",
+"icon": "Icon_FateStrategy_398",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7117": {
+"cn": "天衍-气旋掌",
+"en": "Heavenly Derivation - Cyclone Palm",
+"icon": "Card_382",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7118": {
+"cn": "热血化气",
+"en": "Fiery Stake Stance",
+"icon": "Icon_FateStrategy_347",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7120": {
+"cn": "上古威势",
+"en": "Ancient Mighty Force",
+"icon": "Icon_FateStrategy_428",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7121": {
+"cn": "天衍-修玄不泯",
+"en": "Heavenly Derivation - Undying Cultivation",
+"icon": "Icon_Talent_177",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7123": {
+"cn": "天衍-猫魂庇佑",
+"en": "Heavenly Derivation - Cat Soul Blessing",
+"icon": "Icon_Talent_45",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7124": {
+"cn": "极•云剑猫爪",
+"en": "Ultimate: Cloud Sword Cat Paw",
+"icon": "Card_8",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7125": {
+"cn": "木灵•万物生",
+"en": "Wood Spirit - All Things Grow",
+"icon": "Card_17",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7126": {
+"cn": "极•冥心入玄",
+"en": "Ultimate: Meditation of Xuan",
+"icon": "Card_81",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7127": {
+"cn": "惊雷破敌",
+"en": "Thunder Shock Breaks Enemy",
+"icon": "Icon_FateStrategy_396",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7128": {
+"cn": "天衍-布星问卦",
+"en": "Heavenly Derivation - Lay Stars and Divine",
+"icon": "Icon_Talent_62",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7129": {
+"cn": "风卜卦术",
+"en": "Wind Divination Hexagram Art",
+"icon": "Icon_FateStrategy_404",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7130": {
+"cn": "淬剑-云海",
+"en": "Tempered Blade - Cloud Sea",
+"icon": "Icon_FateStrategy_324",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7131": {
+"cn": "浩荡不息",
+"en": "Unceasing Universe",
+"icon": "Card_45",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7132": {
+"cn": "御云结阵",
+"en": "Cloud Command Formation",
+"icon": "Icon_FateStrategy_380",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7133": {
+"cn": "霜华守护",
+"en": "Frost Guard",
+"icon": "Icon_FateStrategy_382",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7135": {
+"cn": "枯荣往复",
+"en": "Wither and Bloom Cycle",
+"icon": "Icon_FateStrategy_164",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7136": {
+"cn": "猫之狂念",
+"en": "Cat's Madness",
+"icon": "Icon_FateStrategy_322",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"7137": {
+"cn": "玉瓶封印",
+"en": "Jade Vessel Seal",
+"icon": "Icon_XianMoStrategy_7137",
+"pool": 7,
+"poolCn": "公输钥的仙命池 2 · 角色专属强化",
+"poolEn": "Gongshu Yao’s pool 2 · Character-specific enhancements"
+},
+"8001": {
+"cn": "讙之力",
+"en": "Power of Huan",
+"icon": "Card_430",
+"pool": 8,
+"poolCn": "九节的仙命池 1 · 灵宠之力",
+"poolEn": "Jiu Jie’s pool 1 · Spiritual-pet powers"
+},
+"8002": {
+"cn": "龟之力",
+"en": "Power of Turtle",
+"icon": "Card_431",
+"pool": 8,
+"poolCn": "九节的仙命池 1 · 灵宠之力",
+"poolEn": "Jiu Jie’s pool 1 · Spiritual-pet powers"
+},
+"8003": {
+"cn": "鼠之力",
+"en": "Power of Rat",
+"icon": "Card_432",
+"pool": 8,
+"poolCn": "九节的仙命池 1 · 灵宠之力",
+"poolEn": "Jiu Jie’s pool 1 · Spiritual-pet powers"
+},
+"8004": {
+"cn": "狸之力",
+"en": "Power of Raccoon",
+"icon": "Card_433",
+"pool": 8,
+"poolCn": "九节的仙命池 1 · 灵宠之力",
+"poolEn": "Jiu Jie’s pool 1 · Spiritual-pet powers"
+},
+"8005": {
+"cn": "鹦之力",
+"en": "Power of Parrot",
+"icon": "Card_434",
+"pool": 8,
+"poolCn": "九节的仙命池 1 · 灵宠之力",
+"poolEn": "Jiu Jie’s pool 1 · Spiritual-pet powers"
+},
+"28001": {
+"cn": "影枭兔",
+"en": "Shadow Owl Rabbit",
+"icon": "Card_99000210",
+"pool": 28,
+"poolCn": "九节的仙命池 2 · 影枭兔",
+"poolEn": "Jiu Jie’s pool 2 · Shadow Owl Rabbit"
+},
+"9001": {
+"cn": "首山定岳剑",
+"en": "Mountain-Splitting Sword",
+"icon": "Card_1000045",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9002": {
+"cn": "九天流光轮",
+"en": "Flowing-Light Wheel",
+"icon": "Card_4000026",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9003": {
+"cn": "瑶光溯时镜",
+"en": "Time-Revert Mirror",
+"icon": "Card_7000058",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9004": {
+"cn": "裂穹开天斧",
+"en": "Heaven-Cleaving Axe",
+"icon": "Card_10000068",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9005": {
+"cn": "五色补天石",
+"en": "Sky-Mending Stone",
+"icon": "Card_2000013",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9006": {
+"cn": "灵墟锁魂塔",
+"en": "Soul-Locking Pagoda",
+"icon": "Card_3000014",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9007": {
+"cn": "灵韵御心琴",
+"en": "Heart-Commanding Zither",
+"icon": "Card_5000014",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9008": {
+"cn": "五帝长生印",
+"en": "Long-Living Seal",
+"icon": "Card_6000013",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9009": {
+"cn": "鸿蒙镇天钟",
+"en": "Chaos-Suppressing Bell",
+"icon": "Card_8000012",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9010": {
+"cn": "百草神炼鼎",
+"en": "Divine-Refining Cauldron",
+"icon": "Card_9000015",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"9011": {
+"cn": "幽冥化生壶",
+"en": "Life-Transforming Vessel",
+"icon": "Card_11000018",
+"pool": 9,
+"poolCn": "黑球的仙命池 1 · 上古神器",
+"poolEn": "Black Sphere’s pool 1 · Ancient artifacts"
+},
+"29001": {
+"cn": "变招之音",
+"en": "Sound of Varied Moves",
+"icon": "Icon_XianMoStrategy_29001",
+"pool": 29,
+"poolCn": "葛天音的仙命池 1 · 变招之音",
+"poolEn": "Getian Yin’s pool 1 · Sound of Varied Moves"
+},
+"1001": {
+"cn": "天灵之音",
+"en": "Heaven Spirit Sound",
+"icon": "Icon_XianMoStrategy_1001",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"1002": {
+"cn": "狂舞之音",
+"en": "Wild Dance Sound",
+"icon": "Icon_XianMoStrategy_1002",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"1003": {
+"cn": "回春之音",
+"en": "Rejuvenation Sound",
+"icon": "Icon_XianMoStrategy_1003",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"1004": {
+"cn": "断肠之音",
+"en": "Heartbreak Sound",
+"icon": "Icon_XianMoStrategy_1004",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"1005": {
+"cn": "困仙之音",
+"en": "Immortal-Trapping Sound",
+"icon": "Icon_XianMoStrategy_1005",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"1006": {
+"cn": "肃杀之音",
+"en": "Killing Intent Sound",
+"icon": "Icon_XianMoStrategy_1006",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"1007": {
+"cn": "强化之音",
+"en": "Empowerment Sound",
+"icon": "Icon_XianMoStrategy_1007",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"1008": {
+"cn": "幽绪之音",
+"en": "Melancholy Sound",
+"icon": "Icon_XianMoStrategy_1008",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"1009": {
+"cn": "升阶之音",
+"en": "Sound of Ascension",
+"icon": "Icon_XianMoStrategy_1009",
+"pool": 1,
+"poolCn": "葛天音的仙命池 2 · 双方战斗音乐效果",
+"poolEn": "Getian Yin’s pool 2 · Two-sided combat music"
+},
+"12001": {
+"cn": "幻•暗鸦灵剑",
+"en": "Mirage: Raven Spirit Sword",
+"icon": "Card_1000020",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12002": {
+"cn": "幻•轻剑",
+"en": "Mirage: Light Sword",
+"icon": "Card_1000004",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12003": {
+"cn": "幻•引气剑",
+"en": "Mirage: Spiritage Sword",
+"icon": "Card_1000024",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12004": {
+"cn": "幻•云剑探云",
+"en": "Mirage: Cloud Sword - Touch Sky",
+"icon": "Card_1000001",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12005": {
+"cn": "幻•斩草除根",
+"en": "Mirage: Cutting Weeds",
+"icon": "Card_4000019",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12006": {
+"cn": "幻•流水无情",
+"en": "Mirage: Ruthless Water",
+"icon": "Card_4000022",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12007": {
+"cn": "幻•斗转星移",
+"en": "Mirage: Shifting Stars",
+"icon": "Card_4000023",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12008": {
+"cn": "幻•火灵聚炎",
+"en": "Mirage: Fire Spirit - Flame Eater",
+"icon": "Card_7000021",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12009": {
+"cn": "幻•水灵波澜",
+"en": "Mirage: Water Spirit - Billows",
+"icon": "Card_7000019",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12010": {
+"cn": "幻•木灵复苏",
+"en": "Mirage: Wood Spirit - Recovery",
+"icon": "Card_7000018",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12011": {
+"cn": "幻•金灵针",
+"en": "Mirage: Metal Spirit - Needle",
+"icon": "Card_7000002",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12012": {
+"cn": "幻•血气方刚",
+"en": "Mirage: Youthful Vigor",
+"icon": "Card_10000012",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12013": {
+"cn": "幻•锻骨",
+"en": "Mirage: Exercise Bones",
+"icon": "Card_10000027",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12014": {
+"cn": "幻•气沉丹田",
+"en": "Mirage: Sinking Qi",
+"icon": "Card_10000032",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12015": {
+"cn": "幻•云剑无锋",
+"en": "Mirage: Cloud Sword - Conceal",
+"icon": "Card_1000014",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12016": {
+"cn": "幻•飞星刺",
+"en": "Mirage: Astral Fleche",
+"icon": "Card_4000024",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12017": {
+"cn": "幻•五行流转",
+"en": "Mirage: Five Elements Circulation",
+"icon": "Card_7000067",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12018": {
+"cn": "幻•双鬼拍门",
+"en": "Mirage: Double Trouble",
+"icon": "Card_10000030",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12019": {
+"cn": "幻•罗刹扑",
+"en": "Mirage: Rakshasa Pouncing",
+"icon": "Card_10000008",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12020": {
+"cn": "幻•藕断丝连",
+"en": "Mirage: Incessant",
+"icon": "Card_4000013",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12021": {
+"cn": "幻•土灵群山",
+"en": "Mirage: Earth Spirit - Mountains",
+"icon": "Card_7000024",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12022": {
+"cn": "幻•坤卦",
+"en": "Mirage: Earth Hexagram",
+"icon": "Card_4000002",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12023": {
+"cn": "幻•崩拳戳",
+"en": "Mirage: Crash Fist - Poke",
+"icon": "Card_10000001",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12024": {
+"cn": "幻•飞牙剑",
+"en": "Mirage: Flying Fang Sword",
+"icon": "Card_1000021",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12025": {
+"cn": "幻•星罗棋布",
+"en": "Mirage: Dotted Around",
+"icon": "Card_4000008",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12026": {
+"cn": "幻•浑天印",
+"en": "Mirage: Cosmos Seal",
+"icon": "Card_7000014",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12027": {
+"cn": "幻•岿然不动",
+"en": "Mirage: Standing Firm",
+"icon": "Card_10000021",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12028": {
+"cn": "幻•落花有意",
+"en": "Mirage: Flower Sentient",
+"icon": "Card_4000021",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12029": {
+"cn": "幻•云舞诀",
+"en": "Mirage: Cloud Dance Rhythm",
+"icon": "Card_1000031",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12030": {
+"cn": "幻•浩然正气",
+"en": "Mirage: Magnanimous Righteousness",
+"icon": "Card_10000023",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12031": {
+"cn": "幻•狂剑盘龙",
+"en": "Mirage: Unrestrained Sword - Dragon Coiled",
+"icon": "Card_1000049",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12032": {
+"cn": "幻•金灵印",
+"en": "Mirage: Metal Spirit Seal",
+"icon": "Card_7000001",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12033": {
+"cn": "幻•土灵阵",
+"en": "Mirage: Earth Spirit Formation",
+"icon": "Card_7000023",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12034": {
+"cn": "幻•崩拳缠",
+"en": "Mirage: Crash Fist - Entangle",
+"icon": "Card_10000014",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12035": {
+"cn": "幻•两仪阵",
+"en": "Mirage: Yin Yang Formation",
+"icon": "Card_4000040",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12036": {
+"cn": "幻•灵犀剑阵",
+"en": "Mirage: Consonance Sword Formation",
+"icon": "Card_1000033",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12037": {
+"cn": "幻•火灵印",
+"en": "Mirage: Fire Spirit Seal",
+"icon": "Card_7000009",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12038": {
+"cn": "幻•死缠烂打",
+"en": "Mirage: Endless Entanglement",
+"icon": "Card_10000054",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12039": {
+"cn": "幻•勤拙剑",
+"en": "Mirage: Diligent Sword",
+"icon": "Card_1000054",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"12040": {
+"cn": "幻•生机绽放",
+"en": "Mirage: Vitality Blossom",
+"icon": "Card_4000048",
+"pool": 12,
+"poolCn": "丹青客的仙命池 1 · 幻景牌奖励",
+"poolEn": "Danqingke’s pool 1 · Mirage card rewards"
+},
+"16001": {
+"cn": "副职转换",
+"en": "Side Job Change",
+"icon": "Icon_FateStrategy_30",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16002": {
+"cn": "全能副职",
+"en": "Omni Side Job",
+"icon": "Icon_FateStrategy_31",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16003": {
+"cn": "天衍-触类旁通",
+"en": "Heavenly Derivation - Reason By Analogy",
+"icon": "Card_6000010",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16004": {
+"cn": "悟道丹",
+"en": "Enlightenment Elixir",
+"icon": "Card_2000015",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16005": {
+"cn": "冰灵护体丹",
+"en": "Ice Spirit Guard Elixir",
+"icon": "Card_2000013",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16006": {
+"cn": "万邪入体咒",
+"en": "Thousand Evil Incantation",
+"icon": "Card_3000015",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16007": {
+"cn": "千里神行符",
+"en": "Divine Walk Fulu",
+"icon": "Card_3000013",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16008": {
+"cn": "转弦合调",
+"en": "Chord In Tune",
+"icon": "Card_5000014",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16009": {
+"cn": "天音困仙曲",
+"en": "Predicament for Immortals",
+"icon": "Card_5000015",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16010": {
+"cn": "画龙点睛",
+"en": "Finishing Touch",
+"icon": "Card_6000013",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16011": {
+"cn": "运笔如飞",
+"en": "Flying Brush",
+"icon": "Card_6000012",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16012": {
+"cn": "须弥阵纹",
+"en": "Meru Formation",
+"icon": "Card_8000014",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16013": {
+"cn": "阵纹雕琢",
+"en": "Formation Rune Engraving",
+"icon": "Icon_FateStrategy_259",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16014": {
+"cn": "变异浇灌",
+"en": "Mutant Watering",
+"icon": "Icon_FateStrategy_260",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16015": {
+"cn": "空间灵田",
+"en": "Space Spiritual Field",
+"icon": "Card_9000015",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16016": {
+"cn": "厄劫缠身",
+"en": "Envelop In Disaster",
+"icon": "Card_11000018",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16017": {
+"cn": "命运轮回",
+"en": "Cycle of Fate",
+"icon": "Card_11000021",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16018": {
+"cn": "副职悟道",
+"en": "Side-Class Enlightenment",
+"icon": "Icon_XianMoStrategy_16018",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16019": {
+"cn": "钻研副职",
+"en": "Side Job Research",
+"icon": "Icon_FateStrategy_9",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16020": {
+"cn": "天衍-以画入道",
+"en": "Heavenly Derivation - Painting the Dao",
+"icon": "Card_6000009",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16021": {
+"cn": "随心画卷",
+"en": "Whimsical Scroll",
+"icon": "Icon_XianMoStrategy_16021",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16022": {
+"cn": "极•画龙点睛",
+"en": "Ultimate: Finishing Touch",
+"icon": "Card_6000013",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"16023": {
+"cn": "天衍-妙笔生花",
+"en": "Heavenly Derivation - Blooming Brushwork",
+"icon": "Card_6000015",
+"pool": 16,
+"poolCn": "丹青客的仙命池 2 · 副职强化",
+"poolEn": "Danqingke’s pool 2 · Side-job enhancements"
+},
+"21001": {
+"cn": "丹药感悟",
+"en": "Pill Insight",
+"icon": "Icon_Career_1",
+"pool": 21,
+"poolCn": "丹青客的仙命池 3 · 副职兼修",
+"poolEn": "Danqingke’s pool 3 · Additional side-job access"
+},
+"21002": {
+"cn": "符咒感悟",
+"en": "Talisman Insight",
+"icon": "Icon_Career_2",
+"pool": 21,
+"poolCn": "丹青客的仙命池 3 · 副职兼修",
+"poolEn": "Danqingke’s pool 3 · Additional side-job access"
+},
+"21003": {
+"cn": "琴音感悟",
+"en": "Musician Insight",
+"icon": "Icon_Career_3",
+"pool": 21,
+"poolCn": "丹青客的仙命池 3 · 副职兼修",
+"poolEn": "Danqingke’s pool 3 · Additional side-job access"
+},
+"21004": {
+"cn": "画卷感悟",
+"en": "Scroll Insight",
+"icon": "Icon_Career_4",
+"pool": 21,
+"poolCn": "丹青客的仙命池 3 · 副职兼修",
+"poolEn": "Danqingke’s pool 3 · Additional side-job access"
+},
+"21005": {
+"cn": "阵法感悟",
+"en": "Formation Insight",
+"icon": "Icon_Career_5",
+"pool": 21,
+"poolCn": "丹青客的仙命池 3 · 副职兼修",
+"poolEn": "Danqingke’s pool 3 · Additional side-job access"
+},
+"21006": {
+"cn": "灵植感悟",
+"en": "Spirit Plant Insight",
+"icon": "Icon_Career_6",
+"pool": 21,
+"poolCn": "丹青客的仙命池 3 · 副职兼修",
+"poolEn": "Danqingke’s pool 3 · Additional side-job access"
+},
+"21007": {
+"cn": "命理感悟",
+"en": "Fate Insight",
+"icon": "Icon_Career_7",
+"pool": 21,
+"poolCn": "丹青客的仙命池 3 · 副职兼修",
+"poolEn": "Danqingke’s pool 3 · Additional side-job access"
+},
+"11001": {
+"cn": "剑宗秘卷",
+"en": "Sword Sect Secret Scroll",
+"icon": "Icon_XianMoStrategy_11001",
+"pool": 11,
+"poolCn": "混沌天魔的仙命池 1 · 其他门派牌获取",
+"poolEn": "Chaos Devil’s pool 1 · Other-sect card acquisition"
+},
+"11002": {
+"cn": "七星秘卷",
+"en": "Heptastar Secret Scroll",
+"icon": "Icon_XianMoStrategy_11002",
+"pool": 11,
+"poolCn": "混沌天魔的仙命池 1 · 其他门派牌获取",
+"poolEn": "Chaos Devil’s pool 1 · Other-sect card acquisition"
+},
+"11003": {
+"cn": "五行秘卷",
+"en": "Five Elements Secret Scroll",
+"icon": "Icon_XianMoStrategy_11003",
+"pool": 11,
+"poolCn": "混沌天魔的仙命池 1 · 其他门派牌获取",
+"poolEn": "Chaos Devil’s pool 1 · Other-sect card acquisition"
+},
+"11004": {
+"cn": "锻玄秘卷",
+"en": "Duan Xuan Secret Scroll",
+"icon": "Icon_XianMoStrategy_11004",
+"pool": 11,
+"poolCn": "混沌天魔的仙命池 1 · 其他门派牌获取",
+"poolEn": "Chaos Devil’s pool 1 · Other-sect card acquisition"
+},
+"27001": {
+"cn": "命途共鸣-牧逸风",
+"en": "Fate Resonance - Mu Yifeng",
+"icon": "CharAvatar_1000001_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27002": {
+"cn": "命途共鸣-炎雪",
+"en": "Fate Resonance - Yan Xue",
+"icon": "CharAvatar_1000002_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27003": {
+"cn": "命途共鸣-龙瑶",
+"en": "Fate Resonance - Long Yao",
+"icon": "CharAvatar_1000003_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27004": {
+"cn": "命途共鸣-林小月",
+"en": "Fate Resonance - Lin Xiaoyue",
+"icon": "CharAvatar_1000004_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27005": {
+"cn": "命途共鸣-陆剑心",
+"en": "Fate Resonance - Lu Jianxin",
+"icon": "CharAvatar_1000005_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27006": {
+"cn": "命途共鸣-黎承云",
+"en": "Fate Resonance - Li Chengyun",
+"icon": "CharAvatar_1000006_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27007": {
+"cn": "命途共鸣-谭舒雁",
+"en": "Fate Resonance - Tan Shuyan",
+"icon": "CharAvatar_2000001_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27008": {
+"cn": "命途共鸣-炎尘",
+"en": "Fate Resonance - Yan Chen",
+"icon": "CharAvatar_2000002_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27009": {
+"cn": "命途共鸣-曜灵",
+"en": "Fate Resonance - Yao Ling",
+"icon": "CharAvatar_2000003_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27010": {
+"cn": "命途共鸣-姜袭明",
+"en": "Fate Resonance - Jiang Ximing",
+"icon": "CharAvatar_2000004_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27011": {
+"cn": "命途共鸣-吴策",
+"en": "Fate Resonance - Wu Ce",
+"icon": "CharAvatar_2000005_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27012": {
+"cn": "命途共鸣-风绪",
+"en": "Fate Resonance - Feng Xu",
+"icon": "CharAvatar_2000006_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27013": {
+"cn": "命途共鸣-吾行之",
+"en": "Fate Resonance - Wu Xingzhi",
+"icon": "CharAvatar_3000001_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27014": {
+"cn": "命途共鸣-杜伶鸳",
+"en": "Fate Resonance - Du Lingyuan",
+"icon": "CharAvatar_3000002_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27015": {
+"cn": "命途共鸣-花沁蕊",
+"en": "Fate Resonance - Hua Qinrui",
+"icon": "CharAvatar_3000003_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27016": {
+"cn": "命途共鸣-慕虎",
+"en": "Fate Resonance - Mu Hu",
+"icon": "CharAvatar_3000004_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27017": {
+"cn": "命途共鸣-南宫生",
+"en": "Fate Resonance - Nangong Sheng",
+"icon": "CharAvatar_3000005_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27018": {
+"cn": "命途共鸣-祁忘忧",
+"en": "Fate Resonance - Qi Wangyou",
+"icon": "CharAvatar_3000006_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27019": {
+"cn": "命途共鸣-小布",
+"en": "Fate Resonance - Xiao Bu",
+"icon": "CharAvatar_4000001_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27020": {
+"cn": "命途共鸣-屠馗",
+"en": "Fate Resonance - Tu Kui",
+"icon": "CharAvatar_4000002_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27021": {
+"cn": "命途共鸣-叶冥冥",
+"en": "Fate Resonance - Ye Mingming",
+"icon": "CharAvatar_4000003_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27022": {
+"cn": "命途共鸣-姬方生",
+"en": "Fate Resonance - Ji Fangsheng",
+"icon": "CharAvatar_4000004_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27023": {
+"cn": "命途共鸣-李㵘",
+"en": "Fate Resonance - Li Man",
+"icon": "CharAvatar_4000005_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"27024": {
+"cn": "命途共鸣-聆羽",
+"en": "Fate Resonance - Ling Yu",
+"icon": "CharAvatar_4000006_0",
+"pool": 27,
+"poolCn": "混沌天魔的仙命池 2 · 角色命途共鸣",
+"poolEn": "Chaos Devil’s pool 2 · Character Fate Resonance"
+},
+"24004": {
+"cn": "休养之道",
+"en": "Path of Recuperation",
+"icon": "Icon_XianMoStrategy_24004",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24006": {
+"cn": "镜像之道",
+"en": "Path of Mirroring",
+"icon": "Icon_XianMoStrategy_24006",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24007": {
+"cn": "衍生之道•一",
+"en": "Path of Derivation I",
+"icon": "Icon_XianMoStrategy_24007",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24008": {
+"cn": "副职之道",
+"en": "Path of Side-Job",
+"icon": "Icon_XianMoStrategy_24008",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24001": {
+"cn": "突破之道•一",
+"en": "Path of Breakthrough I",
+"icon": "Icon_XianMoStrategy_突破之道",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24002": {
+"cn": "换牌之道•一",
+"en": "Path of Exchange I",
+"icon": "Icon_XianMoStrategy_换牌之道",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24003": {
+"cn": "锻体之道•一",
+"en": "Path of Body-Forging I",
+"icon": "Icon_XianMoStrategy_锻体之道",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24005": {
+"cn": "境界之道•一",
+"en": "Path of Phase I",
+"icon": "Icon_XianMoStrategy_境界之道",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24009": {
+"cn": "封印之道•一",
+"en": "Path of Sealing I",
+"icon": "Icon_XianMoStrategy_封印之道",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24010": {
+"cn": "险境之道•一",
+"en": "Path of Peril I",
+"icon": "Icon_XianMoStrategy_险境之道",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"24011": {
+"cn": "变数之道•一",
+"en": "Path of Change I",
+"icon": "Icon_XianMoStrategy_变数之道",
+"pool": 24,
+"poolCn": "狻猊的仙命池 1 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 1 · Strong general fates offered when you skip"
+},
+"25001": {
+"cn": "记忆之道",
+"en": "Path of Memory",
+"icon": "Icon_XianMoStrategy_25001",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25002": {
+"cn": "探索之道",
+"en": "Path of Exploration",
+"icon": "Icon_XianMoStrategy_25002",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25003": {
+"cn": "全能之道",
+"en": "Path of All-Around",
+"icon": "Icon_XianMoStrategy_25003",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25004": {
+"cn": "悟道之道",
+"en": "Path of Enlightenment",
+"icon": "Icon_XianMoStrategy_25004",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25007": {
+"cn": "元婴之道",
+"en": "Path of Immortality",
+"icon": "Icon_XianMoStrategy_25007",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25005": {
+"cn": "换牌之道•二",
+"en": "Path of Exchange II",
+"icon": "Icon_XianMoStrategy_换牌之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25006": {
+"cn": "锻体之道•二",
+"en": "Path of Body-Forging II",
+"icon": "Icon_XianMoStrategy_锻体之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25008": {
+"cn": "道韵之道",
+"en": "Path of Dao Rhyme",
+"icon": "Icon_XianMoStrategy_道韵之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25009": {
+"cn": "封印之道•二",
+"en": "Path of Sealing II",
+"icon": "Icon_XianMoStrategy_封印之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25010": {
+"cn": "险境之道•二",
+"en": "Path of Peril II",
+"icon": "Icon_XianMoStrategy_险境之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25011": {
+"cn": "突破之道•二",
+"en": "Path of Breakthrough II",
+"icon": "Icon_XianMoStrategy_突破之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25012": {
+"cn": "境界之道•二",
+"en": "Path of Phase II",
+"icon": "Icon_XianMoStrategy_境界之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25013": {
+"cn": "变数之道•二",
+"en": "Path of Change II",
+"icon": "Icon_XianMoStrategy_变数之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+},
+"25014": {
+"cn": "衍生之道•二",
+"en": "Path of Derivation II",
+"icon": "Icon_XianMoStrategy_衍生之道",
+"pool": 25,
+"poolCn": "狻猊的仙命池 2 · 跳过时提供的强力通用仙命",
+"poolEn": "Suanni’s pool 2 · Strong general fates offered when you skip"
+}
+}
+}
