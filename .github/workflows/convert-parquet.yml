@@ -3,7 +3,8 @@ name: Convert replays to Parquet
 # Converts sharpobject/yxp_replays tar.zst shards into season-independent Parquet tables
 # (see pipeline/convert_to_parquet.py) and uploads them to the target HF dataset.
 # Resumable: every 50-shard chunk uploads together with a manifest file, and a rerun
-# skips chunks whose manifest already covers all their shards.
+# skips chunks whose manifest already covers all their shards. Each job uploads all its
+# chunks in a single commit (HF rate-limits a repo to ~128 commits/hour).
 # Needs the HF_TOKEN repo secret (write access to the target dataset).
 on:
   workflow_dispatch:
@@ -12,8 +13,8 @@ on:
         description: "Only convert this many not-yet-done chunks (0 = all). Use 2-3 for a test run."
         default: "0"
       per_job:
-        description: "Chunks (50 shards each) handled by one job"
-        default: "2"
+        description: "Chunks (50 shards each) per job; a job uploads in ONE commit (HF allows ~128 commits/hour per repo)"
+        default: "4"
 
 env:
   TARGET: www1234567890/Yi_Xian_Replay_Compressed

@@ -273,22 +273,29 @@ def cmd_plan(a):
     print(json.dumps(jobs))
 
 
-def upload_chunk(api, target, key, workdir, shards):
+def upload_chunks(api, target, done, workdir):
+    """ONE commit for all of this job's chunks: HF caps a repo at ~128 commits/hour, so a
+    commit per chunk from many parallel jobs gets rejected. `done` = {key: [shard ids]}.
+    The manifests ride in the same commit as the data, so a chunk is never half-done."""
     import json, random
     from huggingface_hub import CommitOperationAdd
-    mpath = os.path.join(workdir, f"c{key}.manifest.json")
-    json.dump({"format_version": FORMAT_VERSION, "chunk": key, "shards": sorted(shards)}, open(mpath, "w"))
-    ops = [CommitOperationAdd(f"{t}/c{key}.parquet", os.path.join(workdir, t, f"c{key}.parquet"))
-           for t in SCHEMAS]
-    ops.append(CommitOperationAdd(f"manifest/c{key}.json", mpath))   # last: marks the chunk done
-    for attempt in range(10):
+    ops = []
+    for key, shards in done.items():
+        mpath = os.path.join(workdir, f"c{key}.manifest.json")
+        json.dump({"format_version": FORMAT_VERSION, "chunk": key, "shards": sorted(shards)},
+                  open(mpath, "w"))
+        ops += [CommitOperationAdd(f"{t}/c{key}.parquet", os.path.join(workdir, t, f"c{key}.parquet"))
+                for t in SCHEMAS]
+        ops.append(CommitOperationAdd(f"manifest/c{key}.json", mpath))
+    for attempt in range(12):
         try:
-            api.create_commit(target, ops, repo_type="dataset", commit_message=f"chunk {key}")
+            api.create_commit(target, ops, repo_type="dataset",
+                              commit_message=f"chunks {' '.join(map(str, done))}")
             return
-        except Exception as e:     # concurrent-commit conflicts / rate limits: back off and retry
+        except Exception as e:     # rate limit / concurrent-commit conflict: wait it out
             print(f"upload retry {attempt}: {e}", file=sys.stderr)
-            time.sleep(random.uniform(5, 30) * (attempt + 1))
-    raise RuntimeError(f"upload of chunk {key} failed")
+            time.sleep(random.uniform(30, 90) * min(attempt + 1, 6))
+    raise RuntimeError(f"upload of chunks {list(done)} failed")
 
 
 def convert_chunk(key, shards, workdir):
@@ -309,17 +316,19 @@ def cmd_run(a):
     from huggingface_hub import HfApi
     api = HfApi(token=os.environ["HF_TOKEN"])
     src = source_chunks()
-    for key in a.chunks:
-        shards = src[key]
-        if done_manifest(api, a.target, key) >= set(shards):
-            print(f"chunk {key} already done", file=sys.stderr)
-            continue
-        wd = tempfile.mkdtemp(prefix=f"yxp{key}_")
-        try:
+    wd, done = tempfile.mkdtemp(prefix="yxp_"), {}
+    try:
+        for key in a.chunks:
+            shards = src[key]
+            if done_manifest(api, a.target, key) >= set(shards):
+                print(f"chunk {key} already done", file=sys.stderr)
+                continue
             convert_chunk(key, shards, wd)
-            upload_chunk(api, a.target, key, wd, shards)
-        finally:
-            shutil.rmtree(wd, ignore_errors=True)
+            done[key] = shards
+        if done:
+            upload_chunks(api, a.target, done, wd)
+    finally:
+        shutil.rmtree(wd, ignore_errors=True)
 
 
 def cmd_local(a):
