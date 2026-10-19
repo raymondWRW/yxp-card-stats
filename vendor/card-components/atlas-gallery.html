@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Card atlas gallery</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui,sans-serif;background:#121519;color:#e9edf2}*{box-sizing:border-box}body{max-width:1500px;margin:auto;padding:32px 24px}h1{margin:0 0 8px;font-size:30px}p{color:#aeb8c4;margin:0 0 24px}header{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}button{border:1px solid #657286;background:#263140;color:inherit;border-radius:8px;padding:10px 14px;cursor:pointer}main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}article{border:1px solid #36404d;border-radius:12px;overflow:hidden;background:#1d232c}h2{font-size:18px;margin:0}article header{padding:18px}a{color:#aaceff}small{display:block;color:#aeb8c4;margin-top:6px}.preview{display:block;padding:16px;background:#303740;overflow:auto}.preview img{display:block;width:100%;height:auto}.light .preview{background:#ececec}.checker .preview{background-color:#555;background-image:linear-gradient(45deg,#444 25%,transparent 25%),linear-gradient(-45deg,#444 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#444 75%),linear-gradient(-45deg,transparent 75%,#444 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}.actual .preview{max-height:700px}.actual .preview img{width:auto;max-width:none}nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}@media(max-width:800px){main{grid-template-columns:1fr}body{padding:24px 12px}}
+</style>
+<header><div><h1>Card atlas gallery</h1><p>Five text sheets and three frame sheets. Current shared sheets used to render cards.</p></div></header>
+<nav aria-label="Gallery display"><button id="background">Background: dark</button><button id="size">Size: fit to panel</button></nav>
+<main id="gallery"></main>
+<script>
+const sheets=[["Normal frames + shared decorations", "Watermarks, title plate, numbers and symbols", "b669f26cf1f60b6f8d3949e2"], ["Dream frames", "All six phases", "610bec25455650efed27651e"], ["Sigil frames + decorations", "All six phases, dots, max-HP indicators, numbers and watermarks", "c24d3fec1726c75853451ca1"], ["English sigil titles", "Individual title glyphs", "e36d4c22cb4945eb41796f12"], ["English titles + rules", "Normal English card text", "c6fafff46667f94815c3ec90"], ["Chinese sigil titles", "Individual title glyphs", "4d5c6d1c60908f7bb2af1881"], ["Chinese card titles", "Shared by both languages", "6ec7db79c253a2e0cb738c67"], ["Chinese rules", "Chinese rules text", "c1fdcae40e884111f9bcccdb"], ["Chinese rules", "Chinese rules text", "ee8d26e8e370d1850d31180c"], ["Chinese rules", "Chinese rules text", "127743761e3f5a9ed9b5af98"], ["Chinese rules", "Chinese rules text", "93cca6163cec702bc8b7c0f0"]];
+for(const [title,description,hash] of sheets){
+ const url=`s/${hash}.webp`;
+ const article=document.createElement('article');
+ const header=document.createElement('header');const text=document.createElement('div');const heading=document.createElement('h2');heading.textContent=title;const subtitle=document.createElement('small');subtitle.textContent=description;text.append(heading,subtitle);
+ const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener';link.textContent='Full-size ↗';header.append(text,link);
+ const preview=document.createElement('a');preview.className='preview';preview.href=url;preview.target='_blank';preview.rel='noopener';preview.title='Open full-size sheet';const image=new Image();image.alt=title;image.src=url;image.addEventListener('load',()=>{subtitle.textContent=description+` · ${image.naturalWidth} × ${image.naturalHeight}`});image.addEventListener('error',()=>{subtitle.textContent=description+' · Image unavailable'});preview.append(image);article.append(header,preview);document.querySelector('#gallery').append(article);
+}
+let background=0;document.querySelector('#background').onclick=()=>{background=(background+1)%3;document.body.classList.toggle('light',background===1);document.body.classList.toggle('checker',background===2);document.querySelector('#background').textContent='Background: '+['dark','light','checkerboard'][background]};
+document.querySelector('#size').onclick=()=>{const actual=document.body.classList.toggle('actual');document.querySelector('#size').textContent='Size: '+(actual?'actual pixels (scroll panels)':'fit to panel')};
+</script>
+</html>

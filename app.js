@@ -1,5 +1,9 @@
 "use strict";
 const WIKI = "https://sharpobject.github.io/yxp_wiki/assets/cards/";
+// Card faces: the yxp_wiki renderer (vendored under vendor/card-components, used with
+// permission) composes each card in a worker and caches it; YxpCards.source() hands the
+// <img> a placeholder it hydrates. Without the runtime, fall back to the wiki's WebP.
+const cardSrc = (id, lang) => (window.YxpCards ? window.YxpCards.source(`${id}_${lang}`) : `${WIKI}${id}_${lang}.webp`);
 const STRIDE = 8; // [seasonIdx, charIdx, career, fam, level, round, wins, losses]
 
 // ---- i18n ------------------------------------------------------------------
@@ -390,7 +394,7 @@ function tile(r) {
   const el = document.createElement("div");
   el.className = "card";
   el.innerHTML = `
-    <img loading="lazy" src="${WIKI}${c.img}_${S.lang}.webp"
+    <img loading="lazy" src="${cardSrc(c.img, S.lang)}"
       onerror="this.onerror=null;this.src='${WIKI}${c.img}_en.webp'" alt="${name}">
     <div class="nm">${name}</div>
     <div class="sect">${sectLabel(c.sect)}</div>
@@ -433,7 +437,7 @@ function modalAgg() {
 function renderModal() {
   if (S.modalFam == null) return;
   const c = DATA.cards[S.modalFam];
-  $("#mImg").src = `${WIKI}${c.img}_${S.lang}.webp`;
+  $("#mImg").src = cardSrc(c.img, S.lang);
   $("#mImg").onerror = function () { this.onerror = null; this.src = `${WIKI}${c.img}_en.webp`; };
   $("#mName").textContent = cardName(c);
   $("#mSect").textContent = sectLabel(c.sect);
@@ -1243,7 +1247,7 @@ function cardImgs(fidxs, imgs) {
   const fam = BS.data.families;
   // imgs (v2) = per-slot most common card LEVEL id for this board; fall back to the
   // family's representative art on older data.
-  return fidxs.map((i, j) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; const im = (imgs && imgs[j]) || f.img; return `<img title="${nm}" loading="lazy" src="${WIKI}${im}_${S.lang}.webp" onerror="this.onerror=null;this.src='${WIKI}${im}_en.webp'">`; }).join("");
+  return fidxs.map((i, j) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; const im = (imgs && imgs[j]) || f.img; return `<img title="${nm}" loading="lazy" src="${cardSrc(im, S.lang)}" onerror="this.onerror=null;this.src='${WIKI}${im}_en.webp'">`; }).join("");
 }
 function boardRowHTML(fidxs, raw, wc, ww, cls, hint, imgs) {
   const wr = wc ? ww / wc : 0;
@@ -1392,7 +1396,7 @@ function xname(oid) {
 }
 function yname(oid) { const e = (BS.data.ynames || {})[oid] || {}; return (S.lang === "zh" ? e.cn : e.en) || e.cn || ("#" + oid); }
 function selIconURL(oid, kind) {
-  if (kind === "daoyun") return `${WIKI}${oid}_${S.lang}.webp`;   // 道韵 options are cards -> card art
+  if (kind === "daoyun") return cardSrc(oid, S.lang);   // 道韵 options are cards -> card art
   if (kind === "xianmo") {                                        // 仙命: the wiki's hundred-schools art
     const x = (BS.data.xnames || {})[oid] || {};
     return x.icon ? `${BS.xmIconBase}${x.icon}.webp` : "";
