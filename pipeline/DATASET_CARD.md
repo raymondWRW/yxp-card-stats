@@ -14,6 +14,8 @@ configs:
     data_files: "players/*.parquet"
   - config_name: rounds
     data_files: "rounds/*.parquet"
+  - config_name: names
+    data_files: "names/*.parquet"
 ---
 
 # Yi Xian Replay (compressed, columnar)
@@ -50,7 +52,8 @@ the stable fields are typed columns, and everything season-specific is kept in a
   not included. `is_daoxin` marks DaoXin-ladder games.
 - Seasons 7-10 as present in the source at the time of conversion (`season` = the raw `seasonMec`).
 - Both players' replays of one game are merged into one game (the source has up to 8 perspectives per game).
-- Dropped on purpose: cosmetics (skins, card backs, scene / scroller / defeat-effect ids, usernames).
+- Dropped on purpose: cosmetics (skins, card backs, scene / scroller / defeat-effect ids). Usernames are not
+  in the game tables; they live only in the small separate `names` table.
 
 ## Layout
 
@@ -58,6 +61,7 @@ the stable fields are typed columns, and everything season-specific is kept in a
 games/c<chunk>.parquet      one row per game
 players/c<chunk>.parquet    one row per (game, player)
 rounds/c<chunk>.parquet     one row per (game, round, player)   <- the big table
+names/c<chunk>.parquet      one row per (player, source shard): latest username
 manifest/c<chunk>.json      which source shards the chunk holds + format_version
 ```
 
@@ -100,6 +104,13 @@ maps (<https://github.com/raymondWRW/yxp-card-stats>, `pipeline/*_map.json`).
 `priv.daoYunSelectionDatas`, `pub.daoYinDatas` / `pub.daoYinIds`, ...). They are **not** typed columns on
 purpose, so a new season never changes the schema; some blocks (e.g. the selection blocks) are cumulative,
 so read them from a player's last round. Parse `extra` only when you need it; it is most of the file size.
+
+### `names`
+`uid`, `username`, `last_ts` (end time of the player's latest game in that shard under that name),
+`src_shard`. One row per real player (bots excluded) per source shard, so a player's current name is the
+row with the highest `last_ts` across chunks. Added after the other tables (no `format_version` change);
+chunks converted before it existed were backfilled from the players' own replays, so for those chunks a
+player is only listed if their own replay of that shard exists.
 
 ## Quick start
 
