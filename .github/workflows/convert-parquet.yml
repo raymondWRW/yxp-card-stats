@@ -1,0 +1,64 @@
+name: Convert replays to Parquet
+
+# Converts sharpobject/yxp_replays tar.zst shards into season-independent Parquet tables
+# (see pipeline/convert_to_parquet.py) and uploads them to the target HF dataset.
+# Resumable: every 50-shard chunk uploads together with a manifest file, and a rerun
+# skips chunks whose manifest already covers all their shards.
+# Needs the HF_TOKEN repo secret (write access to the target dataset).
+on:
+  workflow_dispatch:
+    inputs:
+      max_chunks:
+        description: "Only convert this many not-yet-done chunks (0 = all). Use 2-3 for a test run."
+        default: "0"
+      per_job:
+        description: "Chunks (50 shards each) handled by one job"
+        default: "2"
+
+env:
+  TARGET: www1234567890/Yi_Xian_Replay_Compressed
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      jobs: ${{ steps.plan.outputs.jobs }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/requirements-convert.txt
+      - run: pip install -r pipeline/requirements-convert.txt
+      - id: plan
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          jobs=$(python pipeline/convert_to_parquet.py plan --target "$TARGET" \
+                   --per-job ${{ inputs.per_job }} --max-chunks ${{ inputs.max_chunks }})
+          echo "jobs=$jobs" >> "$GITHUB_OUTPUT"
+          echo "$jobs"
+
+  convert:
+    needs: plan
+    if: needs.plan.outputs.jobs != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        chunks: ${{ fromJSON(needs.plan.outputs.jobs) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/requirements-convert.txt
+      - run: pip install -r pipeline/requirements-convert.txt
+      - name: Convert and upload chunks ${{ join(matrix.chunks, ' ') }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python -u pipeline/convert_to_parquet.py run --target "$TARGET" --chunks ${{ join(matrix.chunks, ' ') }}
