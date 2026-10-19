@@ -1,0 +1,5 @@
+pyarrow
+orjson
+zstandard
+requests
+huggingface_hub
