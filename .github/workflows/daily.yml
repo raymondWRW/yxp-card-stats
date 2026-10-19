@@ -37,6 +37,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r pipeline/requirements.txt
 
+      # New source shards -> Parquet dataset (only chunks of the current season; a chunk is
+      # 50 shards, so the still-filling tail chunk is simply rebuilt). The extraction below
+      # then reads the Parquet dataset instead of the raw tar.zst shards.
+      - name: Convert new replay shards to Parquet
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          TARGET: www1234567890/Yi_Xian_Replay_Compressed
+        run: |
+          jobs=$(python pipeline/convert_to_parquet.py plan --target "$TARGET" --per-job 1000 --min-chunk 668)
+          chunks=$(python -c "import json,sys; print(*[c for j in json.loads(sys.argv[1]) for c in j])" "$jobs")
+          echo "chunks to convert: ${chunks:-none}"
+          if [ -n "$chunks" ]; then
+            python -u pipeline/convert_to_parquet.py run --target "$TARGET" --chunks $chunks
+          fi
+
       - name: Restore extraction state
         uses: actions/cache/restore@v4
         with:
@@ -50,6 +65,8 @@ jobs:
           YXP_PROXY: ${{ github.workspace }}/pipeline
           YXP_OUTDIR: ${{ github.workspace }}/data
           YXP_STATE: ${{ github.workspace }}/state/season10_state.pkl.zst
+          YXP_SOURCE: parquet
+          YXP_PARQUET: www1234567890/Yi_Xian_Replay_Compressed
         run: python -u pipeline/season_builds.py full
 
       - name: Commit refreshed data if changed
