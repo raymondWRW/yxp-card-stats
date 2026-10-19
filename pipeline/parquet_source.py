@@ -129,7 +129,10 @@ def _records(t, games, players, season, tier_field, tier_min):
     return out
 
 
-def max_end_ts(source, key, season):
+def max_end_ts(source, key, season, shards=None):
+    """Newest game end time (ms) of the season in chunk `key`, optionally only among `shards`
+    (the raw path takes it from the newest scanned shard, so the scanned set is what counts)."""
     games, players = source.games_players(key)
     return max((p["end_ts"] or 0 for (gid, _), p in players.items()
-                if p["has_self_record"] and games[gid]["season"] == season), default=0)
+                if p["has_self_record"] and games[gid]["season"] == season
+                and (shards is None or games[gid]["src_shard"] in shards)), default=0)

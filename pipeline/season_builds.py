@@ -1275,7 +1275,8 @@ def main(mode, opts):
     if n_new:
         if SOURCE == "parquet":               # newest chunk's newest game sets the recency reference
             _pq_source()
-            T_REF = max(ref, _PQ["mod"].max_end_ts(_pq_source(), list(chunks)[-1], SEASON))
+            lk = list(chunks)[-1]
+            T_REF = max(ref, _PQ["mod"].max_end_ts(_pq_source(), lk, SEASON, set(chunks[lk])))
         else:
             _, lastraw = fetch_raw(shards[-1])    # newest shard sets the recency reference
             T_REF = max(ref, max_endts_from_raw(lastraw) if lastraw else 0)
