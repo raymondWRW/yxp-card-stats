@@ -10,8 +10,9 @@ Tables (one Parquet file per table per chunk of shards):
 The core columns never change across seasons. Every other block of a round
 (xianMoData, keYinData, mirageData, relicData, ...) lands unparsed in `extra`
 (JSON string), so a new season's mechanics never needs a schema change.
-Dropped on purpose: publicData.lastRoundData (duplicate of the previous round) and
-cosmetics (skins, card backs, scene/scroller/defeat-effect ids, usernames).
+publicData.lastRoundData is the player's state at the START of the round (e.g. its life
+differs from the previous round's final life in ~17% of rounds): `life_start` + `start_state`.
+Dropped on purpose: cosmetics (skins, card backs, scene/scroller/defeat-effect ids, usernames).
 
 Usage:
   python convert_to_parquet.py local --out DIR FILE.tar.zst ...          # no upload
@@ -31,7 +32,7 @@ import pyarrow.parquet as pq
 import zstandard
 
 BASE = "https://huggingface.co/datasets/sharpobject/yxp_replays/resolve/main"
-FORMAT_VERSION = 1
+FORMAT_VERSION = 2   # 2: + life_start / start_state (lastRoundData is NOT a copy of the previous round), + players.begin_ts/end_ts (endTs is per player)
 
 # fields lifted into typed round columns; everything else (minus DROP_*) goes to `extra`
 CORE_PUBLIC = {"uid", "life", "level", "exp", "talents", "isAI", "rank", "winRoundCount",
@@ -55,6 +56,13 @@ def _extra(pub, priv):
     return orjson.dumps(ex).decode() if ex else None
 
 
+def _start_state(pub):
+    """lastRoundData minus life (stored as life_start), empty fields pruned, as JSON."""
+    lr = pub.get("lastRoundData") or {}
+    ex = {k: v for k, v in lr.items() if k != "life" and v not in EMPTY}
+    return orjson.dumps(ex).decode() if ex else None
+
+
 def _ints(xs):
     return [x for x in (xs or []) if x]
 
@@ -64,6 +72,7 @@ class Chunk:
 
     def __init__(self):
         self.games, self.players, self.rounds = {}, {}, {}
+        self.authoritative = set()      # (game, round, uid) rows written by that player's own self-record
 
     def add_record(self, d, shard):
         gid = d["gameId"]
@@ -88,28 +97,35 @@ class Chunk:
                 "career": d.get("career"), "battle_rank": d.get("battleRank"),
                 "rank_score_begin": d.get("beginRankScore"), "rank_score_diff": d.get("diffRankScore"),
                 "daoxin_begin": d.get("beginDaoXinRankScore"), "daoxin_diff": d.get("diffDaoXinRankScore"),
-                "has_self_record": True}
+                "begin_ts": d.get("beginTs"), "end_ts": d.get("endTs"), "has_self_record": True}
         for rs in rss:
             rnd = rs.get("round")
             for sp, op in (("p1", "p2"), ("p2", "p1")):
                 pub, priv = rs[sp]["publicData"], rs[sp]["privateData"]
                 uid = pub["uid"]
                 key = (gid, rnd, uid)
-                # the subject's own rows are authoritative; opponents' rows fill gaps
-                if key in self.rounds and uid != subject:
+                # Only a player's own SELF-record is authoritative for that player's rows. Other
+                # files (an opponent's view, or a partial file whose subject is the same uid but
+                # that is not the full self-record -- e.g. a ghost match against a bot) may only
+                # fill rows that do not exist yet, whatever the processing order.
+                if is_self and uid == subject:
+                    self.authoritative.add(key)
+                elif key in self.rounds:
                     continue
                 if (gid, uid) not in self.players:
                     self.players[(gid, uid)] = {
                         "game_id": gid, "uid": uid, "is_ai": bool(pub.get("isAI")),
                         "char_id": pub.get("characterId"), "career": pub.get("career"),
                         "battle_rank": None, "rank_score_begin": None, "rank_score_diff": None,
-                        "daoxin_begin": None, "daoxin_diff": None, "has_self_record": False}
+                        "daoxin_begin": None, "daoxin_diff": None, "begin_ts": None, "end_ts": None,
+                        "has_self_record": False}
                 self.rounds[key] = {
                     "game_id": gid, "round": rnd, "uid": uid,
                     "opp_uid": rs[op]["publicData"]["uid"], "side": sp,
                     "first_player": rs.get("firstPlayerId") == uid,
                     "won": (rs.get("winerId") == uid) if rs.get("winerId") else None,
-                    "life": pub.get("life"), "level": pub.get("level"), "exp": pub.get("exp"),
+                    "life": pub.get("life"), "life_start": (pub.get("lastRoundData") or {}).get("life"),
+                    "level": pub.get("level"), "exp": pub.get("exp"),
                     "rank": pub.get("rank"), "win_count": pub.get("winRoundCount"),
                     "lose_count": pub.get("loseRoundCount"),
                     "rerolls": priv.get("replaceCardChance"), "unlock_grids": priv.get("unlockGrids"),
@@ -117,7 +133,8 @@ class Chunk:
                     "hand": _ints(priv.get("handCards")),
                     "talents": _ints(pub.get("talents")),
                     "hp_delta": rs.get("hpDelta"), "life_damage": rs.get("lifeDamage"),
-                    "battle_time": rs.get("battleTime"), "extra": _extra(pub, priv)}
+                    "battle_time": rs.get("battleTime"), "start_state": _start_state(pub),
+                    "extra": _extra(pub, priv)}
                 if uid != subject:
                     # opponent rows are only trustworthy for what the shared round shows; keep anyway
                     pass
@@ -165,14 +182,14 @@ GAMES_SCHEMA = pa.schema([("game_id", STR), ("season", I32), ("game_mode", I32),
 PLAYERS_SCHEMA = pa.schema([("game_id", STR), ("uid", STR), ("is_ai", BOOL), ("char_id", I32),
                             ("career", I32), ("battle_rank", I32), ("rank_score_begin", I32),
                             ("rank_score_diff", I32), ("daoxin_begin", I32), ("daoxin_diff", I32),
-                            ("has_self_record", BOOL)])
+                            ("begin_ts", I64), ("end_ts", I64), ("has_self_record", BOOL)])
 ROUNDS_SCHEMA = pa.schema([("game_id", STR), ("round", I32), ("uid", STR), ("opp_uid", STR),
                            ("side", STR), ("first_player", BOOL), ("won", BOOL), ("life", I32),
-                           ("level", I32), ("exp", I32), ("rank", I32), ("win_count", I32),
+                           ("life_start", I32), ("level", I32), ("exp", I32), ("rank", I32), ("win_count", I32),
                            ("lose_count", I32), ("rerolls", I32), ("unlock_grids", I32),
                            ("board", pa.list_(I32)), ("hand", pa.list_(I32)),
                            ("talents", pa.list_(I32)), ("hp_delta", I32), ("life_damage", I32),
-                           ("battle_time", I32), ("extra", STR)])
+                           ("battle_time", I32), ("start_state", STR), ("extra", STR)])
 
 
 SCHEMAS = {"games": GAMES_SCHEMA, "players": PLAYERS_SCHEMA, "rounds": ROUNDS_SCHEMA}
@@ -264,6 +281,8 @@ def cmd_plan(a):
     api = HfApi(token=os.environ.get("HF_TOKEN"))
     todo = []
     for key, shards in sorted(source_chunks().items()):
+        if key < a.min_chunk:
+            continue
         if done_manifest(api, a.target, key) >= set(shards):
             continue
         todo.append(key)
@@ -331,16 +350,30 @@ def cmd_run(a):
         shutil.rmtree(wd, ignore_errors=True)
 
 
+def cmd_card(a):
+    """Upload the dataset card (pipeline/DATASET_CARD.md) as the target repo's README.md."""
+    from huggingface_hub import HfApi
+    HfApi(token=os.environ["HF_TOKEN"]).upload_file(
+        path_or_fileobj=os.path.join(os.path.dirname(os.path.abspath(__file__)), "DATASET_CARD.md"),
+        path_in_repo="README.md", repo_id=a.target, repo_type="dataset", commit_message="Update dataset card")
+
+
 def cmd_local(a):
-    chunk, t0, ids = Chunk(), time.time(), []
+    import json
+    t0, ids = time.time(), []
+    name = a.name or "c0"
+    w = ChunkWriter(a.out, name)
     for f in a.files:
         sid = os.path.basename(f).split(".")[0]
+        chunk = Chunk()
         seen, kept = convert_shard(chunk, sid, open(f, "rb").read())
+        w.add(chunk.tables())          # one table (row group) per shard, like the real flow
         ids.append(sid)
         print(f"{sid}: {seen} files, {kept} ranked records, {time.time() - t0:.1f}s", file=sys.stderr)
-    w = ChunkWriter(a.out, a.name or f"{ids[0]}-{ids[-1]}")
-    w.add(chunk.tables())
     w.close()
+    os.makedirs(os.path.join(a.out, "manifest"), exist_ok=True)
+    json.dump({"format_version": FORMAT_VERSION, "chunk": name[1:] if name[:1] == "c" else name,
+               "shards": sorted(ids)}, open(os.path.join(a.out, "manifest", name + ".json"), "w"))
 
 
 def main():
@@ -350,11 +383,15 @@ def main():
     p.add_argument("--target", required=True)
     p.add_argument("--per-job", type=int, default=2)
     p.add_argument("--max-chunks", type=int, default=0)
+    p.add_argument("--min-chunk", type=int, default=0, help="skip chunks below this key (daily refresh: current season only)")
     p.set_defaults(fn=cmd_plan)
     p = sub.add_parser("run", help="convert chunks and upload them (needs HF_TOKEN)")
     p.add_argument("--target", required=True)
     p.add_argument("--chunks", type=int, nargs="+", required=True)
     p.set_defaults(fn=cmd_run)
+    p = sub.add_parser("card", help="upload the dataset card as README.md (needs HF_TOKEN)")
+    p.add_argument("--target", required=True)
+    p.set_defaults(fn=cmd_card)
     p = sub.add_parser("local", help="convert local tar.zst files into --out (no upload)")
     p.add_argument("--out", required=True)
     p.add_argument("--name")

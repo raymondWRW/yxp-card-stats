@@ -44,6 +44,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BASE = "https://huggingface.co/datasets/sharpobject/yxp_replays/resolve/main"
 API = "https://huggingface.co/api/datasets/sharpobject/yxp_replays/tree/main"
 
+# Record source: "parquet" (default) reads the converted dataset (convert_to_parquet.py);
+# "tar" reads sharpobject's raw tar.zst shards (slow; kept to cross-check the two).
+SOURCE = os.environ.get("YXP_SOURCE") or "parquet"
+PARQUET_SRC = os.environ.get("YXP_PARQUET") or "www1234567890/Yi_Xian_Replay_Compressed"   # HF repo id or local dir
+
 SEASON = int(os.environ.get("YXP_SEASON") or 10)
 # First shard worth scanning per season (found by probing the dataset around the season
 # rollover; everything earlier is skipped outright instead of downloaded-and-filtered).
@@ -717,6 +722,63 @@ def new_shards(only=None):
     return sorted(names)
 
 
+# ---- parquet source ----------------------------------------------------------
+_PQ = {}
+
+
+def _pq_source():
+    if "src" not in _PQ:
+        import parquet_source
+        _PQ["mod"] = parquet_source
+        _PQ["src"] = parquet_source.Source(PARQUET_SRC)
+    return _PQ["src"]
+
+
+def new_shards_parquet(only=None):
+    """-> {chunk_key: [new shard ids]} : shards of fully-uploaded chunks that are not yet
+    folded into STATE (same baseline / season-start / `only` rules as new_shards)."""
+    old = {str(x) for x in json.load(open(os.path.join(HERE, "_shards.json")))} | {str(x) for x in STATE["done"]}
+    start = SEASON_START.get(SEASON, 0)
+    out = {}
+    for key, shards in _pq_source().manifests().items():
+        new = sorted((s for s in shards if s not in old and int(s) >= start
+                      and (only is None or only(int(s)))), key=int)
+        if new:
+            out[key] = new
+    return dict(sorted(out.items(), key=lambda kv: int(kv[0])))
+
+
+def scan_parquet(chunks, no_save=False):
+    """Fold the new shards of each chunk in shard order (the matchup window relies on it),
+    checkpointing the state every CHECKPOINT_EVERY shards."""
+    if not chunks:
+        return
+    src = _pq_source()
+    total = sum(len(v) for v in chunks.values())
+    t0 = time.time(); done = 0; since_ckpt = 0
+    for key, shards in chunks.items():
+        for sid, recs in src.shard_records(key, set(shards), SEASON, TIER_FIELD, DAOXIN_MIN):
+            mu_begin_shard()
+            try:
+                STATE["files"] += len(recs)
+                for d in recs:
+                    STATE["self"] += 1
+                    process_record(d)
+                STATE["shards"] += 1
+            except Exception as e:
+                print(f"  !! shard {sid}: {e}")
+            mu_end_shard()
+            STATE["done"].add(int(sid)); since_ckpt += 1; done += 1
+            if done % 25 == 0 or done == total:
+                el = time.time() - t0
+                print(f"[{done}/{total}] self={STATE['self']} "
+                      f"builds={len(STATE['builds'])} | {done / el * 60:.0f} shards/min")
+            if PRUNE and PRUNE_EVERY and done % PRUNE_EVERY == 0:
+                prune_boards()
+            if CHECKPOINT_EVERY and since_ckpt >= CHECKPOINT_EVERY and not no_save:
+                save_state(); since_ckpt = 0
+
+
 # ---- state persistence -----------------------------------------------------------
 def _rescale(obj, f):
     # multiply every float (weighted accumulator) by f; ints (raw counts) stay as they are
@@ -1202,13 +1264,21 @@ def main(mode, opts):
         write_output()
         return
     loaded = (not opts["fresh"]) and load_state()
-    shards = new_shards(opts["only"])
+    if SOURCE == "parquet":
+        chunks = new_shards_parquet(opts["only"])
+        n_new = sum(len(v) for v in chunks.values())
+    else:
+        shards = new_shards(opts["only"]); n_new = len(shards)
     print(f"state: {'loaded, ' + str(len(STATE['done'])) + ' shards folded' if loaded else 'fresh (full rebuild)'}; "
-          f"new (season-{SEASON}) shards to scan: {len(shards)}")
+          f"new (season-{SEASON}) shards to scan: {n_new} [{SOURCE}]")
     ref = STATE.get("ref") or 0
-    if shards:
-        _, lastraw = fetch_raw(shards[-1])    # newest shard sets the recency reference
-        T_REF = max(ref, max_endts_from_raw(lastraw) if lastraw else 0)
+    if n_new:
+        if SOURCE == "parquet":               # newest chunk's newest game sets the recency reference
+            _pq_source()
+            T_REF = max(ref, _PQ["mod"].max_end_ts(_pq_source(), list(chunks)[-1], SEASON))
+        else:
+            _, lastraw = fetch_raw(shards[-1])    # newest shard sets the recency reference
+            T_REF = max(ref, max_endts_from_raw(lastraw) if lastraw else 0)
     else:
         T_REF = ref
     if loaded and ref and T_REF > ref:
@@ -1216,7 +1286,10 @@ def main(mode, opts):
         print(f"re-referencing weights: +{(T_REF - ref) / 86400e3:.2f} days -> x{f:.4g}")
         rescale_state(f)
     print(f"T_REF (newest game) = {T_REF}")
-    scan(shards, opts["no_save"])
+    if SOURCE == "parquet":
+        scan_parquet(chunks, opts["no_save"])
+    else:
+        scan(shards, opts["no_save"])
     write_output()
     if not opts["no_save"]:
         save_state()

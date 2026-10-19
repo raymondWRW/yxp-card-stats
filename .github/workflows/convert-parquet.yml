@@ -20,6 +20,19 @@ env:
   TARGET: www1234567890/Yi_Xian_Replay_Compressed
 
 jobs:
+  card:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install huggingface_hub
+      - name: Upload dataset card (README.md)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python pipeline/convert_to_parquet.py card --target "$TARGET"
+
   plan:
     runs-on: ubuntu-latest
     outputs:
