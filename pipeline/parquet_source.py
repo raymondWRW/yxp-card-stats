@@ -59,23 +59,26 @@ class Source:
 
     def shard_records(self, key, want_shards, season, tier_field, tier_min):
         """Yield (shard_id, [record dicts]) in shard order for the wanted shards of chunk `key`.
-        Each shard was appended as its own row group set; rows of a game are contiguous."""
+        Each shard was appended as its own row group set; rows of a game are contiguous.
+        Memory: only the (cheap) game_id column of every row group is read up front; the
+        heavy columns are read one shard at a time, so a 50-shard chunk never sits in RAM."""
         games, players = self.games_players(key)
         rf = self._open("rounds", key)
-        by_shard = defaultdict(list)
+        by_shard = defaultdict(list)                 # shard -> [row group index]
         for rg in range(rf.num_row_groups):
-            t = rf.read_row_group(rg)
-            if t.num_rows == 0:
+            gids = rf.read_row_group(rg, columns=["game_id"]).column("game_id")
+            if len(gids) == 0:
                 continue
-            gids = t.column("game_id")
-            first = games.get(gids[0].as_py())
-            if first is None or first["src_shard"] not in want_shards:
-                continue
-            by_shard[first["src_shard"]].append(t)
-        for sid in sorted(want_shards, key=int):      # shards with no ranked rows still tick the window
+            g = games.get(gids[0].as_py())
+            if g is not None and g["src_shard"] in want_shards:
+                by_shard[g["src_shard"]].append(rg)
+        cols = [c for c in rf.schema_arrow.names if c != "start_state"]   # start_state: unused here
+        for sid in sorted(want_shards, key=int):     # shards with no ranked rows still tick the window
             recs = []
-            for t in by_shard.get(sid, []):
-                recs += _records(t, games, players, season, tier_field, tier_min)
+            if by_shard.get(sid):
+                t = rf.read_row_groups(by_shard[sid], columns=cols)
+                recs = _records(t, games, players, season, tier_field, tier_min)
+                del t
             yield sid, recs
 
 
