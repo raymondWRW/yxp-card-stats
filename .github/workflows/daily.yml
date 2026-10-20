@@ -67,6 +67,9 @@ jobs:
           YXP_STATE: ${{ github.workspace }}/state/season10_state.pkl.zst
           YXP_SOURCE: parquet
           YXP_PARQUET: www1234567890/Yi_Xian_Replay_Compressed
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}          # authenticated reads: higher rate limits
+          HF_HUB_DOWNLOAD_TIMEOUT: "60"
+          YXP_CHECKPOINT: "50"   # save the state every 50 shards: a killed/cancelled cold rebuild resumes instead of restarting
         run: python -u pipeline/season_builds.py full
 
       # Vendored yxp_wiki card renderer (used with permission): re-copy it so new cards and
