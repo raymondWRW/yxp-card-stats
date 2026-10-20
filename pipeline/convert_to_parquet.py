@@ -6,13 +6,15 @@ Tables (one Parquet file per table per chunk of shards):
   games    one row per game
   players  one row per (game, uid)
   rounds   one row per (game, round, uid) -- the stable core + `extra` JSON
+  names    one row per (player, source shard): the player's latest username in that shard
 
 The core columns never change across seasons. Every other block of a round
 (xianMoData, keYinData, mirageData, relicData, ...) lands unparsed in `extra`
 (JSON string), so a new season's mechanics never needs a schema change.
 publicData.lastRoundData is the player's state at the START of the round (e.g. its life
 differs from the previous round's final life in ~17% of rounds): `life_start` + `start_state`.
-Dropped on purpose: cosmetics (skins, card backs, scene/scroller/defeat-effect ids, usernames).
+Dropped on purpose: cosmetics (skins, card backs, scene/scroller/defeat-effect ids). Usernames are
+kept out of the game tables and live only in the small `names` table (bots excluded).
 
 Usage:
   python convert_to_parquet.py local --out DIR FILE.tar.zst ...          # no upload
@@ -72,6 +74,7 @@ class Chunk:
 
     def __init__(self):
         self.games, self.players, self.rounds = {}, {}, {}
+        self.names = {}                 # uid -> [username, last_ts] (latest name seen in this shard)
         self.authoritative = set()      # (game, round, uid) rows written by that player's own self-record
 
     def add_record(self, d, shard):
@@ -104,6 +107,11 @@ class Chunk:
                 pub, priv = rs[sp]["publicData"], rs[sp]["privateData"]
                 uid = pub["uid"]
                 key = (gid, rnd, uid)
+                nm, ts = pub.get("username"), d.get("endTs") or d.get("beginTs") or 0
+                if nm and not pub.get("isAI"):
+                    cur = self.names.get(uid)
+                    if cur is None or ts >= cur[1]:
+                        self.names[uid] = [nm, ts]
                 # Only a player's own SELF-record is authoritative for that player's rows. Other
                 # files (an opponent's view, or a partial file whose subject is the same uid but
                 # that is not the full self-record -- e.g. a ghost match against a bot) may only
@@ -139,9 +147,11 @@ class Chunk:
                     # opponent rows are only trustworthy for what the shared round shows; keep anyway
                     pass
 
-    def tables(self):
+    def tables(self, shard=None):
         """-> {table_name: pa.Table}; rounds sorted by (game_id, round)."""
+        names = [{"uid": u, "username": n, "last_ts": t, "src_shard": shard} for u, (n, t) in self.names.items()]
         out = {
+            "names": pa.Table.from_pylist(names, schema=NAMES_SCHEMA),
             "games": pa.Table.from_pylist(list(self.games.values()), schema=GAMES_SCHEMA),
             "players": pa.Table.from_pylist(list(self.players.values()), schema=PLAYERS_SCHEMA),
             "rounds": pa.Table.from_pylist(list(self.rounds.values()), schema=ROUNDS_SCHEMA),
@@ -192,7 +202,12 @@ ROUNDS_SCHEMA = pa.schema([("game_id", STR), ("round", I32), ("uid", STR), ("opp
                            ("battle_time", I32), ("start_state", STR), ("extra", STR)])
 
 
-SCHEMAS = {"games": GAMES_SCHEMA, "players": PLAYERS_SCHEMA, "rounds": ROUNDS_SCHEMA}
+# names: additive table (no FORMAT_VERSION bump -- the other tables are unchanged). Chunks
+# converted before it existed got theirs backfilled from self-records (tools: names_backfill.py).
+NAMES_SCHEMA = pa.schema([("uid", STR), ("username", STR), ("last_ts", I64), ("src_shard", STR)])
+
+
+SCHEMAS = {"games": GAMES_SCHEMA, "players": PLAYERS_SCHEMA, "rounds": ROUNDS_SCHEMA, "names": NAMES_SCHEMA}
 
 
 def iter_members(raw):
@@ -324,7 +339,7 @@ def convert_chunk(key, shards, workdir):
         chunk = Chunk()
         s, k = convert_shard(chunk, sid, fetch(sid))
         seen, kept = seen + s, kept + k
-        w.add(chunk.tables())
+        w.add(chunk.tables(sid))
     w.close()
     print(f"chunk {key}: {len(shards)} shards, {seen} files, {kept} ranked records, "
           f"{time.time() - t0:.0f}s", file=sys.stderr)
@@ -367,7 +382,7 @@ def cmd_local(a):
         sid = os.path.basename(f).split(".")[0]
         chunk = Chunk()
         seen, kept = convert_shard(chunk, sid, open(f, "rb").read())
-        w.add(chunk.tables())          # one table (row group) per shard, like the real flow
+        w.add(chunk.tables(sid))          # one table (row group) per shard, like the real flow
         ids.append(sid)
         print(f"{sid}: {seen} files, {kept} ranked records, {time.time() - t0:.1f}s", file=sys.stderr)
     w.close()

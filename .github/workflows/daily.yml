@@ -69,11 +69,18 @@ jobs:
           YXP_PARQUET: www1234567890/Yi_Xian_Replay_Compressed
         run: python -u pipeline/season_builds.py full
 
+      # Vendored yxp_wiki card renderer (used with permission): re-copy it so new cards and
+      # renderer fixes reach the site. A wiki outage must not block the data refresh.
+      - name: Sync yxp_wiki card renderer
+        continue-on-error: true
+        run: python pipeline/sync_card_renderer.py .
+
       - name: Commit refreshed data if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/season10.json data/season10_builds.json data/season10_fates.json
+          git add -A vendor/card-components
           if git diff --cached --quiet; then
             echo "No data changes today."
           else
