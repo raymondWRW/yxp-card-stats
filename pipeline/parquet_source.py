@@ -11,6 +11,7 @@ where the cumulative selection blocks (fate / 天衍 / 道韵 / 仙命) are read
 """
 import json
 import os
+import time
 from collections import defaultdict
 
 import orjson
@@ -23,9 +24,10 @@ class Source:
     def __init__(self, src):
         self.src = src
         self.local = os.path.isdir(src)
+        self.tmp = None
         if not self.local:
-            from huggingface_hub import HfApi, HfFileSystem
-            self.api, self.fs = HfApi(), HfFileSystem()
+            from huggingface_hub import HfApi
+            self.api = HfApi()
 
     def manifests(self):
         """{chunk_key: [shard ids]} for every chunk that is fully uploaded."""
@@ -44,9 +46,35 @@ class Source:
         return out
 
     def _open(self, table, key):
+        """Local ParquetFile. Remote files are downloaded whole (hf_hub_download: timeouts,
+        retries, resume) instead of streamed through fsspec -- thousands of small range
+        requests without a timeout hung a long run. release(key) deletes them again."""
         if self.local:
             return pq.ParquetFile(os.path.join(self.src, table, f"c{key}.parquet"))
-        return pq.ParquetFile(f"datasets/{self.src}/{table}/c{key}.parquet", filesystem=self.fs)
+        from huggingface_hub import hf_hub_download
+        if self.tmp is None:
+            import tempfile
+            self.tmp = tempfile.mkdtemp(prefix="yxp_pq_")
+        for attempt in range(6):
+            try:
+                path = hf_hub_download(self.src, f"{table}/c{key}.parquet", repo_type="dataset",
+                                       local_dir=self.tmp)
+                return pq.ParquetFile(path)
+            except Exception as e:
+                if attempt == 5:
+                    raise
+                print(f"  !! download {table}/c{key}: {e} (retry {attempt + 1})")
+                time.sleep(5 * (attempt + 1))
+
+    def release(self, key):
+        """Drop the downloaded files of chunk `key` (keeps CI disk use at one chunk)."""
+        if self.tmp:
+            import shutil
+            for t in ("games", "players", "rounds"):
+                try:
+                    os.remove(os.path.join(self.tmp, t, f"c{key}.parquet"))
+                except OSError:
+                    pass
 
     def games_players(self, key):
         g = self._open("games", key).read().to_pydict()

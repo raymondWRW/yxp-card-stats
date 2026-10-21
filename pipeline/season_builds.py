@@ -777,6 +777,7 @@ def scan_parquet(chunks, no_save=False):
                 prune_boards()
             if CHECKPOINT_EVERY and since_ckpt >= CHECKPOINT_EVERY and not no_save:
                 save_state(); since_ckpt = 0
+        src.release(key)
 
 
 # ---- state persistence -----------------------------------------------------------
