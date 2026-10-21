@@ -734,6 +734,19 @@ def _pq_source():
     return _PQ["src"]
 
 
+def _mem():
+    """Current / peak RSS of this process (Linux /proc; falls back to peak only)."""
+    import resource
+    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    peak_mb = peak / 1024 if sys.platform != "darwin" else peak / 1048576
+    try:
+        with open("/proc/self/status") as f:
+            cur = next(int(l.split()[1]) for l in f if l.startswith("VmRSS")) / 1024
+        return f"rss {cur:.0f} MB (peak {peak_mb:.0f} MB)"
+    except Exception:
+        return f"peak rss {peak_mb:.0f} MB"
+
+
 def new_shards_parquet(only=None):
     """-> {chunk_key: [new shard ids]} : shards of fully-uploaded chunks that are not yet
     folded into STATE (same baseline / season-start / `only` rules as new_shards)."""
@@ -757,6 +770,7 @@ def scan_parquet(chunks, no_save=False):
     total = sum(len(v) for v in chunks.values())
     t0 = time.time(); done = 0; since_ckpt = 0
     for key, shards in chunks.items():
+        print(f"chunk {key}: {len(shards)} new shards | {time.time() - t0:.0f}s | {_mem()}")
         for sid, recs in src.shard_records(key, set(shards), SEASON, TIER_FIELD, DAOXIN_MIN):
             mu_begin_shard()
             try:
@@ -772,7 +786,7 @@ def scan_parquet(chunks, no_save=False):
             if done % 25 == 0 or done == total:
                 el = time.time() - t0
                 print(f"[{done}/{total}] self={STATE['self']} "
-                      f"builds={len(STATE['builds'])} | {done / el * 60:.0f} shards/min")
+                      f"builds={len(STATE['builds'])} | {done / el * 60:.0f} shards/min | {_mem()}")
             if PRUNE and PRUNE_EVERY and done % PRUNE_EVERY == 0:
                 prune_boards()
             if CHECKPOINT_EVERY and since_ckpt >= CHECKPOINT_EVERY and not no_save:
@@ -1265,6 +1279,7 @@ def main(mode, opts):
         write_output()
         return
     loaded = (not opts["fresh"]) and load_state()
+    print(f"state {'loaded' if loaded else 'not loaded'} | {_mem()}")
     if SOURCE == "parquet":
         chunks = new_shards_parquet(opts["only"])
         n_new = sum(len(v) for v in chunks.values())

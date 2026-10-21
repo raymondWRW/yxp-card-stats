@@ -9,12 +9,14 @@ the subject's side (uid/life/life_start/level/talents/board/rerolls) plus the op
 uid + character. `extra` (JSON) is parsed ONLY for each record's last round, which is
 where the cumulative selection blocks (fate / 天衍 / 道韵 / 仙命) are read from.
 """
+import gc
 import json
 import os
 import time
 from collections import defaultdict
 
 import orjson
+import pyarrow as pa
 import pyarrow.parquet as pq
 
 SELECTION_BLOCKS = ("talentSelectionDatas", "fateStrategyData", "daoYunSelectionDatas", "xianMoData")
@@ -76,9 +78,14 @@ class Source:
                 except OSError:
                     pass
 
+    # only the columns the record rebuild needs (keeps the per-chunk dicts small)
+    GAME_COLS = ["game_id", "season", "game_mode", "src_shard"]
+    PLAYER_COLS = ["game_id", "uid", "is_ai", "char_id", "career", "battle_rank", "rank_score_begin",
+                   "daoxin_begin", "begin_ts", "end_ts", "has_self_record"]
+
     def games_players(self, key):
-        g = self._open("games", key).read().to_pydict()
-        p = self._open("players", key).read().to_pydict()
+        g = self._open("games", key).read(columns=self.GAME_COLS).to_pydict()
+        p = self._open("players", key).read(columns=self.PLAYER_COLS).to_pydict()
         games = {g["game_id"][i]: {k: g[k][i] for k in g} for i in range(len(g["game_id"]))}
         players = {}
         for i in range(len(p["game_id"])):
@@ -100,23 +107,29 @@ class Source:
             g = games.get(gids[0].as_py())
             if g is not None and g["src_shard"] in want_shards:
                 by_shard[g["src_shard"]].append(rg)
-        cols = [c for c in rf.schema_arrow.names if c != "start_state"]   # start_state: unused here
         for sid in sorted(want_shards, key=int):     # shards with no ranked rows still tick the window
             recs = []
             if by_shard.get(sid):
-                t = rf.read_row_groups(by_shard[sid], columns=cols)
+                t = rf.read_row_groups(by_shard[sid], columns=ROUND_COLS + ["extra"])
                 recs = _records(t, games, players, season, tier_field, tier_min)
                 del t
+                pa.default_memory_pool().release_unused()   # Arrow keeps freed buffers otherwise
             yield sid, recs
+        del games, players
+        gc.collect()
+
+
+ROUND_COLS = ["game_id", "round", "uid", "opp_uid", "side", "first_player", "won", "life", "life_start",
+              "level", "talents", "board", "rerolls", "hp_delta", "life_damage"]
 
 
 def _records(t, games, players, season, tier_field, tier_min):
-    c = t.to_pydict()
+    c = t.select(ROUND_COLS).to_pydict()          # `extra` stays in Arrow: only last rounds need it
     n = t.num_rows
     rows = defaultdict(list)                       # (game, uid) -> row indexes (round order)
     for i in range(n):
         rows[(c["game_id"][i], c["uid"][i])].append(i)
-    out = []
+    keep = []
     for (gid, uid), idx in rows.items():
         g = games.get(gid)
         pl = players.get((gid, uid))
@@ -127,6 +140,11 @@ def _records(t, games, players, season, tier_field, tier_min):
         tier = pl["daoxin_begin"] if tier_field == "beginDaoXinRankScore" else pl["rank_score_begin"]
         if (tier or 0) < tier_min:
             continue
+        keep.append((gid, uid, idx, g, pl))
+    # cumulative selections live on each record's last round: materialise only those `extra` cells
+    extras = t.column("extra").take([k[2][-1] for k in keep]).to_pylist() if keep else []
+    out = []
+    for (gid, uid, idx, g, pl), ex in zip(keep, extras):
         rss = []
         for i in idx:
             ouid = c["opp_uid"][i]
@@ -145,7 +163,6 @@ def _records(t, games, players, season, tier_field, tier_min):
             rs["p1" if c["side"][i] == "p1" else "p2"] = mine
             rs["p2" if c["side"][i] == "p1" else "p1"] = theirs
             rss.append(rs)
-        ex = c["extra"][idx[-1]]                   # cumulative selections live on the last round
         if ex:
             ex = orjson.loads(ex)
             priv = rss[-1]["p1" if c["side"][idx[-1]] == "p1" else "p2"]["privateData"]
@@ -155,7 +172,8 @@ def _records(t, games, players, season, tier_field, tier_min):
         out.append({"gameId": gid, "uid": uid, "charId": pl["char_id"], "career": pl["career"],
                     "battleRank": pl["battle_rank"], "beginRankScore": pl["rank_score_begin"],
                     "beginDaoXinRankScore": pl["daoxin_begin"], "beginTs": pl["begin_ts"],
-                    "endTs": pl["end_ts"],      # per player: an eliminated player's replay ends earlier "seasonMec": g["season"], "gameMode": g["game_mode"],
+                    "endTs": pl["end_ts"],      # per player: an eliminated player's replay ends earlier
+                    "seasonMec": g["season"], "gameMode": g["game_mode"],
                     "roundStats": rss})
     return out
 
