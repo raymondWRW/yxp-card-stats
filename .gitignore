@@ -3,3 +3,6 @@ pipeline/season*_diag.json
 __pycache__/
 state/
 _season*_state.pkl.zst*
+
+# daily_stats day periods: rebuilt by every run from the Parquet dataset (only weeks are committed)
+data/daily/*/periods/d*
