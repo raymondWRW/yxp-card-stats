@@ -3,3 +3,4 @@ zstandard
 pyarrow
 orjson
 huggingface_hub
+duckdb

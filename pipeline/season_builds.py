@@ -91,7 +91,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 15            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 16            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -225,7 +225,7 @@ def new_build():
         # Boards are accumulated already grouped the way the output wants them (see
         # add_board): realm -> familySet -> [per band [raw, w, w_wins],
         # {positionalFams -> [per band [raw, w, w_wins], {cidTuple -> raw}]}]. The per-slot
-        # "most common level" comes from the cid tuples of each positional variation.
+        # "most common level" comes from per-slot {(slot, cid) -> raw} counts of each variation.
         "boards": defaultdict(dict),
         "mboards": defaultdict(dict),        # oppChar -> same structure (late-game boards vs that opponent)
         # per-round value HISTOGRAMS (for median curves): per band, per round 1..CURVE_ROUNDS,
@@ -265,8 +265,15 @@ except Exception:
     SIGS = {}
 
 
+# Strategy-variant split switch. Off: every stat is keyed by character + side job only
+# (the site then shows no variant views). Turn back on with YXP_SPLIT_VARIANTS=1.
+SPLIT_VARIANTS = os.environ.get("YXP_SPLIT_VARIANTS", "0") == "1"
+
+
 def classify_variant(char, career, talents, late_fams):
     """Per-game strategy label ('' = this combo is not split)."""
+    if not SPLIT_VARIANTS:
+        return ""
     if char == CHAR_LICHY:
         return "融剑" if set(talents) & WC_RONGHUI else "白板"
     if char == CHAR_LUJX:
@@ -362,7 +369,9 @@ def add_board(bd, cids, fams, cs, bi, w, wwin):
         vv = g[1][fams] = [_b3(), {}]
     gb = g[0][bi]; gb[0] += 1; gb[1] += w; gb[2] += wwin
     vb = vv[0][bi]; vb[0] += 1; vb[1] += w; vb[2] += wwin
-    vv[1][cids] = vv[1].get(cids, 0) + 1
+    lv = vv[1]                       # (slot, cid) -> raw: per-slot level counts (SCHEMA 16;
+    for i, c in enumerate(cids):     # was one key per exact cid tuple -- unbounded)
+        lv[(i, c)] = lv.get((i, c), 0) + 1
 
 
 def _weight(endTs):
@@ -761,7 +770,7 @@ def new_shards_parquet(only=None):
     return dict(sorted(out.items(), key=lambda kv: int(kv[0])))
 
 
-def scan_parquet(chunks, no_save=False):
+def scan_parquet(chunks, no_save=False, release=True):
     """Fold the new shards of each chunk in shard order (the matchup window relies on it),
     checkpointing the state every CHECKPOINT_EVERY shards."""
     if not chunks:
@@ -791,7 +800,8 @@ def scan_parquet(chunks, no_save=False):
                 prune_boards()
             if CHECKPOINT_EVERY and since_ckpt >= CHECKPOINT_EVERY and not no_save:
                 save_state(); since_ckpt = 0
-        src.release(key)
+        if release:
+            src.release(key)
 
 
 # ---- state persistence -----------------------------------------------------------
@@ -947,7 +957,7 @@ def write_output():
     V_DAOYUN = output_view(STATE["daoyun"], vmap)
     V_XIANMO = output_view(STATE["xianmo"], vmap)
     mu = STATE["mu"]; tot = mu["kept"] + mu["dropped"]
-    waiting = sum(len(v) for v in mu["pending"].values())
+    waiting = mu.get("waiting_n", sum(len(v) for v in mu["pending"].values()))
     dist = sorted(mu["dist"].items()); n = sum(c for _, c in dist); acc = 0; p999 = 0
     for d_, c in dist:
         acc += c
@@ -969,10 +979,10 @@ def write_output():
         wtot = lambda s3: s3[0][1] + s3[1][1] + s3[2][1]
         rb = lambda s3: [[s[0], r2(s[1]), r2(s[2])] for s in s3]
 
-        def slot_levels(fams, cidcounts):
+        def slot_levels(fams, slotcounts):
             per = [Counter() for _ in fams]
-            for ckey, raw in cidcounts.items():
-                for i, c in enumerate(ckey):
+            for (i, c), raw in slotcounts.items():
+                if i < len(per):
                     per[i][c] += raw             # level popularity per slot (raw count)
             return [c.most_common(1)[0][0] for c in per]
         out = []

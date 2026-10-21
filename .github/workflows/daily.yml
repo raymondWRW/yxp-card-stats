@@ -1,14 +1,13 @@
 name: Daily data refresh
 
-# Folds the new HuggingFace replay shards into the current season's stats and commits
-# the refreshed data/ JSON so GitHub Pages serves up-to-date stats. Runs every day and
-# can also be triggered manually from the Actions tab. The season lives in
+# Converts the new HuggingFace replay shards into the Parquet dataset, folds them into
+# per-day statistics (pipeline/daily_stats.py -> data/daily/), combines all days/weeks
+# into the site JSON and commits both, so GitHub Pages serves up-to-date stats. Runs
+# every day and can also be triggered manually from the Actions tab. The season lives in
 # pipeline/season_builds.py (SEASON, currently 10); season9*.json stays frozen.
 #
-# The extraction is INCREMENTAL: the accumulated state lives in the Actions cache
-# (restored below, saved after the run -- also after a cancelled/timed-out run, thanks
-# to the script's periodic checkpoints). No cache = rebuild from the season's first
-# shard; with it a daily run only scans the ~30 new shards (minutes either way early on).
+# Only days whose source shards changed are recomputed (normally today + yesterday);
+# finished weeks are compacted. No state cache: data/daily/ in the repo is the state.
 on:
   schedule:
     - cron: "0 8 * * *" # 08:00 UTC daily
@@ -24,8 +23,8 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    # Only a cold full rebuild needs this long (~30 shards/min, 2400+ shards); a
-    # checkpointed state survives a timeout, so the next run resumes where it stopped.
+    # Only the first run (every day of the season) takes long; it stops building days
+    # after YXP_DAILY_BUDGET_MIN, commits them, and the next run continues.
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v5
@@ -52,28 +51,18 @@ jobs:
             python -u pipeline/convert_to_parquet.py run --target "$TARGET" --chunks $chunks
           fi
 
-      - name: Restore extraction state
-        uses: actions/cache/restore@v4
-        with:
-          path: state/season10_state.pkl.zst
-          key: s10-state-${{ github.run_id }}
-          restore-keys: |
-            s10-state-
-
-      - name: Run extraction
+      - name: Build daily statistics and site data
         env:
           YXP_PROXY: ${{ github.workspace }}/pipeline
           YXP_OUTDIR: ${{ github.workspace }}/data
-          YXP_STATE: ${{ github.workspace }}/state/season10_state.pkl.zst
-          YXP_SOURCE: parquet
           YXP_PARQUET: www1234567890/Yi_Xian_Replay_Compressed
+          YXP_DAILY_BUDGET_MIN: "120"
           HF_TOKEN: ${{ secrets.HF_TOKEN }}          # authenticated reads: higher rate limits
           HF_HUB_DOWNLOAD_TIMEOUT: "60"
-          YXP_CHECKPOINT: "50"   # save the state every 50 shards: a killed/cancelled cold rebuild resumes instead of restarting
-        # [mem] lines every 30s: if the runner dies (out of memory) the log still shows the trend
+        # [mem] lines every 30s, so a memory problem is visible in the log
         run: |
-          ( while sleep 30; do echo "[mem] $(date -u +%H:%M:%S) $(free -m | awk '/Mem:/{print "used "$3" / "$2" MB, avail "$7}') | swap $(free -m | awk '/Swap:/{print $3}') MB"; done ) &
-          python -u pipeline/season_builds.py full
+          ( while sleep 30; do echo "[mem] $(date -u +%H:%M:%S) $(free -m | awk '/Mem:/{print "used "$3" / "$2" MB, avail "$7}')"; done ) &
+          python -u pipeline/daily_stats.py
 
       # Vendored yxp_wiki card renderer (used with permission): re-copy it so new cards and
       # renderer fixes reach the site. A wiki outage must not block the data refresh.
@@ -86,22 +75,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/season10.json data/season10_builds.json data/season10_fates.json
+          git add -A data/daily
           git add -A vendor/card-components
           if git diff --cached --quiet; then
             echo "No data changes today."
           else
             git commit -m "Daily data refresh ($(date -u +%Y-%m-%d))"
-            # main may have moved during the ~1h extraction; rebase so the push
-            # isn't rejected as non-fast-forward (only this job writes data/*.json)
+            # main may have moved during the run; rebase so the push isn't rejected as
+            # non-fast-forward (only this job writes data/*.json and data/daily/)
             git pull --rebase origin main
             git push
           fi
-
-      # New cache entry per run (entries are immutable); restore-keys above picks the
-      # newest. always(): a cancelled run still saves its last checkpoint.
-      - name: Save extraction state
-        if: always() && hashFiles('state/season10_state.pkl.zst') != ''
-        uses: actions/cache/save@v4
-        with:
-          path: state/season10_state.pkl.zst
-          key: s10-state-${{ github.run_id }}
