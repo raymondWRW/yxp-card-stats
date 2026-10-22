@@ -64,6 +64,41 @@ jobs:
           ( while sleep 30; do echo "[mem] $(date -u +%H:%M:%S) $(free -m | awk '/Mem:/{print "used "$3" / "$2" MB, avail "$7}')"; done ) &
           python -u pipeline/daily_stats.py
 
+      # Elo leaderboard (pipeline/elo): rates only source shards it hasn't rated yet, read from
+      # the Parquet dataset. Its state lives in the Actions cache; if that entry has expired the
+      # permanent `elo-state-seed` release is used and the missed shards are simply rated now
+      # (the state records which shards it has processed). Never blocks the data refresh.
+      - name: Restore Elo state
+        uses: actions/cache/restore@v4
+        with:
+          path: state/elo_state.pkl.zst
+          key: elo-state-${{ github.run_id }}
+          restore-keys: |
+            elo-state-
+
+      - name: Update Elo leaderboard
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_HUB_DOWNLOAD_TIMEOUT: "60"
+          YXP_ELO_STATE: ${{ github.workspace }}/state/elo_state.pkl.zst
+          YXP_ELO_OUT: ${{ github.workspace }}/data/elo
+        run: |
+          mkdir -p state
+          if [ ! -f state/elo_state.pkl.zst ]; then
+            echo "no cached Elo state: starting from the elo-state-seed release"
+            gh release download elo-state-seed --repo "$GITHUB_REPOSITORY" --pattern elo_state.pkl.zst --dir state
+          fi
+          python -u pipeline/elo/update.py
+
+      - name: Save Elo state
+        if: always() && hashFiles('state/elo_state.pkl.zst') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: state/elo_state.pkl.zst
+          key: elo-state-${{ github.run_id }}
+
       # Vendored yxp_wiki card renderer (used with permission): re-copy it so new cards and
       # renderer fixes reach the site. A wiki outage must not block the data refresh.
       - name: Sync yxp_wiki card renderer
@@ -77,6 +112,7 @@ jobs:
           git add data/season10.json data/season10_builds.json data/season10_fates.json
           git add -A data/daily
           git add -A vendor/card-components
+          git add -A data/elo
           if git diff --cached --quiet; then
             echo "No data changes today."
           else

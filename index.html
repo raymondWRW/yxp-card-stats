@@ -17,6 +17,7 @@
       <span id="cardcount">…</span>
       <span data-i18n="subPost">张卡牌</span>
     </span>
+    <span id="sub-elo" data-i18n="subElo" hidden>基于排位与道心对局的技术分，可跨段位、跨赛季比较</span>
     <span id="sub-builds" data-i18n="subBuilds10">百家之道 · 排位流派（段位分≥3000）· 近期加权（约4天半衰期）</span>
   </p>
 </header>
@@ -25,6 +26,7 @@
   <button class="tab on" data-tab="builds10" data-i18n="tabBuilds10">赛季 · 百家之道</button>
   <button class="tab" data-tab="builds9" data-i18n="tabBuilds9">赛季 · 天衍万象</button>
   <button class="tab" data-tab="cards" data-i18n="tabCards">卡牌 · 天机刻印 / 临渊织梦</button>
+  <button class="tab" data-tab="elo" data-i18n="tabElo">天梯 · Elo</button>
   <div class="seg" id="lang">
     <button data-v="en">EN</button>
     <button data-v="zh" class="on">中文</button>
@@ -108,6 +110,10 @@
   <div id="builds-content"></div>
 </section>
 
+<section id="view-elo" hidden>
+  <div id="elo-content"></div>
+</section>
+
 <footer>
   <span data-i18n="footData">Data:</span>
   <a href="https://huggingface.co/datasets/sharpobject/yxp_replays">sharpobject/yxp_replays</a> ·
@@ -148,5 +154,6 @@
 <!-- yxp_wiki card renderer (vendored, used with permission): composes card faces in a worker -->
 <script src="vendor/card-components/runtime/cards.js?v=1"></script>
 <script src="app.js"></script>
+<script src="elo.js"></script>
 </body>
 </html>

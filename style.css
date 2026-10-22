@@ -294,3 +294,39 @@ footer #updated{margin-top:6px}
   .fpop{transform:translateY(-4px);transition:opacity .12s,transform .12s}
   .fphase:hover .fpop{transform:none}
 }
+
+/* ===== 天梯 / Elo leaderboard ===== */
+#view-elo{padding:20px 24px 60px}
+.elo-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;position:relative}
+.elo-search{position:relative;flex:1;min-width:200px;max-width:360px}
+.elo-search input{width:100%}
+.elo-hits{position:absolute;top:100%;left:0;right:0;margin-top:4px;z-index:40;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:6px;max-height:320px;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.elo-hits[hidden]{display:none}
+.elo-hit{padding:6px 8px;border-radius:6px;cursor:pointer}
+.elo-hit:hover{background:var(--panel2)}
+.elo-hits .muted{padding:6px 8px}
+.elo-bar .infopop{top:100%;left:auto;right:0}
+.elo-note{font-size:12px;margin:0 0 10px}
+.elo-tablewrap{overflow-x:auto}
+.elo-table{border-collapse:collapse;width:100%;max-width:760px;font-size:14px}
+.elo-table th{color:var(--muted);font-weight:600;font-size:12px;text-align:right;padding:6px 10px;border-bottom:1px solid var(--line)}
+.elo-table td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--line)}
+.elo-table .l{text-align:left}
+.elo-table tbody tr[data-uid]{cursor:pointer}
+.elo-table tbody tr[data-uid]:hover{background:var(--panel)}
+.elo-table .rk{color:var(--muted);width:40px}
+.elo-table .nm{font-weight:600}
+.elo-table tbody tr:nth-child(-n+3) .rk{color:#d9a441;font-weight:700}
+.elo-back{width:auto;display:inline-block;margin:0 0 12px;padding:6px 12px}
+.elo-card{max-width:760px}
+.elo-head h2{margin:0 0 8px;font-size:22px}
+.elo-head .kpis{display:flex;flex-wrap:wrap;gap:24px}
+.elo-head .kpi b{font-size:20px}
+.elo-head .kpi span:last-child{display:block;font-size:11px;color:var(--muted);text-transform:uppercase}
+.elo-chart{display:block;max-width:560px;color:var(--text);background:var(--panel2);border-radius:8px}
+.elo-seasons{max-width:560px;margin-top:8px}
+@media (prefers-reduced-motion: no-preference){
+  .elo-table tbody tr{animation:rise .3s cubic-bezier(.2,.7,.2,1) var(--d,0ms) backwards}
+  .elo-hits:not([hidden]){animation:drop .15s backwards}
+}

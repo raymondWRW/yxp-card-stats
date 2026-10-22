@@ -4,3 +4,4 @@ pyarrow
 orjson
 huggingface_hub
 duckdb
+openskill

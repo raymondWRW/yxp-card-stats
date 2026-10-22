@@ -21,7 +21,8 @@ const UI = {
     all: "All", none: "None", allSel: "All", nSel: "selected", searchPh: "card name…",
     sect: "Sect", baseLevel: "base", overall: "overall",
     notEnough: "Not enough data to calculate win rate at this Min games.",
-    tabCards: "Cards · Tianji Sigil / Dream Weave", tabBuilds10: "Season · Hundred Schools", tabBuilds9: "Season · Heavenly Derivation", top4rate: "Top-4 win rate",
+    tabCards: "Cards · Tianji Sigil / Dream Weave", tabElo: "Leaderboard · Elo",
+    subElo: "Skill rating from ranked + DaoXin games, comparable across rank tiers and seasons", tabBuilds10: "Season · Hundred Schools", tabBuilds9: "Season · Heavenly Derivation", top4rate: "Top-4 win rate",
     avgplace: "Avg placement", sidejobs: "Side-jobs played", power: "Power profile",
     boards: "Popular boards", matchup: "Placement vs character", realm: "Realm",
     hhHigher: "finishes higher", youAbbr: "you", oppAbbr: "opp",
@@ -79,7 +80,8 @@ const UI = {
     all: "全部", none: "清空", allSel: "全部", nSel: "项已选", searchPh: "卡牌名称…",
     sect: "门派", baseLevel: "基础", overall: "总体",
     notEnough: "当前最少场次下数据不足，无法计算胜率。",
-    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabBuilds10: "赛季 · 百家之道", tabBuilds9: "赛季 · 天衍万象", top4rate: "前四胜率",
+    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabElo: "天梯 · Elo",
+    subElo: "基于排位与道心对局的技术分，可跨段位、跨赛季比较", tabBuilds10: "赛季 · 百家之道", tabBuilds9: "赛季 · 天衍万象", top4rate: "前四胜率",
     avgplace: "平均名次", sidejobs: "搭配副职", power: "强度雷达",
     boards: "热门卡组", matchup: "对位名次", realm: "境界",
     hhHigher: "名次高于对方", youAbbr: "我", oppAbbr: "对方",
@@ -494,7 +496,8 @@ function renderModal() {
 // only hands each item of a group an increasing --d (indexed per parent, capped so a
 // long list doesn't keep trickling in) so they rise one after another, not all at once.
 const STAGGER = [[".cchip", 22, 30], [".card", 14, 24], [".sjrow", 35, 14], [".board", 40, 12],
-                 [".mcell", 18, 30], [".fphase", 45, 10], [".pb", 30, 8], [".col", 12, 40], [".realmtbl tr", 40, 8]];
+                 [".mcell", 18, 30], [".fphase", 45, 10], [".pb", 30, 8], [".col", 12, 40], [".realmtbl tr", 40, 8],
+                 [".elo-table tbody tr", 12, 40]];
 function enter(host) {
   if (!host) return;
   for (const [sel, step, cap] of STAGGER) {
@@ -606,6 +609,7 @@ function applyLang() {
   render();
   if (S.modalFam != null) renderModal();
   if (BS.active) renderBuilds();
+  if (S.eloActive && window.EloTab) EloTab.render();
 }
 
 // ---- wiring ----------------------------------------------------------------
@@ -1490,10 +1494,14 @@ function fatesSectionHTML(key) {
 function wireBuilds() {
   document.querySelectorAll("#tabbar .tab").forEach((tb) => tb.onclick = () => {
     document.querySelectorAll("#tabbar .tab").forEach((x) => x.classList.remove("on")); tb.classList.add("on");
-    const isB = tb.dataset.tab.startsWith("builds");
-    $("#view-cards").hidden = isB; $("#view-builds").hidden = !isB;
-    $("#sub-cards").hidden = isB; $("#sub-builds").hidden = !isB;   // tab-appropriate subtitle
-    if (isB) {
+    const isB = tb.dataset.tab.startsWith("builds"), isE = tb.dataset.tab === "elo";
+    $("#view-cards").hidden = isB || isE; $("#view-builds").hidden = !isB; $("#view-elo").hidden = !isE;
+    $("#sub-cards").hidden = isB || isE; $("#sub-builds").hidden = !isB; $("#sub-elo").hidden = !isE;   // tab-appropriate subtitle
+    S.eloActive = isE;
+    if (isE) {
+      BS.active = false;
+      window.EloTab && EloTab.render();
+    } else if (isB) {
       setBuildsSeason(+tb.dataset.tab.slice(6));
       BS.active = true;
       const sb = $("#sub-builds"); sb.dataset.i18n = "subBuilds" + BS.season; sb.textContent = t("subBuilds" + BS.season);
