@@ -57,6 +57,7 @@ jobs:
           YXP_OUTDIR: ${{ github.workspace }}/data
           YXP_PARQUET: www1234567890/Yi_Xian_Replay_Compressed
           YXP_DAILY_BUDGET_MIN: "120"
+          YXP_SPLIT_VARIANTS: "1"                   # per-strategy sub-builds (strategy_signatures.json + fate rules)
           HF_TOKEN: ${{ secrets.HF_TOKEN }}          # authenticated reads: higher rate limits
           HF_HUB_DOWNLOAD_TIMEOUT: "60"
         # [mem] lines every 30s, so a memory problem is visible in the log
@@ -69,6 +70,7 @@ jobs:
       # permanent `elo-state-seed` release is used and the missed shards are simply rated now
       # (the state records which shards it has processed). Never blocks the data refresh.
       - name: Restore Elo state
+        if: ${{ !cancelled() }}                   # Elo doesn't depend on the stats step
         uses: actions/cache/restore@v4
         with:
           path: state/elo_state.pkl.zst
@@ -77,6 +79,7 @@ jobs:
             elo-state-
 
       - name: Update Elo leaderboard
+        if: ${{ !cancelled() }}
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
@@ -102,10 +105,14 @@ jobs:
       # Vendored yxp_wiki card renderer (used with permission): re-copy it so new cards and
       # renderer fixes reach the site. A wiki outage must not block the data refresh.
       - name: Sync yxp_wiki card renderer
+        if: ${{ !cancelled() }}
         continue-on-error: true
         run: python pipeline/sync_card_renderer.py .
 
+      # Commits whatever finished (Elo / renderer still land if the stats step failed;
+      # a failed stats build never reaches write_output, so it leaves no partial site JSON).
       - name: Commit refreshed data if changed
+        if: ${{ !cancelled() }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

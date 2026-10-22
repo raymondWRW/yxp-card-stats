@@ -48,7 +48,7 @@ import season_builds as sb         # noqa: E402
 DAILY_DIR = os.environ.get("YXP_DAILY") or os.path.join(os.path.dirname(HERE), "data", "daily", f"s{sb.SEASON}")
 PERIODS = os.path.join(DAILY_DIR, "periods")
 FAMILIES = os.path.join(DAILY_DIR, "families.json")
-FORMAT = 1                          # bump to rebuild every period (layout / accumulator change)
+FORMAT = 2                          # bump to rebuild every period (layout / accumulator change); 2: strategy-variant split back on
 
 # board tables kept per (character, side job, phase) when a week is compacted (and when
 # combining for the site): more than the 20 / 8 the site shows, so the published top lists
@@ -267,6 +267,11 @@ def merge_small(pids_refs, ref):
     return acc
 
 
+def _arrow(rel):
+    """DuckDB result -> Arrow table (2.0 renamed fetch_arrow_table to to_arrow_table)."""
+    return rel.to_arrow_table() if hasattr(rel, "to_arrow_table") else rel.fetch_arrow_table()
+
+
 def combine_boards(pids_refs, ref, mult=1):
     """DuckDB: sum every period's board rows (weights scaled to `ref`), keep the top K per
     table (K x mult) and the top K_VARIANTS layouts per board, summing their level counts.
@@ -304,8 +309,8 @@ def combine_boards(pids_refs, ref, mult=1):
               FROM (SELECT {key}, lay, unnest(lv) AS u FROM {src('variants')} SEMI JOIN v USING ({key}, lay))
               GROUP BY ALL)
         GROUP BY ALL""")
-    gt = con.execute("SELECT * FROM g").fetch_arrow_table()
-    vt = con.execute(f"SELECT v.*, l.lv FROM v LEFT JOIN l USING ({key}, lay)").fetch_arrow_table()
+    gt = _arrow(con.execute("SELECT * FROM g"))
+    vt = _arrow(con.execute(f"SELECT v.*, l.lv FROM v LEFT JOIN l USING ({key}, lay)"))
     con.close()
     return gt, vt
 
