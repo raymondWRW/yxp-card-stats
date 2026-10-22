@@ -1043,8 +1043,8 @@ const VAR_EN = {
   "纯水": "Mono Water", "纯火": "Mono Fire", "纯木": "Mono Wood", "纯土": "Mono Earth", "纯金": "Mono Metal",
   "狂剑": "Unrestrained Sword", "云剑": "Cloud Sword", "多段": "Multi-hit", "火木": "Fire & Wood", "答辩": "World Smash",
   "木火": "Wood & Fire", "金水": "Metal & Water", "无极": "Limitless",
-  "万法": "Myriad Methods", "云防": "Cloud Guard", "修玄": "Mystic Cultivation", "内伤": "Internal Injury",
-  "外伤雷": "External Injury Thunder", "星力雷": "Star Power Thunder", "百愈": "Hundred Heals",
+  "万法": "Dharma", "云防": "Cloud Sword", "修玄": "Debuff", "内伤": "Internal Injury",
+  "外伤雷": "Wound Thunder", "星力雷": "Star Power Thunder", "百愈": "Healing Hands",
 };
 function wcVarLabel(v, ch, cr) {
   const rn = BS.season === 9 ? ((ch != null && VAR_RENAME[`${ch}_${cr}`]) || (ch != null && VAR_RENAME[String(ch)]) || null) : null;
