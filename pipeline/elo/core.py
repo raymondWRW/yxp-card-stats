@@ -34,13 +34,16 @@ def model():
     return PlackettLuce(mu=MU0, sigma=SIGMA0, beta=BETA, tau=TAU)
 
 
+HISTORY = 1             # state format: 1 = players carry an end-of-day rating history ("h")
+
+
 def params():
-    return {"beta": BETA, "tau": TAU, "seasonSigma": SEASON_SIGMA, "daySigma": DAY_SIGMA}
+    return {"beta": BETA, "tau": TAU, "seasonSigma": SEASON_SIGMA, "daySigma": DAY_SIGMA, "history": HISTORY}
 
 
 def new_player(name, ts, season):
     return {"mu": MU0, "sigma": SIGMA0, "games": 0, "dx": 0, "last": ts, "name": name or "",
-            "nameTs": ts if name else 0, "season": season, "seasons": {}}
+            "nameTs": ts if name else 0, "season": season, "seasons": {}, "h": []}
 
 
 def pre_game(p, ts, season):
@@ -75,6 +78,12 @@ def rate_game(m, P, ts, ent):
             se = p["seasons"][season] = {"start": d, "peak": d, "games": 0}
         se["end"] = d; se["endC"] = round(disp(r.mu - 2 * r.sigma))
         se["peak"] = max(se["peak"], d); se["games"] += 1
+        day, h = ts // DAY_MS, p["h"]           # end-of-day rating history (one point per day played)
+        se.setdefault("d0", day); se["d1"] = day     # first / last day played in that season
+        if h and h[-1][0] == day:
+            h[-1][1] = d
+        else:
+            h.append([day, d])
     return ent, ps
 
 
@@ -95,11 +104,37 @@ def load_state(path):
 
 
 # ---- site export ------------------------------------------------------------------
+def _change(p, now, days):
+    """rating change over the last `days` days (vs the end of the day `days` ago); None = no history then"""
+    before = rating_on(p.get("h") or [], now // DAY_MS - days)
+    return None if before is None else round(disp(p["mu"])) - before
+
+
 def _row(rank, uid, p, rating, cons, games, extra=None):
     r = {"r": rank, "uid": uid, "name": p["name"], "rating": rating, "cons": cons, "games": games}
     if extra:
         r.update(extra)
     return r
+
+
+def rating_on(h, day):
+    """rating at the end of `day` (last point on or before it), None if the player hadn't played yet"""
+    lo, hi = 0, len(h)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if h[mid][0] <= day:
+            lo = mid + 1
+        else:
+            hi = mid
+    return h[lo - 1][1] if lo else None
+
+
+def encode_h(h):
+    """[[day, rating], ...] -> flat delta list [day0, r0, dDay1, dR1, ...] (small JSON)"""
+    out, pd, pr = [], 0, 0
+    for d, r in h:
+        out += [d - pd, r - pr]; pd, pr = d, r
+    return out
 
 
 def export(P, outdir, now):
@@ -112,7 +147,8 @@ def export(P, outdir, now):
                  key=lambda up: cons(up[1]), reverse=True)[:TOP_N]
     top = {"generated": now, "params": params(), "minGames": MIN_GAMES, "activeDays": ACTIVE_DAYS,
            "current": [_row(i, u, p, round(disp(p["mu"])), round(cons(p)), p["games"],
-                            {"dx": p["dx"], "sigma": round(SCALE * p["sigma"]), "last": p["last"]})
+                            {"dx": p["dx"], "sigma": round(SCALE * p["sigma"]), "last": p["last"],
+                             "d7": _change(p, now, 7)})
                        for i, (u, p) in enumerate(cur, 1)],
            "seasons": {}}
     for s in sorted({s for p in P.values() for s in p["seasons"]}):
@@ -132,7 +168,8 @@ def export(P, outdir, now):
         shards.setdefault(u[-2:], {})[u] = {
             "name": p["name"], "rating": round(disp(p["mu"])), "cons": round(cons(p)),
             "sigma": round(SCALE * p["sigma"]), "games": p["games"], "dx": p["dx"], "last": p["last"],
-            "seasons": {str(s): {k: v for k, v in se.items() if k != "endC"} for s, se in p["seasons"].items()}}
+            "seasons": {str(s): {k: v for k, v in se.items() if k != "endC"} for s, se in p["seasons"].items()},
+            "h": encode_h(p.get("h") or [])}
     for k, v in shards.items():
         json.dump(v, open(os.path.join(outdir, "p", f"{k}.json"), "w", encoding="utf-8"), ensure_ascii=False,
                   separators=(",", ":"))

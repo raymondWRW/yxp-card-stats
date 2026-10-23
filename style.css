@@ -330,3 +330,15 @@ footer #updated{margin-top:6px}
   .elo-table tbody tr{animation:rise .3s cubic-bezier(.2,.7,.2,1) var(--d,0ms) backwards}
   .elo-hits:not([hidden]){animation:drop .15s backwards}
 }
+
+.elo-histhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.elo-histhead h3{margin:0}
+.elo-modes button{padding:4px 10px;font-size:13px}
+.elo-zoomable{cursor:zoom-in;max-width:560px}
+.elo-chartwrap{position:relative}
+.elo-chartwrap.big .elo-chart{max-width:none}
+#eloZoom .popup-box{width:min(1180px,100%)}
+#eloZoom .elo-modes{margin-bottom:10px}
+.elo-table .up{color:var(--good);font-weight:600}
+.elo-table .down{color:var(--bad);font-weight:600}
+.lc-tip .up{color:#5fd88a}.lc-tip .down{color:#ff7a72}

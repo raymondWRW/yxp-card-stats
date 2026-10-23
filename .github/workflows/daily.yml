@@ -69,14 +69,15 @@ jobs:
       # the Parquet dataset. Its state lives in the Actions cache; if that entry has expired the
       # permanent `elo-state-seed` release is used and the missed shards are simply rated now
       # (the state records which shards it has processed). Never blocks the data refresh.
+      # v2: state carries each player's end-of-day rating history (key bumped with the format).
       - name: Restore Elo state
         if: ${{ !cancelled() }}                   # Elo doesn't depend on the stats step
         uses: actions/cache/restore@v4
         with:
           path: state/elo_state.pkl.zst
-          key: elo-state-${{ github.run_id }}
+          key: elo-state-v2-${{ github.run_id }}
           restore-keys: |
-            elo-state-
+            elo-state-v2-
 
       - name: Update Elo leaderboard
         if: ${{ !cancelled() }}
@@ -100,7 +101,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: state/elo_state.pkl.zst
-          key: elo-state-${{ github.run_id }}
+          key: elo-state-v2-${{ github.run_id }}
 
       # Vendored yxp_wiki card renderer (used with permission): re-copy it so new cards and
       # renderer fixes reach the site. A wiki outage must not block the data refresh.
