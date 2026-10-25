@@ -21,7 +21,7 @@ const UI = {
     all: "All", none: "None", allSel: "All", nSel: "selected", searchPh: "card name…",
     sect: "Sect", baseLevel: "base", overall: "overall",
     notEnough: "Not enough data to calculate win rate at this Min games.",
-    tabCards: "Cards · Tianji Sigil / Dream Weave", tabElo: "Leaderboard · Elo",
+    tabCards: "Cards · Tianji Sigil / Dream Weave", tabElo: "Leaderboard · Elo", zoomBoard: "Click to enlarge the board",
     subElo: "Skill rating from ranked + DaoXin games, comparable across rank tiers and seasons", tabBuilds10: "Season · Hundred Schools", tabBuilds9: "Season · Heavenly Derivation", top4rate: "Top-4 win rate",
     avgplace: "Avg placement", sidejobs: "Side-jobs played", power: "Power profile",
     boards: "Popular boards", matchup: "Placement vs character", realm: "Realm",
@@ -80,7 +80,7 @@ const UI = {
     all: "全部", none: "清空", allSel: "全部", nSel: "项已选", searchPh: "卡牌名称…",
     sect: "门派", baseLevel: "基础", overall: "总体",
     notEnough: "当前最少场次下数据不足，无法计算胜率。",
-    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabElo: "天梯 · Elo",
+    tabCards: "卡牌 · 天机刻印 / 临渊织梦", tabElo: "天梯 · Elo", zoomBoard: "点击放大卡组",
     subElo: "基于排位与道心对局的技术分，可跨段位、跨赛季比较", tabBuilds10: "赛季 · 百家之道", tabBuilds9: "赛季 · 天衍万象", top4rate: "前四胜率",
     avgplace: "平均名次", sidejobs: "搭配副职", power: "强度雷达",
     boards: "热门卡组", matchup: "对位名次", realm: "境界",
@@ -1253,7 +1253,7 @@ function cardImgs(fidxs, imgs) {
   const fam = BS.data.families;
   // imgs (v2) = per-slot most common card LEVEL id for this board; fall back to the
   // family's representative art on older data.
-  return fidxs.map((i, j) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; const im = (imgs && imgs[j]) || f.img; return `<img title="${nm}" loading="lazy" src="${cardSrc(im, S.lang)}" onerror="this.onerror=null;this.src='${WIKI}${im}_en.webp'">`; }).join("");
+  return fidxs.map((i, j) => { const f = fam[i]; const nm = (S.lang === "zh" ? f.cn : f.en) || f.cn || ""; const im = (imgs && imgs[j]) || f.img; return `<img title="${nm}" data-c="${im}" loading="lazy" src="${cardSrc(im, S.lang)}" onerror="this.onerror=null;this.src='${WIKI}${im}_en.webp'">`; }).join("");
 }
 function boardRowHTML(fidxs, raw, wc, ww, cls, hint, imgs) {
   const wr = wc ? ww / wc : 0;
@@ -1289,7 +1289,35 @@ function wireExpand(box) {
     const v = el.nextElementSibling;
     if (v && v.classList.contains("board-vars")) { v.hidden = !v.hidden; el.classList.toggle("open"); }
   });
+  // clicking a board's cards opens it zoomed (the rest of an expandable row still toggles its variations)
+  box.querySelectorAll(".board .cards").forEach((c) => {
+    c.title = t("zoomBoard");
+    c.onclick = (e) => { e.stopPropagation(); openBoardZoom(c.closest(".board")); };
+  });
 }
+// zoomed board: the same cards at full size with their names + the row's stats;
+// outside click, the x or Esc closes it (like the chart popup)
+function openBoardZoom(row) {
+  closeBoardZoom();
+  const cards = [...row.querySelectorAll(".cards img")].map((im) => ({ id: im.dataset.c, name: im.title || "" }));
+  const ov = document.createElement("div");
+  ov.id = "boardZoom"; ov.className = "popup-bg";
+  ov.innerHTML = `<div class="popup-box board-zoom"><button class="popup-x" aria-label="close">✕</button>` +
+    `<div class="bz-cards">` + cards.map((c, i) => `<figure><span class="bz-slot">${i + 1}</span>` +
+      `<img src="${cardSrc(c.id, S.lang)}" alt="${c.name}" onerror="this.onerror=null;this.src='${WIKI}${c.id}_en.webp'">` +
+      `<figcaption>${c.name}</figcaption></figure>`).join("") + `</div>` +
+    `<div class="bz-stat"></div></div>`;
+  const st = row.querySelector(".bstat");
+  if (st) { const s = st.cloneNode(true); s.querySelectorAll(".varhint").forEach((h) => h.remove()); ov.querySelector(".bz-stat").innerHTML = s.innerHTML.replace(/ · \s*$/, ""); }
+  ov.addEventListener("click", (e) => { if (!e.target.closest(".popup-box") || e.target.closest(".popup-x")) closeBoardZoom(); });
+  document.body.appendChild(ov);
+  document.addEventListener("keydown", boardZoomKey);
+}
+function closeBoardZoom() {
+  const ov = document.getElementById("boardZoom"); if (ov) ov.remove();
+  document.removeEventListener("keydown", boardZoomKey);
+}
+function boardZoomKey(e) { if (e.key === "Escape") closeBoardZoom(); }
 function matchupHTML(b) {
   // v2: matchup = head-to-head FINAL PLACEMENT vs each character (same lobby, real
   // >=3000 opponents). % = share of games this build finished above that character.

@@ -342,3 +342,21 @@ footer #updated{margin-top:6px}
 .elo-table .up{color:var(--good);font-weight:600}
 .elo-table .down{color:var(--bad);font-weight:600}
 .lc-tip .up{color:#5fd88a}.lc-tip .down{color:#ff7a72}
+
+/* zoomed board (click a board's cards) */
+.board .cards{cursor:zoom-in}
+.board-zoom{width:min(1180px,100%)}
+.bz-cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:8px 4px 4px}
+.bz-cards figure{margin:0;position:relative;width:min(132px,22vw);text-align:center}
+.bz-cards img{width:100%;aspect-ratio:308/508;object-fit:contain;border-radius:8px;background:#0c0e12}
+.bz-cards figcaption{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.25}
+.bz-slot{position:absolute;top:-6px;left:-6px;z-index:1;width:20px;height:20px;border-radius:50%;background:var(--panel2);
+  border:1px solid var(--line);color:var(--muted);font-size:11px;line-height:18px;text-align:center}
+.bz-stat{text-align:center;margin-top:10px;font-size:14px}
+@media (prefers-reduced-motion: no-preference){
+  .bz-cards figure{animation:pop .3s cubic-bezier(.2,.8,.2,1) backwards}
+  .bz-cards figure:nth-child(2){animation-delay:.03s}.bz-cards figure:nth-child(3){animation-delay:.06s}
+  .bz-cards figure:nth-child(4){animation-delay:.09s}.bz-cards figure:nth-child(5){animation-delay:.12s}
+  .bz-cards figure:nth-child(6){animation-delay:.15s}.bz-cards figure:nth-child(7){animation-delay:.18s}
+  .bz-cards figure:nth-child(8){animation-delay:.21s}
+}
