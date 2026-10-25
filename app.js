@@ -1308,7 +1308,7 @@ function openBoardZoom(row) {
       `<figcaption>${c.name}</figcaption></figure>`).join("") + `</div>` +
     `<div class="bz-stat"></div></div>`;
   const st = row.querySelector(".bstat");
-  if (st) { const s = st.cloneNode(true); s.querySelectorAll(".varhint").forEach((h) => h.remove()); ov.querySelector(".bz-stat").innerHTML = s.innerHTML.replace(/ · \s*$/, ""); }
+  if (st) { const s = st.cloneNode(true); s.querySelectorAll(".varhint").forEach((h) => h.remove()); ov.querySelector(".bz-stat").innerHTML = s.innerHTML.replace(/\s*·\s*(<\/span>)?\s*$/, "$1"); }
   ov.addEventListener("click", (e) => { if (!e.target.closest(".popup-box") || e.target.closest(".popup-x")) closeBoardZoom(); });
   document.body.appendChild(ov);
   document.addEventListener("keydown", boardZoomKey);
