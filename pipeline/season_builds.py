@@ -23,6 +23,7 @@ Usage:
   python season9_builds.py local       # test on ./_new.tar.zst only
   python season9_builds.py full         # all new (season-9) shards via API diff
 """
+import bisect
 import copy
 import io
 import json
@@ -50,6 +51,12 @@ SOURCE = os.environ.get("YXP_SOURCE") or "parquet"
 PARQUET_SRC = os.environ.get("YXP_PARQUET") or "www1234567890/Yi_Xian_Replay_Compressed"   # HF repo id or local dir
 
 SEASON = int(os.environ.get("YXP_SEASON") or 10)
+# Skill measure behind Power's skill adjustment (the swr/swr2/swrp sums): "elo" = the
+# player's Elo (pipeline/elo) at the end of the last UTC day BEFORE the game (so a game's
+# own result never feeds its skill estimate); players without an Elo history yet count as
+# ELO_START, the rating everyone starts at. "rank" = the in-game rank score (old behaviour).
+# The tier filter (3000/4000/6000 bands) stays on the rank score either way.
+SKILL = os.environ.get("YXP_SKILL") or "elo"
 # First shard worth scanning per season (found by probing the dataset around the season
 # rollover; everything earlier is skipped outright instead of downloaded-and-filtered).
 SEASON_START = {9: 0, 10: 33400000}
@@ -91,7 +98,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 16            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 17            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -490,6 +497,51 @@ def destiny_profile(sides):
     return {r: v * DESTINY_BASE / E for r, v in eff.items()}, E
 
 
+ELO_DIR = os.environ.get("YXP_ELO_DIR") or os.path.join(os.path.dirname(HERE), "data", "elo")
+ELO_START = 3000
+_ELO = {}                 # uid -> (array of days, array of end-of-day ratings), loaded once
+ELO_STATS = Counter()     # games scored with an Elo / with the ELO_START fallback
+
+
+def _load_elo():
+    """data/elo/p/*.json (exported by pipeline/elo): per player a delta-encoded end-of-day
+    rating history "h" = [day0, r0, dDay1, dR1, ...] (days since epoch, UTC)."""
+    import glob
+    from array import array
+    files = glob.glob(os.path.join(ELO_DIR, "p", "*.json"))
+    if not files:
+        raise SystemExit(f"YXP_SKILL=elo but no Elo histories in {ELO_DIR}/p (set YXP_SKILL=rank to use rank score)")
+    for fn in files:
+        with open(fn, encoding="utf-8") as f:
+            for uid, p in json.load(f).items():
+                h = p.get("h") or []
+                days, ratings = array("i"), array("i")
+                d = r = 0
+                for i in range(0, len(h) - 1, 2):
+                    d += h[i]; r += h[i + 1]
+                    days.append(d); ratings.append(r)
+                if days:
+                    _ELO[uid] = (days, ratings)
+    print(f"Elo histories loaded: {len(_ELO)} players from {ELO_DIR}")
+
+
+def skill_of(d):
+    """Skill value of this record's player (see SKILL)."""
+    if SKILL != "elo":
+        return d.get("beginRankScore", 0) or 0
+    if not _ELO:
+        _load_elo()
+    e = _ELO.get(str(d["uid"]))
+    if e is not None:
+        ts = d.get("endTs") or d.get("beginTs") or T_REF
+        i = bisect.bisect_right(e[0], ts // 86400000 - 1)    # last day strictly before the game's day
+        if i:
+            ELO_STATS["elo"] += 1
+            return e[1][i - 1]
+    ELO_STATS["start"] += 1
+    return ELO_START
+
+
 def process_record(d):
     """d is a season-9 mode-3 daoxin>=3000 SELF-record's data dict."""
     uid = d["uid"]
@@ -525,8 +577,8 @@ def process_record(d):
     c = STATE["char"][char]
     b["gw"] += w; b["graw"] += 1; c["gw"] += w; c["graw"] += 1
     b["place"][rank] += w
-    # rank-score sufficient stats for the within-character skill slope
-    p = rank + 1; r = d.get("beginRankScore", 0) or 0
+    # skill sufficient stats for the within-character skill slope (Elo by default, see SKILL)
+    p = rank + 1; r = skill_of(d)
     c["swr"] += w * r; c["swr2"] += w * r * r; c["swrp"] += w * r * p
     # tier band (A=3000-3999, B=4000-5999, C=6000+ on TIER_FIELD) for the tier filter
     dx = d.get(TIER_FIELD) or 0
@@ -956,6 +1008,10 @@ def write_output():
     V_DERIVS = output_view(STATE["derivs"], vmap)
     V_DAOYUN = output_view(STATE["daoyun"], vmap)
     V_XIANMO = output_view(STATE["xianmo"], vmap)
+    if ELO_STATS:
+        n = sum(ELO_STATS.values())
+        print(f"skill = Elo: {ELO_STATS['elo']} records with a prior-day Elo, {ELO_STATS['start']} "
+              f"({ELO_STATS['start'] / n * 100:.1f}%) without one counted as {ELO_START}")
     mu = STATE["mu"]; tot = mu["kept"] + mu["dropped"]
     waiting = mu.get("waiting_n", sum(len(v) for v in mu["pending"].values()))
     dist = sorted(mu["dist"].items()); n = sum(c for _, c in dist); acc = 0; p999 = 0
@@ -1111,7 +1167,7 @@ def write_output():
     # Split into a light file (drives the character leaderboard, loads instantly) and a
     # heavy file (build detail: boards/matchups/families, lazy-loaded on first build open).
     light = {
-        "meta": {"season": SEASON, "mode": 3, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
+        "meta": {"season": SEASON, "mode": 3, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4, "skill": SKILL,
                  "selfRecords": STATE["self"], "shards": STATE["shards"], "wcRound": WC_ROUND,
                  "generated": generated},
         "chars": char_out, "tiers": tiers_out, "wc": wc_out,

@@ -51,27 +51,15 @@ jobs:
             python -u pipeline/convert_to_parquet.py run --target "$TARGET" --chunks $chunks
           fi
 
-      - name: Build daily statistics and site data
-        env:
-          YXP_PROXY: ${{ github.workspace }}/pipeline
-          YXP_OUTDIR: ${{ github.workspace }}/data
-          YXP_PARQUET: www1234567890/Yi_Xian_Replay_Compressed
-          YXP_DAILY_BUDGET_MIN: "120"
-          YXP_SPLIT_VARIANTS: "1"                   # per-strategy sub-builds (strategy_signatures.json + fate rules)
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}          # authenticated reads: higher rate limits
-          HF_HUB_DOWNLOAD_TIMEOUT: "60"
-        # [mem] lines every 30s, so a memory problem is visible in the log
-        run: |
-          ( while sleep 30; do echo "[mem] $(date -u +%H:%M:%S) $(free -m | awk '/Mem:/{print "used "$3" / "$2" MB, avail "$7}')"; done ) &
-          python -u pipeline/daily_stats.py
-
       # Elo leaderboard (pipeline/elo): rates only source shards it hasn't rated yet, read from
       # the Parquet dataset. Its state lives in the Actions cache; if that entry has expired the
       # permanent `elo-state-seed` release is used and the missed shards are simply rated now
       # (the state records which shards it has processed). Never blocks the data refresh.
+      # Runs BEFORE the stats build: Power's skill adjustment reads these Elo histories
+      # (data/elo/p), so they must include yesterday's games.
       # v2: state carries each player's end-of-day rating history (key bumped with the format).
       - name: Restore Elo state
-        if: ${{ !cancelled() }}                   # Elo doesn't depend on the stats step
+        if: ${{ !cancelled() }}
         uses: actions/cache/restore@v4
         with:
           path: state/elo_state.pkl.zst
@@ -102,6 +90,20 @@ jobs:
         with:
           path: state/elo_state.pkl.zst
           key: elo-state-v2-${{ github.run_id }}
+
+      - name: Build daily statistics and site data
+        env:
+          YXP_PROXY: ${{ github.workspace }}/pipeline
+          YXP_OUTDIR: ${{ github.workspace }}/data
+          YXP_PARQUET: www1234567890/Yi_Xian_Replay_Compressed
+          YXP_DAILY_BUDGET_MIN: "120"
+          YXP_SPLIT_VARIANTS: "1"                   # per-strategy sub-builds (strategy_signatures.json + fate rules)
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}          # authenticated reads: higher rate limits
+          HF_HUB_DOWNLOAD_TIMEOUT: "60"
+        # [mem] lines every 30s, so a memory problem is visible in the log
+        run: |
+          ( while sleep 30; do echo "[mem] $(date -u +%H:%M:%S) $(free -m | awk '/Mem:/{print "used "$3" / "$2" MB, avail "$7}')"; done ) &
+          python -u pipeline/daily_stats.py
 
       # Vendored yxp_wiki card renderer (used with permission): re-copy it so new cards and
       # renderer fixes reach the site. A wiki outage must not block the data refresh.
