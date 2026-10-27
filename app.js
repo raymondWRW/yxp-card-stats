@@ -32,6 +32,7 @@ const UI = {
     ri_m: "Mid (R{c}–{d}): average destiny damage taken per round in rounds {c}–{d}, compared with the top 50 strategies as a z-score (dashed ring = average, each ring = 1 sd). Bigger = takes less damage.",
     ri_l: "Late (R{e}+): average destiny damage taken per round from round {e} on, compared with the top 50 strategies as a z-score (dashed ring = average, each ring = 1 sd). Bigger = takes less damage.",
     riNorm: "Normalized for extra destiny: destiny gained outside combat (fates, absorbed cards) and damage reductions (慈念曲, 龙鳞…) raise the player's effective starting destiny, and each round's damage (before reductions) is scaled to a 100-destiny pool.",
+    riDeath: "The round a player is eliminated in counts with its full damage, so over a whole game the damage adds up to all of the player's destiny: strategies that last longer show less damage per round.",
     ri_pop: "Popularity: the number is this character+side-job's percentile rank (0–100) by games played among the top 50 combos (shared by its sub-strategies). The shape is the z-score of its log game count in that group (dashed ring = average, each ring = 1 sd). Bigger = more popular.",
     ri_cx: "Simplicity (0–100): from R12 on, how small the effective card pool is and how few choices each slot has. The number is a percentile rank vs the top 50 strategies; the shape is the z-score (log scale; dashed ring = average, each ring = 1 sd). Bigger = simpler deck.",
     ri_f: "First: average destiny damage taken per round when acting first. Bigger = takes less.",
@@ -91,6 +92,7 @@ const UI = {
     ri_m: "中期（第{c}–{d}回合）：第{c}–{d}回合每回合承受的命元伤害，与热门前50角色流派以 z 分数比较（虚线圈 = 平均，每圈 = 1 个标准差）。数值越大 = 承伤越低。",
     ri_l: "后期（第{e}回合起）：第{e}回合起每回合承受的命元伤害，与热门前50角色流派以 z 分数比较（虚线圈 = 平均，每圈 = 1 个标准差）。数值越大 = 承伤越低。",
     riNorm: "已按额外命元校正：战斗外获得的命元（天命、吸收卡牌等）与命元伤害减免（慈念曲、龙鳞等）计入有效初始命元，每回合（减免前的）伤害按 100 命元折算。",
+    riDeath: "被淘汰的那一回合按全额伤害计入，因此整局承伤恰好等于玩家的全部命元：坚持得越久，每回合承伤越低。",
     ri_pop: "人气：数字 = 该角色+副职在热门前50组合中按对局数的百分位排名（0–100，分支流派共享）；形状 = 对局数（对数）在该组中的 z 分数（虚线圈 = 平均，每圈 = 1 个标准差）。越大 = 越热门。",
     ri_cx: "简易（0–100）：12回合后有效卡池越小、各槽位选择越少得分越高。数字 = 相对热门前50流派的百分位排名；形状 = z 分数（对数尺度；虚线圈 = 平均，每圈 = 1 个标准差）。越大 = 卡组越简单。",
     ri_f: "先手：先手时每回合承受的命元伤害。数值越大 = 承伤越低。",
@@ -789,6 +791,7 @@ async function ensureBuilds() {
   BS.v5 = (bd.v || 1) >= 5;                // curves are per-tier medians since v5
   BS.rsplit = bd.rs || [7, 13];
   BS.dnorm = !!bd.dn;                      // e/m/l damage normalised for extra destiny (destiny_profile)
+  BS.dfull = (bd.dn || 0) >= 2;            // ...and the elimination round is included (dn 2)
   BS.v6 = (bd.v || 1) >= 6;                // radar = e/m/l dmg + first-rate + complexity since v6
   if (!BS.v3) {                          // v3 percentile pools are built per-tier on demand
     const axv = {}; RADAR_AXES_V5.forEach(([k]) => axv[k] = []);
@@ -1558,7 +1561,7 @@ function wireBuilds() {
     const g = e.target.closest && e.target.closest(".rinfo"); if (!g) return;
     e.stopPropagation();
     const p = document.createElement("div"); p.className = "rpop"; const sp = BS.rsplit || [7, 13];   // phase boundaries come from the data (S9 frozen = 7/13, S10 = 9/13)
-    p.textContent = t("ri_" + g.dataset.k).replace(/\{a\}/g, 1).replace(/\{b\}/g, sp[0]).replace(/\{c\}/g, sp[0] + 1).replace(/\{d\}/g, sp[1]).replace(/\{e\}/g, sp[1] + 1) + (BS.dnorm && "eml".includes(g.dataset.k) ? " " + t("riNorm") : "");
+    p.textContent = t("ri_" + g.dataset.k).replace(/\{a\}/g, 1).replace(/\{b\}/g, sp[0]).replace(/\{c\}/g, sp[0] + 1).replace(/\{d\}/g, sp[1]).replace(/\{e\}/g, sp[1] + 1) + (BS.dnorm && "eml".includes(g.dataset.k) ? " " + t("riNorm") : "") + (BS.dfull && "eml".includes(g.dataset.k) ? " " + t("riDeath") : "");
     document.body.appendChild(p);
     const r = g.getBoundingClientRect();
     p.style.left = Math.max(8, Math.min(r.left + scrollX - 20, scrollX + innerWidth - p.offsetWidth - 8)) + "px";
