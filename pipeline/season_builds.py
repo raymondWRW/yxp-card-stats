@@ -98,7 +98,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 17            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 18            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -461,11 +461,15 @@ def destiny_profile(sides):
     Effective total E = 100 + extra = what the player would have needed to start with to end
     on the same destiny with no modifiers. Returns ({round: effective damage taken, scaled
     to a 100-destiny pool}, E).
-    The round the player is eliminated in is left OUT of the result (neither damage nor a
-    round): its overkill would inflate the phase, while capping it at the destiny left makes
-    it near-zero for death-prevention builds (谭舒雁/小布 化身 leave them at 1). A between-round
-    drop to exactly 0 is a forfeit (quitting zeroes destiny), not destiny spent, so it doesn't
-    lower E."""
+    The round the player is eliminated in is KEPT at its full damage (SCHEMA 18), and its
+    overkill (damage beyond the destiny left) is part of E like any other unexplained
+    difference -- so an eliminated player's rounds add up to their whole effective pool, and
+    lasting longer necessarily shows as less damage per round. (Dropping the death round, as
+    before, hid survival: death-prevention builds such as 谭舒雁/小布 化身, which live at 1
+    destiny for several rounds, read as weak late game while outlasting their lobby; keeping
+    it raised the e/m/l axes' correlation with placement across builds from 0.65 to 0.78.)
+    A between-round drop to exactly 0 is a forfeit (quitting zeroes destiny), not destiny
+    spent, so it doesn't lower E."""
     eff, extra = {}, 0
     prev_r = prev_life = None
     for rs, side, _, selfp in sides:
@@ -490,9 +494,6 @@ def destiny_profile(sides):
         else:
             extra += raw - recv; prev_r = None
         eff[rnd] = raw
-    last = sides[-1]
-    if (last[1]["publicData"].get("life") or 0) <= 0:         # eliminated: drop the death round
-        eff.pop(last[0].get("round") or 0, None)
     E = max(DESTINY_E_MIN, DESTINY_BASE + extra)
     return {r: v * DESTINY_BASE / E for r, v in eff.items()}, E
 
@@ -1181,7 +1182,7 @@ def write_output():
     heavy = {
         "v": 6,
         "rs": [RADAR_EARLY_END, RADAR_MID_END],     # radar phase boundaries, so the site labels follow the data
-        "dn": 1,                                    # e/m/l = destiny taken normalised for extra destiny (destiny_profile)
+        "dn": 2,                                    # e/m/l = destiny taken normalised for extra destiny (destiny_profile); 2: death round included
         "builds": builds_out,
         "families": [{**m, "pop": r2(STATE["fam_pop"].get(m["i"], 0))} for m in STATE["fam_meta"]],
     }
