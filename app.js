@@ -44,7 +44,7 @@ const UI = {
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "destiny dmg taken per round by phase (number = actual, larger shape = takes less)",
     powerNote6: "early/mid/late: destiny dmg taken per round, ranked against the top 50 character+side-job strategies (larger shape = takes less) · popularity: percentile of total games played, shared by a combo's sub-strategies (bigger = more popular) · simplicity: percentile rank of needing a small card pool & few per-slot choices (R12+; bigger = simpler)",
-    powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player rank; 50 = average character; small samples regress toward 50)",
+    powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player skill via Elo; 50 = average character; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "Rank ≥", notAtTier: "This build doesn't exist at this rank tier (no games).",
     wheelchair: "Wheelchair index", strategies: "strategies",
@@ -103,7 +103,7 @@ const UI = {
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段每回合承受命元伤害（数字为实际，形状越大承伤越低）",
     powerNote6: "前/中/后期：每回合承受命元伤害（形状越大承伤越低，与热门前50角色流派比较）· 人气：该角色+副职总出场量的百分位（越大越热门，分支共享） · 卡组简易程度：有效卡池小、槽位选择少的百分位得分（12回合后，0-100，越大越简单，与热门前50角色流派比较）",
-    powerScore: "强度", powerTip: "经玩家段位校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
+    powerScore: "强度", powerTip: "经玩家 Elo 校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "段位分 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
     wheelchair: "轮椅指数", strategies: "策略",
@@ -811,7 +811,8 @@ async function ensureBuilds() {
   BS.loaded = true;
 }
 // Power = standardized, SKILL-ADJUSTED average placement (recency-weighted).
-// Controls for player skill (rank score): each character's placement is re-baselined to
+// Controls for player skill (the player's Elo at the end of the previous day; rank score
+// before SCHEMA 17 -- meta.skill says which): each character's placement is re-baselined to
 // an average-skill pilot, removing the "only strong mains still play it" inflation.
 //   b   = within-character slope of placement vs rank  = Σ_c(swrp - swr·AP_c) / Σ_c(swr² - swr²/sw)
 //   adj = AP_c − b·(R_c − R̄)      (R_c = avg rank, R̄ = global avg rank)

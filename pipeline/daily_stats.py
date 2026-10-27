@@ -48,7 +48,7 @@ import season_builds as sb         # noqa: E402
 DAILY_DIR = os.environ.get("YXP_DAILY") or os.path.join(os.path.dirname(HERE), "data", "daily", f"s{sb.SEASON}")
 PERIODS = os.path.join(DAILY_DIR, "periods")
 FAMILIES = os.path.join(DAILY_DIR, "families.json")
-FORMAT = 2                          # bump to rebuild every period (layout / accumulator change); 2: strategy-variant split back on
+FORMAT = 3                          # bump to rebuild every period (layout / accumulator change); 2: strategy-variant split back on; 3: Power skill = Elo
 
 # board tables kept per (character, side job, phase) when a week is compacted (and when
 # combining for the site): more than the 20 / 8 the site shows, so the published top lists
