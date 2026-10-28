@@ -132,3 +132,18 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+      # Mirror the refreshed site to the Hong Kong server (https://elo.kaigua.vip/), which
+      # GitHub Pages can't serve reliably from China. Needs the DEPLOY_SSH_KEY secret.
+      - name: Deploy to server
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then echo "DEPLOY_SSH_KEY secret not set, skipping"; exit 0; fi
+          install -m 700 -d ~/.ssh
+          printf '%s
+' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          echo "162.211.181.181 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA6Gy68Fzq9iwLiSc4UTxYDxAJPsylEXClIoGE6+axyt" > ~/.ssh/known_hosts
+          rsync -rltz --delete --exclude=.git --exclude=.github --exclude=pipeline --exclude=README.md             -e "ssh -i ~/.ssh/deploy_key -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes"             ./ root@162.211.181.181:/var/www/yxp/

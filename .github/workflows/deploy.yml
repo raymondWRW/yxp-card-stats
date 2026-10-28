@@ -1,0 +1,34 @@
+name: Deploy to server
+
+# Copies the static site to the Hong Kong server (https://elo.kaigua.vip/). daily.yml has
+# the same step after its data commit (pushes made with GITHUB_TOKEN don't trigger this
+# workflow), so this one covers manual commits and manual runs.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "pipeline/**"
+      - ".github/**"
+      - "README.md"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Rsync site to server
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then echo "DEPLOY_SSH_KEY secret not set"; exit 1; fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          echo "162.211.181.181 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA6Gy68Fzq9iwLiSc4UTxYDxAJPsylEXClIoGE6+axyt" > ~/.ssh/known_hosts
+          rsync -rltz --delete --exclude=.git --exclude=.github --exclude=pipeline --exclude=README.md \
+            -e "ssh -i ~/.ssh/deploy_key -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes" \
+            ./ root@162.211.181.181:/var/www/yxp/
