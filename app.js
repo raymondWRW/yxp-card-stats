@@ -13,7 +13,7 @@ const STRIDE = 8; // [seasonIdx, charIdx, career, fam, level, round, wins, losse
 // ---- i18n ------------------------------------------------------------------
 const UI = {
   en: {
-    title: "Yi Xian Stats", subPre: "Win rate & popularity from",
+    title: "Yi Xian Stats", home: "← Home", subPre: "Win rate & popularity from",
     subMid: "card-battles ·", subPost: "cards shown", tier: "DaoXin tier",
     language: "Language", season: "Season", career: "Career", character: "Character",
     rounds: "Rounds", sortby: "Sort by", popularity: "Popularity", winrate: "Win rate",
@@ -74,7 +74,7 @@ const UI = {
     loading: "Loading…", updating: "Matchup data is refreshing — check back shortly.",
   },
   zh: {
-    title: "弈仙牌 数据", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
+    title: "弈仙牌 数据", home: "← 首页", subPre: "数据来自", subMid: "次出战 ·", subPost: "张卡牌",
     tier: "道心段位", language: "语言", season: "赛季", career: "副职", character: "角色",
     rounds: "回合", sortby: "排序", popularity: "使用率", winrate: "胜率", cardname: "名称",
     mingames: "最少场次", search: "搜索", nomatch: "没有符合条件的卡牌。",
@@ -174,9 +174,15 @@ async function boot() {
   NAMES = await fetch("data/names.json").then((r) => r.json());
   wireStatic();
   wireBuilds();
-  setBuildsSeason(10);       // the current season's Builds is the default landing view
-  BS.active = true;
-  await loadBuilds();
+  // Each tool page (hundred_school/, elo/, ...) is this app opened on a tab (body[data-start], see make_pages.py).
+  const start = document.body.dataset.start || "builds10";
+  if (start === "builds10") {
+    setBuildsSeason(10);     // the current season's Builds is the default landing view
+    BS.active = true;
+    await loadBuilds();
+  } else {
+    document.querySelector(`#tabbar .tab[data-tab="${start}"]`).click();
+  }
   applyLang();
 }
 let CARDS_INIT = false;      // cards data is loaded lazily on first Cards-tab open
@@ -1529,8 +1535,14 @@ function fatesSectionHTML(key) {
   }
   return h;
 }
+// tab -> page URL, so switching tabs keeps the address bar shareable
+const TAB_ROUTE = { builds10: "hundred_school", builds9: "heavenly_derivation", cards: "cards", elo: "elo" };
+function syncUrl(tab) {
+  try { history.replaceState(null, "", new URL(".", document.baseURI).pathname + TAB_ROUTE[tab] + "/"); } catch (e) { /* file:// etc. */ }
+}
 function wireBuilds() {
   document.querySelectorAll("#tabbar .tab").forEach((tb) => tb.onclick = () => {
+    syncUrl(tb.dataset.tab);
     document.querySelectorAll("#tabbar .tab").forEach((x) => x.classList.remove("on")); tb.classList.add("on");
     const isB = tb.dataset.tab.startsWith("builds"), isE = tb.dataset.tab === "elo";
     $("#view-cards").hidden = isB || isE; $("#view-builds").hidden = !isB; $("#view-elo").hidden = !isE;
