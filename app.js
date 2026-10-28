@@ -1,5 +1,9 @@
 "use strict";
-const WIKI = "https://sharpobject.github.io/yxp_wiki/assets/cards/";
+// Card art: self-hosted mirror (served by the Hong Kong server under /yxp_wiki/assets/, GitHub Pages
+// is unreliable from China). On github.io / localhost / file:// fall back to the live wiki.
+const WIKI_BASE = /(^|\.)github\.io$|^localhost$|^127\.|^$/.test(location.hostname) ? "https://sharpobject.github.io/yxp_wiki/assets/" : "/yxp_wiki/assets/";
+const WIKI = WIKI_BASE + "cards/";
+const localWiki = (u) => (u ? u.replace("https://sharpobject.github.io/yxp_wiki/assets/", WIKI_BASE) : u);
 // Card faces: the yxp_wiki renderer (vendored under vendor/card-components, used with
 // permission) composes each card in a worker and caches it; YxpCards.source() hands the
 // <img> a placeholder it hydrates. Without the runtime, fall back to the wiki's WebP.
@@ -640,7 +644,7 @@ function wireStatic() {
 // ============================================================================
 //  BUILDS VIEW (per season, hsreplay-style)
 // ============================================================================
-const WIKI_ROOT = "https://sharpobject.github.io/yxp_wiki/assets/";
+const WIKI_ROOT = WIKI_BASE;
 const charAvatar = (id) => `${WIKI_ROOT}characters/${id}-avatar.webp`;
 const sidejobBadge = (c) => `${WIKI_ROOT}side-jobs/side_job_badge_${c}.webp`;
 const RADAR_AXES_V5 = [["e", "axisEarly"], ["m", "axisMid"], ["l", "axisLate"], ["f", "axisFirst"], ["s", "axisSecond"]];
@@ -807,9 +811,9 @@ async function ensureBuilds() {
     BS.data.fates = fd.fates; BS.data.derivations = fd.derivations; BS.data.fnames = fd.names; BS.data.dnames = fd.dnames;
     BS.data.daoyun = fd.daoyun; BS.data.ynames = fd.ynames;
     BS.data.xianmo = fd.xianmo; BS.data.xnames = fd.xnames;   // 百家之道 仙命 (season 10+)
-    BS.xmIconBase = (fd.meta && fd.meta.xmIconBase) || "https://sharpobject.github.io/yxp_wiki/assets/hundred-schools/icons/";
+    BS.xmIconBase = localWiki(fd.meta && fd.meta.xmIconBase) || (WIKI_BASE + "hundred-schools/icons/");
     BS.fv3 = (fd.v || 1) >= 3;           // selection rows are per-DaoXin-band since v3
-    BS.iconBase = (fd.meta && fd.meta.iconBase) || "https://sharpobject.github.io/yxp_wiki/assets/fates/";
+    BS.iconBase = localWiki(fd.meta && fd.meta.iconBase) || (WIKI_BASE + "fates/");
   } catch (e) { /* no fate data yet — the Fates/天衍 sections just won't render */ }
   BS.loaded = true;
 }

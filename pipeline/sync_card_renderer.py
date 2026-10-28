@@ -18,7 +18,8 @@ REPO = "https://github.com/sharpobject/yxp_wiki.git"
 SUB = "assets/card-components"
 WIKI_CARDS = "https://sharpobject.github.io/yxp_wiki/assets/cards/"
 FALLBACK_OLD = "return new URL(`../../cards/${key}.webp`,base).href;"
-FALLBACK_NEW = f"return '{WIKI_CARDS}'+key+'.webp';"
+FALLBACK_NEW = (r"return (/(^|\.)github\.io$|^localhost$|^127\.|^$/.test(location.hostname)?'" + WIKI_CARDS
+                + r"':'/yxp_wiki/assets/cards/')+key+'.webp';")
 
 
 def main():

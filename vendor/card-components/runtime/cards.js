@@ -20,7 +20,7 @@ function keyFor(url){
 function fallback(key){
   if(key.startsWith('KeYinCard_'))return new URL(`../../sigils/${key.split('_').at(-1)}/${key}.webp`,base).href;
   if(key.startsWith('heart-'))return new URL(`../../recordings/clear-heart/${key.slice(6)}.webp`,base).href;
-  return 'https://sharpobject.github.io/yxp_wiki/assets/cards/'+key+'.webp';
+  return (/(^|\.)github\.io$|^localhost$|^127\.|^$/.test(location.hostname)?'https://sharpobject.github.io/yxp_wiki/assets/cards/':'/yxp_wiki/assets/cards/')+key+'.webp';
 }
 function sourceUrl(url){const key=keyFor(url);return key?source(key):url;}
 function getWorker(){
