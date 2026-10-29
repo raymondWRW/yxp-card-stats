@@ -61,6 +61,8 @@ def main():
             gm = g.get(r["game_id"])
             if gm is None or not r["has_self_record"] or r["is_ai"] or r["battle_rank"] is None:
                 continue
+            if uidhash.is_placeholder(r["uid"]):    # 'record-player-N' = many different people behind one slot
+                continue
             e = games.setdefault(r["game_id"], [gm["end_ts"] or 0, []])
             e[0] = max(e[0], r["end_ts"] or 0)
             e[1].append([uidhash.hash_uid(r["uid"]), r["battle_rank"] + 1, 1 if gm["is_daoxin"] else 0, gm["season"], ""])

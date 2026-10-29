@@ -66,9 +66,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: state/elo_state.pkl.zst
-          key: elo-state-v2-${{ github.run_id }}
+          key: elo-state-v3-${{ github.run_id }}
           restore-keys: |
-            elo-state-v2-
+            elo-state-v3-
 
       - name: Update Elo leaderboard
         if: ${{ !cancelled() }}
@@ -92,7 +92,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: state/elo_state.pkl.zst
-          key: elo-state-v2-${{ github.run_id }}
+          key: elo-state-v3-${{ github.run_id }}
 
       - name: Build daily statistics and site data
         env:

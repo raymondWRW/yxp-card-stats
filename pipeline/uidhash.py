@@ -34,8 +34,25 @@ def _load_key():
     return _key
 
 
+PLACEHOLDER_PREFIX = "record-player-"   # the source's anonymised slots (username 修仙者N), shared by many people
+_placeholder_hashes = None
+
+
 def is_bot(uid):
-    return not uid or str(uid).startswith("ai")
+    return not uid or str(uid).startswith("ai") or str(uid).startswith(PLACEHOLDER_PREFIX)
+
+
+def is_placeholder(uid):
+    """True for the source's shared 'record-player-N' slots, raw or in the form hashed before they were exempted."""
+    global _placeholder_hashes
+    uid = str(uid)
+    if uid.startswith(PLACEHOLDER_PREFIX):
+        return True
+    if _placeholder_hashes is None:
+        k = _load_key()
+        _placeholder_hashes = {hmac.new(k, f"{PLACEHOLDER_PREFIX}{i}".encode(), hashlib.sha256).hexdigest()[:HASH_LEN]
+                               for i in range(1, 65)}
+    return uid in _placeholder_hashes
 
 
 def is_hashed(uid):
