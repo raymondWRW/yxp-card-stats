@@ -31,6 +31,7 @@ import math
 import os
 import re
 import sys
+import uidhash
 import time
 import pickle
 import tarfile
@@ -532,7 +533,7 @@ def skill_of(d):
         return d.get("beginRankScore", 0) or 0
     if not _ELO:
         _load_elo()
-    e = _ELO.get(str(d["uid"]))
+    e = _ELO.get(uidhash.hash_uid(d["uid"]))      # data/elo/p/*.json is keyed by the pseudonymised uid
     if e is not None:
         ts = d.get("endTs") or d.get("beginTs") or T_REF
         i = bisect.bisect_right(e[0], ts // 86400000 - 1)    # last day strictly before the game's day

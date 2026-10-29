@@ -16,6 +16,9 @@ on:
 permissions:
   contents: write
 
+env:
+  YXP_UID_KEY: ${{ secrets.UID_HASH_KEY }}   # pseudonymises uids (pipeline/uidhash.py); NEVER commit the key
+
 concurrency:
   group: daily-refresh
   cancel-in-progress: false

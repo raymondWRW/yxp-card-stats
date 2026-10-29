@@ -55,6 +55,15 @@ the stable fields are typed columns, and everything season-specific is kept in a
 - Dropped on purpose: cosmetics (skins, card backs, scene / scroller / defeat-effect ids). Usernames are not
   in the game tables; they live only in the small separate `names` table.
 
+## Privacy: pseudonymised player ids
+
+Every player `uid` (`players.uid`, `rounds.uid`, `rounds.opp_uid`, `names.uid`) is replaced by a pseudonym: the first 16 hex
+characters of `HMAC-SHA256(secret key, raw uid)`. The same player always gets the same id across all tables, chunks and
+seasons, so per-player analysis (ladders, match-ups, opponent history) still works, but the raw uid cannot be recovered or
+recomputed without the key. Bot opponents (`ai...`) are not players and keep their ids. A raw uid is 24 hex characters, a
+pseudonym 16. Chunk manifests carry `uid_hashed: 1`. **Limits:** `game_id` and timestamps are unchanged, so a game can still
+be looked up in the (public, raw-uid) source dataset; and `names` still maps a pseudonym to the username it plays under.
+
 ## Layout
 
 ```

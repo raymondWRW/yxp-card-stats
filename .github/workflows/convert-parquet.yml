@@ -17,6 +17,7 @@ on:
         default: "4"
 
 env:
+  YXP_UID_KEY: ${{ secrets.UID_HASH_KEY }}   # pseudonymises uids (pipeline/uidhash.py); NEVER commit the key
   TARGET: www1234567890/Yi_Xian_Replay_Compressed
 
 jobs:

@@ -7,10 +7,13 @@ starts a new season and with inactivity (never above the starting sigma), so ret
 re-converge quickly. Display: everyone starts at 3000; rating = 3000 + SCALE * (mu - MU0), SCALE so
 that the starting sigma spans 400 points. Leaderboards sort by the conservative rating (mu - 2 sigma).
 """
-import json, math, os, pickle
+import json, math, os, pickle, sys
 
 import zstandard
 from openskill.models import PlackettLuce
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import uidhash   # pseudonymised player ids (pipeline/uidhash.py)
 
 MU0, SIGMA0 = 25.0, 25.0 / 3
 BETA = float(os.environ.get("ELO_BETA") or 25.0 / 6)
@@ -91,7 +94,7 @@ def rate_game(m, P, ts, ent):
 def save_state(path, P, done_shards, last_ts):
     tmp = path + ".tmp"
     with open(tmp, "wb") as f, zstandard.ZstdCompressor(level=6).stream_writer(f) as z:
-        pickle.dump({"params": params(), "P": P, "done": set(done_shards), "last": last_ts}, z, protocol=5)
+        pickle.dump({"params": params(), "P": {uidhash.hash_uid(u): p for u, p in P.items()}, "done": set(done_shards), "last": last_ts}, z, protocol=5)
     os.replace(tmp, path)
 
 
@@ -100,6 +103,9 @@ def load_state(path):
         st = pickle.load(zstandard.ZstdDecompressor().stream_reader(f))
     if st["params"] != params():
         raise SystemExit(f"state was built with {st['params']}, current settings {params()}: rebuild it")
+    # privacy: players are keyed by pseudonymised uid. States saved before that carry raw uids; re-key them
+    # (idempotent: already-hashed ids and bots pass through), so old states/seed releases keep working.
+    st["P"] = {uidhash.hash_uid(u): p for u, p in st["P"].items()}
     return st
 
 

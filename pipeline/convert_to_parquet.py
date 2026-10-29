@@ -33,7 +33,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import zstandard
 
+import uidhash
+
 BASE = "https://huggingface.co/datasets/sharpobject/yxp_replays/resolve/main"
+UID_COLS = {"names": ["uid"], "players": ["uid"], "rounds": ["uid", "opp_uid"]}   # columns holding player uids
 FORMAT_VERSION = 2   # 2: + life_start / start_state (lastRoundData is NOT a copy of the previous round), + players.begin_ts/end_ts (endTs is per player)
 
 # fields lifted into typed round columns; everything else (minus DROP_*) goes to `extra`
@@ -157,6 +160,9 @@ class Chunk:
             "rounds": pa.Table.from_pylist(list(self.rounds.values()), schema=ROUNDS_SCHEMA),
         }
         out["rounds"] = out["rounds"].sort_by([("game_id", "ascending"), ("round", "ascending")])
+        # privacy: every uid leaves this converter pseudonymised (pipeline/uidhash.py; bots untouched)
+        for t, cols in UID_COLS.items():
+            out[t] = uidhash.hash_table(out[t], cols)
         return out
 
 
@@ -316,7 +322,7 @@ def upload_chunks(api, target, done, workdir):
     ops = []
     for key, shards in done.items():
         mpath = os.path.join(workdir, f"c{key}.manifest.json")
-        json.dump({"format_version": FORMAT_VERSION, "chunk": key, "shards": sorted(shards)},
+        json.dump({"format_version": FORMAT_VERSION, "chunk": key, "shards": sorted(shards), "uid_hashed": 1},
                   open(mpath, "w"))
         ops += [CommitOperationAdd(f"{t}/c{key}.parquet", os.path.join(workdir, t, f"c{key}.parquet"))
                 for t in SCHEMAS]
@@ -387,7 +393,7 @@ def cmd_local(a):
         print(f"{sid}: {seen} files, {kept} ranked records, {time.time() - t0:.1f}s", file=sys.stderr)
     w.close()
     os.makedirs(os.path.join(a.out, "manifest"), exist_ok=True)
-    json.dump({"format_version": FORMAT_VERSION, "chunk": name[1:] if name[:1] == "c" else name,
+    json.dump({"format_version": FORMAT_VERSION, "uid_hashed": 1, "chunk": name[1:] if name[:1] == "c" else name,
                "shards": sorted(ids)}, open(os.path.join(a.out, "manifest", name + ".json"), "w"))
 
 

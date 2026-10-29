@@ -1,0 +1,40 @@
+name: Pseudonymise dataset uids
+
+# One-off migration of the published Parquet dataset: rewrites players/rounds/names so every player
+# uid is HMAC-hashed (pipeline/hash_dataset.py + pipeline/uidhash.py). Manual only. Re-runnable:
+# chunks already carrying "uid_hashed" in their manifest are skipped. Needs the HF_TOKEN secret (write
+# access) and the UID_HASH_KEY secret. Does NOT rewrite git history (old commits keep raw uids until
+# the HF repo history is squashed). Don't run while "Convert replays to Parquet" is running.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Migrate at most this many chunks this run (0 = all not yet hashed). Try 2 first."
+        default: "2"
+      batch:
+        description: "Chunks per HF commit (HF allows ~128 commits/hour)"
+        default: "6"
+
+env:
+  YXP_UID_KEY: ${{ secrets.UID_HASH_KEY }}
+  HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+concurrency:
+  group: hf-dataset
+  cancel-in-progress: false
+
+jobs:
+  hash:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r pipeline/requirements-convert.txt
+      - name: Check the key is present
+        run: test -n "$YXP_UID_KEY" || { echo "UID_HASH_KEY secret is not set"; exit 1; }
+      - name: Hash uids in the dataset
+        run: python -u pipeline/hash_dataset.py run --limit "${{ inputs.limit }}" --batch "${{ inputs.batch }}"

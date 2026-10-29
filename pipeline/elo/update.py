@@ -17,7 +17,9 @@ import pyarrow.parquet as pq
 from huggingface_hub import HfApi, hf_hub_download
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import core
+import uidhash          # pipeline/uidhash.py: ids are pseudonymised; hashing is idempotent so raw or hashed chunks both work
 
 TARGET = "www1234567890/Yi_Xian_Replay_Compressed"
 WORK = os.environ.get("YXP_ELO_WORK") or r"C:\Users\raymo\yxp-elo-work"
@@ -51,16 +53,17 @@ def main():
         if f"names/c{key}.parquet" in files:
             for r in pq.read_table(fetch(f"names/c{key}.parquet")).to_pylist():
                 if r["src_shard"] in todo:
-                    cur = names.get(r["uid"])
+                    hu = uidhash.hash_uid(r["uid"])
+                    cur = names.get(hu)
                     if cur is None or r["last_ts"] >= cur[1]:
-                        names[r["uid"]] = (r["username"], r["last_ts"])
+                        names[hu] = (r["username"], r["last_ts"])
         for r in p:
             gm = g.get(r["game_id"])
             if gm is None or not r["has_self_record"] or r["is_ai"] or r["battle_rank"] is None:
                 continue
             e = games.setdefault(r["game_id"], [gm["end_ts"] or 0, []])
             e[0] = max(e[0], r["end_ts"] or 0)
-            e[1].append([r["uid"], r["battle_rank"] + 1, 1 if gm["is_daoxin"] else 0, gm["season"], ""])
+            e[1].append([uidhash.hash_uid(r["uid"]), r["battle_rank"] + 1, 1 if gm["is_daoxin"] else 0, gm["season"], ""])
     m, n = core.model(), 0
     for gid, (ts, ent) in sorted(games.items(), key=lambda kv: kv[1][0]):
         if len(ent) < 2:
