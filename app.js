@@ -49,14 +49,14 @@ const UI = {
     lateBoards: "Late-game boards vs", matchHint: "click an opponent →",
     powerNote: "destiny dmg taken per round by phase (number = actual, larger shape = takes less)",
     powerNote6: "early/mid/late: destiny dmg taken per round, ranked against the top 50 character+side-job strategies (larger shape = takes less) · popularity: percentile of total games played, shared by a combo's sub-strategies (bigger = more popular) · simplicity: percentile rank of needing a small card pool & few per-slot choices (R12+; bigger = simpler)",
-    powerScore: "Power", powerTip: "skill-adjusted average placement (controls for player skill via Elo; 50 = average character; small samples regress toward 50)",
+    powerScore: "Power", powerTip: "average placement compared with all characters (not adjusted for player skill; 50 = average; small samples regress toward 50)",
     showMore: "Show more boards", notEnoughBoards: "Not enough data (no board with 30+ games)",
     tier2: "Rank ≥", notAtTier: "This build doesn't exist at this rank tier (no games).",
     wheelchair: "Wheelchair index", strategies: "strategies",
     rerollsByRound: "Average rerolls held per round (median, with 25th / 75th percentile)", realmByRound: "Round each realm is reached",
     wheelchairNote: "character+side-job builds that place well while always playing the same board from R12 on — combines avg final placement, effective card-pool size, and per-slot variety (all recency-weighted)",
     infoTitle: "How each sort is calculated",
-    infoPower: "Power: average placement adjusted for player rank (so a character isn't inflated just because strong players pick it), then compared with all characters: 50 = average, about ±12 per standard deviation, higher = stronger. Characters with few games are pulled toward 50.",
+    infoPower: "Power: average placement compared with all characters (not adjusted for player skill, so a character strong players favour can look stronger): 50 = average, about ±12 per standard deviation, higher = stronger. Characters with few games are pulled toward 50.",
     infoPlace: "Avg placement: recency-weighted average final placement (1-8) of all games at the selected rank and above. Lower = better.",
     infoPop: "Popularity: share of all games played with this character (recency-weighted, all characters add up to 100%). n = raw number of games.",
     infoWc: "Wheelchair index (0-100): builds that place well AND play the same board from R12 on. Average of three percentiles: good final placement, small effective card pool, few card choices per slot.",
@@ -109,14 +109,14 @@ const UI = {
     lateBoards: "后期对位卡组", matchHint: "点击对手 →",
     powerNote: "各阶段每回合承受命元伤害（数字为实际，形状越大承伤越低）",
     powerNote6: "前/中/后期：每回合承受命元伤害（形状越大承伤越低，与热门前50角色流派比较）· 人气：该角色+副职总出场量的百分位（越大越热门，分支共享） · 卡组简易程度：有效卡池小、槽位选择少的百分位得分（12回合后，0-100，越大越简单，与热门前50角色流派比较）",
-    powerScore: "强度", powerTip: "经玩家 Elo 校正的平均名次（50 = 平均水平；样本过小时回归至 50）",
+    powerScore: "强度", powerTip: "平均名次与全部角色比较（未按玩家水平校正；50 = 平均水平；样本过小时回归至 50）",
     showMore: "显示更多卡组", notEnoughBoards: "数据不足（没有出现30次以上的卡组）",
     tier2: "段位分 ≥", notAtTier: "该流派在此段位不存在（无数据）。",
     wheelchair: "轮椅指数", strategies: "策略",
     rerollsByRound: "平均每回合持有换牌数（中位数，含25% / 75%分位）", realmByRound: "各境界达成回合（中位数）",
     wheelchairNote: "名次好且12回合后卡组固定的角色+副职流派——综合平均名次、有效卡池大小、各槽位选择多样性（均近期加权）",
     infoTitle: "各排序指标的计算方式",
-    infoPower: "强度：先按玩家段位校正平均名次（避免因高手偏爱而虚高），再与全部角色比较：50 = 平均水平，每个标准差约 ±12 分，越高越强；对局少的角色会向 50 回归。",
+    infoPower: "强度：平均名次与全部角色比较（未按玩家水平校正，高手偏爱的角色可能偏高）：50 = 平均水平，每个标准差约 ±12 分，越高越强；对局少的角色会向 50 回归。",
     infoPlace: "平均名次：所选段位及以上所有对局最终名次（1–8）的近期加权平均，越低越好。",
     infoPop: "使用率：该角色对局数占全部对局的比例（近期加权，所有角色合计 100%）。n = 原始对局数。",
     infoWc: "轮椅指数（0–100）：名次好且 12 回合后始终打同一套卡组的流派得分高。取三项百分位的平均：最终名次好、有效卡池小、各槽位选择少。",
@@ -823,7 +823,11 @@ async function ensureBuilds() {
   } catch (e) { /* no fate data yet — the Fates/天衍 sections just won't render */ }
   BS.loaded = true;
 }
-// Power = standardized, SKILL-ADJUSTED average placement (recency-weighted).
+// Power skill adjustment is OFF (the replay source anonymised players, so Elo/skill is no longer
+// available for new games, and the adjustment also muddied the plain "how well does it place" reading).
+// Set true to bring back the within-character skill slope below; then b != 0 and adj = AP - b*(R - Rbar).
+const POWER_SKILL_ADJUST = false;
+// Power = standardized average placement (recency-weighted); optionally SKILL-ADJUSTED (see above).
 // Controls for player skill (the player's Elo at the end of the previous day; rank score
 // before SCHEMA 17 -- meta.skill says which): each character's placement is re-baselined to
 // an average-skill pilot, removing the "only strong mains still play it" inflation.
@@ -845,7 +849,7 @@ function computePower(tier) {
   }
   const Rbar = gSw ? gSwr / gSw : 0;
   let n = 0, dn = 0; for (const r of rows) { n += r.num; dn += r.den; }
-  const b = dn ? n / dn : 0;                      // skill slope (placement per rank point)
+  const b = POWER_SKILL_ADJUST && dn ? n / dn : 0;   // skill slope (placement per rank point)
   const adj = rows.map((r) => r.AP - b * (r.R - Rbar));   // skill-adjusted placement
   const m = adj.reduce((a, x) => a + x, 0) / (adj.length || 1);
   const sd = Math.sqrt(adj.reduce((a, x) => a + (x - m) ** 2, 0) / (adj.length || 1)) || 1;
@@ -922,7 +926,7 @@ function computeBuildPower(tier) {
   }
   const Rbar = gSw ? gSwr / gSw : 0;
   let n = 0, dn = 0; for (const r of rows) { n += r.num; dn += r.den; }
-  const b = dn ? n / dn : 0;
+  const b = POWER_SKILL_ADJUST && dn ? n / dn : 0;
   const adj = rows.map((r) => r.AP - b * (r.R - Rbar));
   const G = rows.reduce((s, r) => s + r.g, 0), B = rows.length;
   const m = rows.reduce((s, r, i) => s + adj[i] * r.g, 0) / (G || 1);          // g-weighted mean
