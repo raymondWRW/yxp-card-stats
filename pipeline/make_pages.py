@@ -11,7 +11,6 @@ ROUTES = {                      # folder -> (start tab, <title>)
     "hundred_school": ("builds10", "百家之道 流派统计 · Hundred Schools builds"),
     "heavenly_derivation": ("builds9", "天衍万象 流派统计 · Heavenly Derivation builds"),
     "cards": ("cards", "卡牌统计 · Card stats"),
-    "elo": ("elo", "天梯 Elo · Elo ladder"),
 }
 
 def main():

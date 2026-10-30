@@ -1536,11 +1536,15 @@ function fatesSectionHTML(key) {
   return h;
 }
 // tab -> page URL, so switching tabs keeps the address bar shareable
-const TAB_ROUTE = { builds10: "hundred_school", builds9: "heavenly_derivation", cards: "cards", elo: "elo" };
+// The Elo tab is retired from public view: the replay source anonymised every player (uid = record-player-N)
+// after shard 34207000, so ratings can no longer be updated. Code and data stay; add ?elo=1 to reveal the tab.
+const ELO_ON = /[?&]elo=1(&|$)/.test(location.search);
+const TAB_ROUTE = { builds10: "hundred_school", builds9: "heavenly_derivation", cards: "cards", elo: "hundred_school" };
 function syncUrl(tab) {
-  try { history.replaceState(null, "", new URL(".", document.baseURI).pathname + TAB_ROUTE[tab] + "/"); } catch (e) { /* file:// etc. */ }
+  try { history.replaceState(null, "", new URL(".", document.baseURI).pathname + TAB_ROUTE[tab] + "/" + (tab === "elo" ? "?elo=1" : "")); } catch (e) { /* file:// etc. */ }
 }
 function wireBuilds() {
+  if (ELO_ON) document.querySelector('#tabbar .tab[data-tab="elo"]').hidden = false;
   document.querySelectorAll("#tabbar .tab").forEach((tb) => tb.onclick = () => {
     syncUrl(tb.dataset.tab);
     document.querySelectorAll("#tabbar .tab").forEach((x) => x.classList.remove("on")); tb.classList.add("on");
