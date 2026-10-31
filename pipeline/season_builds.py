@@ -99,7 +99,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 18            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 19            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -645,7 +645,9 @@ def process_record(d):
         # opponents: bots excluded; real ones buffered per-game for the placement matchup
         oppub = opp["publicData"]
         ouid = str(oppub.get("uid", ""))
-        if ouid.startswith("ai"):
+        # Bots: the isAI flag, plus the legacy "ai..." uid prefix. Since shard ~34207000 the source
+        # anonymises every id (bots too: record-player-N), so the uid alone no longer says who is a bot.
+        if oppub.get("isAI") or ouid.startswith("ai"):
             bot_uids.add(ouid)
         else:
             och = oppub.get("characterId")
