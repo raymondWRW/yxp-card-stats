@@ -99,7 +99,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 19            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 20            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -386,6 +386,28 @@ def _weight(endTs):
     return 0.5 ** (max(0, T_REF - endTs) / HALF_LIFE_MS)   # recency weight (newest ~1)
 
 
+def lobby_place(d, rank):
+    """Placement (0-based, float) among the REAL players of the lobby, on the 8-seat scale.
+    Bots fill seats and mostly finish at the bottom, so a raw place of 3rd in a 2-bot lobby is
+    worth less than 3rd among 8 humans. With R real players and real-only rank rr (1 = best) the
+    percentile mid-point (rr-0.5)/R is mapped back to 8 seats: 8*(rr-0.5)/R - 0.5. A full 8-human
+    lobby gives exactly rank; a lobby with 7 bots gives 3.5 (no information). Records without
+    lobby info (raw-shard path, older data) keep their plain place."""
+    R, rr = d.get("lobbyReal"), d.get("realRank")
+    if not R or not rr:
+        return float(rank)
+    return 8 * (min(rr, R) - 0.5) / R - 0.5
+
+
+def add_place(arr, x, w):
+    """Add weight w at fractional place x (0..7) by linear interpolation between the two seats,
+    which keeps the weighted mean of the histogram exactly x."""
+    lo = int(x); fr = x - lo
+    arr[lo] += w * (1 - fr)
+    if fr > 1e-9:
+        arr[lo + 1] += w * fr
+
+
 def apply_matchup(char, career, var, och, bi, w, myrank, orank):
     m = STATE["builds"][(char, career, var)]["matchup"][och][bi]
     m[0] += w; m[2] += 1
@@ -578,7 +600,8 @@ def process_record(d):
     b = STATE["builds"][(char, career, var)]
     c = STATE["char"][char]
     b["gw"] += w; b["graw"] += 1; c["gw"] += w; c["graw"] += 1
-    b["place"][rank] += w
+    pl_adj = lobby_place(d, rank)          # placement among real players (see lobby_place)
+    add_place(b["place"], pl_adj, w)
     # skill sufficient stats for the within-character skill slope (Elo by default, see SKILL)
     p = rank + 1; r = skill_of(d)
     c["swr"] += w * r; c["swr2"] += w * r * r; c["swrp"] += w * r * p
@@ -587,15 +610,15 @@ def process_record(d):
     band = "A" if dx < 4000 else ("B" if dx < 6000 else "C")
     bi = "ABC".index(band)                # band index for the band-split build stats
     tk = STATE["tier"][(char, career, var, band)]
-    tk["gw"] += w; tk["graw"] += 1; tk["place"][rank] += w
+    tk["gw"] += w; tk["graw"] += 1; add_place(tk["place"], pl_adj, w)
     tk["swr"] += w * r; tk["swr2"] += w * r * r; tk["swrp"] += w * r * p
 
     gid = sys.intern(str(d.get("gameId", "")))
-    mu_register(gid, str(uid), rank)
+    mu_register(gid, str(uid), pl_adj)
     # 轮椅指数 placement for this game's variant
     wk = STATE["wc"][(char, career, var)]
     wpl = wk["pl"][bi]
-    wpl[0] += w; wpl[1] += 1; wpl[2] += w * (rank + 1)
+    wpl[0] += w; wpl[1] += 1; wpl[2] += w * (pl_adj + 1)
     eff_recv, _ = destiny_profile(sides)  # per-round destiny taken, normalised for extra destiny
     opp_chars = {}                        # real opponents this game: uid -> characterId
     bot_uids = set()                      # distinct bot opponents (for bot-exposure diag)
@@ -660,14 +683,14 @@ def process_record(d):
     # one matchup event per distinct real opponent per game; it counts once the opponent's
     # own >=3000 record of the same game is seen (now, or within the next MU_WINDOW shards).
     for ouid, och in opp_chars.items():
-        mu_event(gid, ouid, char, career, var, och, endTs, rank, bi)
+        mu_event(gid, ouid, char, career, var, och, endTs, pl_adj, bi)
 
     be = STATE["botexp"][char]; be[0] += 1; be[1] += len(bot_uids); be[2] += len(opp_chars)
 
     # fate & 天衍 & 道韵 selections — cumulative, read from the player's last present
     # round, keyed with the game's strategy variant.
     priv = last_side.get("privateData", {})
-    placew = w * (rank + 1)
+    placew = w * (pl_adj + 1)
     for s in priv.get("talentSelectionDatas") or []:
         record_selection(STATE["fates"], char, career, var, s, w, placew, bi)
     for s in (priv.get("fateStrategyData") or {}).get("strategies") or []:

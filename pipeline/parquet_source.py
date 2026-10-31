@@ -90,6 +90,17 @@ class Source:
         players = {}
         for i in range(len(p["game_id"])):
             players[(p["game_id"][i], p["uid"][i])] = {k: p[k][i] for k in p}
+        # lobby makeup per game: R = real (non-bot) players, ranks = final places of the real players
+        # that have a self-record (every real player normally does). Used to rate a placement among
+        # real players only, so bot-filled lobbies don't flatter the player (season_builds.process_record).
+        for (gid, _), pl in players.items():
+            gm = games.get(gid)
+            if gm is None:
+                continue
+            if not pl["is_ai"]:
+                gm["_R"] = gm.get("_R", 0) + 1
+                if pl["has_self_record"] and pl["battle_rank"] is not None:
+                    gm.setdefault("_ranks", []).append(pl["battle_rank"])
         return games, players
 
     def shard_records(self, key, want_shards, season, tier_field, tier_min):
@@ -169,7 +180,10 @@ def _records(t, games, players, season, tier_field, tier_min):
             for k in SELECTION_BLOCKS:
                 if ex.get("priv." + k) is not None:
                     priv[k] = ex["priv." + k]
+        br, lr = pl["battle_rank"], g.get("_ranks")
         out.append({"gameId": gid, "uid": uid, "charId": pl["char_id"], "career": pl["career"],
+                    "lobbyReal": max(g.get("_R", 0), len(lr or ())) or None,
+                    "realRank": (1 + sum(1 for x in lr if x < br)) if (lr and br is not None) else None,
                     "battleRank": pl["battle_rank"], "beginRankScore": pl["rank_score_begin"],
                     "beginDaoXinRankScore": pl["daoxin_begin"], "beginTs": pl["begin_ts"],
                     "endTs": pl["end_ts"],      # per player: an eliminated player's replay ends earlier
