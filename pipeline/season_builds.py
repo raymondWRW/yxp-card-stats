@@ -99,7 +99,7 @@ T_REF = None           # reference time (newest game endTs); set before processi
 # incompatible state simply means a full rebuild). Recency weights are exponential in
 # age, so a state built against an older reference time is brought to the new one by
 # multiplying every weighted accumulator by one constant -- see rescale_state().
-SCHEMA = 20            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
+SCHEMA = 21            # bump whenever accumulators / classification / filters / id maps change -> forces a full rebuild
 STATE_PATH = os.environ.get("YXP_STATE") or os.path.join(HERE, f"_season{SEASON}_state.pkl.zst")
 SHARD_CACHE = os.environ.get("YXP_SHARD_CACHE")   # optional local dir caching downloaded shards (tests)
 MU_WINDOW = 30         # shards a record's placement stays available for opponent matching
@@ -207,6 +207,15 @@ def _mu3():
     return [[0.0, 0.0, 0, 0.0, 0.0] for _ in range(3)]
 def _b3():
     return [[0, 0.0, 0.0], [0, 0.0, 0.0], [0, 0.0, 0.0]]
+# Selection ("pick") accumulator row, one per DaoXin band: [chosen_w, offered_w, chosen_place_w,
+# chosen_raw, offered_raw]. Use these names, never bare indices.
+SEL_CHOSEN_W, SEL_OFFERED_W, SEL_PLACE_W, SEL_CHOSEN_RAW, SEL_OFFERED_RAW = range(5)
+# Registry of selection mechanics = STATE keys holding a defaultdict(_sel3) keyed
+# (char, career, variant, selectionId, optionId). Adding one: append the name here (STATE,
+# WEIGHTED and daily_stats pick it up), call record_selection(STATE[kind], ...) in
+# process_record, and emit it in write_output (SEL_OUT_KEY = its key in the fates file).
+SEL_KINDS = ("fates", "derivs", "daoyun", "xianmo")
+SEL_OUT_KEY = {"fates": "fates", "derivs": "derivations", "daoyun": "daoyun", "xianmo": "xianmo"}
 def _sel3():
     return [[0.0, 0.0, 0.0, 0, 0] for _ in range(3)]
 def _fd():
@@ -335,10 +344,9 @@ STATE = {
     "fam_pop": defaultdict(float),        # famIdx -> weighted board appearances (for card ordering)
     # (char,career,variant,selectionId,optionId) -> per DaoXin band
     # [selected_w, offered_w, selected_place_w, selected_raw, offered_raw]
-    "fates": defaultdict(_sel3),   # fate picks (talentSelectionDatas)
-    "derivs": defaultdict(_sel3),  # 天衍 picks (fateStrategyData.strategies)
-    "daoyun": defaultdict(_sel3),  # 道韵 picks (daoYunSelectionDatas)
-    "xianmo": defaultdict(_sel3),  # 仙命 picks (百家之道, xianMoData.strategies), slots 1-3
+    # SEL_KINDS: fates = fate picks (talentSelectionDatas); derivs = 天衍 (fateStrategyData.strategies);
+    # daoyun = 道韵 (daoYunSelectionDatas); xianmo = 仙命 (百家之道 xianMoData.strategies), slots 1-3
+    **{k: defaultdict(_sel3) for k in SEL_KINDS},
     "mu": new_mu(),
     "botexp": defaultdict(_botexp),       # char -> [records, sum_bot_opps, sum_real_opps]
     "done": set(),                        # shard ids folded into this state
@@ -346,7 +354,7 @@ STATE = {
     "schema": SCHEMA, "season": SEASON, "ref": 0,   # ref = the T_REF the weights are relative to
 }
 # STATE members holding recency-weighted accumulators (what rescale_state touches)
-WEIGHTED = ("builds", "wc", "char", "tier", "fam_pop", "fates", "derivs", "daoyun", "xianmo")
+WEIGHTED = ("builds", "wc", "char", "tier", "fam_pop") + SEL_KINDS
 
 
 def fam_index(cid):
@@ -718,11 +726,11 @@ def record_selection(acc, char, career, var, s, w, placew, bi, sid=None):
     if sid is None or not sel:
         return
     e = acc[(char, career, var, sid, sel)][bi]
-    e[0] += w; e[2] += placew; e[3] += 1             # chosen weight + raw, placement-weight
+    e[SEL_CHOSEN_W] += w; e[SEL_PLACE_W] += placew; e[SEL_CHOSEN_RAW] += 1      # chosen weight + raw, placement-weight
     for o in s.get("pendings") or []:
         if o:
             oe = acc[(char, career, var, sid, o)][bi]
-            oe[1] += w; oe[4] += 1                   # offered weight + raw
+            oe[SEL_OFFERED_W] += w; oe[SEL_OFFERED_RAW] += 1                # offered weight + raw
 
 
 # ---- shard streaming -------------------------------------------------------
@@ -824,7 +832,10 @@ def _pq_source():
 
 def _mem():
     """Current / peak RSS of this process (Linux /proc; falls back to peak only)."""
-    import resource
+    try:
+        import resource
+    except ImportError:                       # Windows: no `resource` module (local runs only; CI is Linux)
+        return "rss n/a"
     peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     peak_mb = peak / 1024 if sys.platform != "darwin" else peak / 1048576
     try:
@@ -947,13 +958,28 @@ def save_state(path=None):
           f"{time.time() - t0:.0f}s")
 
 
+# The state is a plain tree of builtins + collections types whose defaultdict factories are the
+# module-level functions below (pickled by name). The unpickler allows EXACTLY those, so a
+# tampered cache entry / release asset can't execute code (it raises UnpicklingError instead).
+# A new accumulator factory must be added to _STATE_FACTORIES (golden_check.py catches a miss).
+_STATE_FACTORIES = frozenset({"_rad3", "_mu3", "_b3", "_sel3", "_fd", "_fdd", "_char", "_tier", "_botexp",
+                              "new_build", "new_wc", "new_mu"})
+_SAFE_GLOBALS = {
+    "builtins": frozenset({"dict", "list", "set", "frozenset", "tuple", "int", "float", "str", "bool"}),
+    "collections": frozenset({"defaultdict", "deque", "Counter", "OrderedDict"}),
+}
+
+
 class _Unpickler(pickle.Unpickler):
-    # The defaultdict factories are pickled by module name, which is "__main__" when the
-    # script runs directly and "season9_builds" when imported -- resolve both to this module.
+    # Factories are pickled by module name, which is "__main__" when the script runs directly and
+    # "season9_builds" / "season_builds" when imported -- resolve all of them to this module.
     def find_class(self, module, name):
-        if module in ("__main__", "season9_builds", "season_builds") and name in globals():
-            return globals()[name]
-        return super().find_class(module, name)
+        if module in ("__main__", "season9_builds", "season_builds"):
+            if name in _STATE_FACTORIES:
+                return globals()[name]
+        elif name in _SAFE_GLOBALS.get(module, ()):
+            return super().find_class(module, name)
+        raise pickle.UnpicklingError(f"state pickle references forbidden global {module}.{name}")
 
 
 def load_state(path=None):
@@ -1031,10 +1057,7 @@ def write_output():
     V_BUILDS = output_view(STATE["builds"], vmap)
     V_TIER = output_view(STATE["tier"], vmap)
     V_WC = output_view(STATE["wc"], vmap)
-    V_FATES = output_view(STATE["fates"], vmap)
-    V_DERIVS = output_view(STATE["derivs"], vmap)
-    V_DAOYUN = output_view(STATE["daoyun"], vmap)
-    V_XIANMO = output_view(STATE["xianmo"], vmap)
+    V_SEL = {k: output_view(STATE[k], vmap) for k in SEL_KINDS}
     if ELO_STATS:
         n = sum(ELO_STATS.values())
         print(f"skill = Elo: {ELO_STATS['elo']} records with a prior-day Elo, {ELO_STATS['start']} "
@@ -1221,14 +1244,14 @@ def write_output():
             key = f"{char}_{career}" + (f"|{var}" if var else "")
             grp[key][sid].append([oid, [[r2(x) for x in bb] for bb in v]])
             ids.add(oid)
-        sel_tot = lambda row: row[1][0][0] + row[1][1][0] + row[1][2][0]
+        sel_tot = lambda row: row[1][0][SEL_CHOSEN_W] + row[1][1][SEL_CHOSEN_W] + row[1][2][SEL_CHOSEN_W]   # not sum(): 3.12+ sum() is compensated -> ties sort differently
         out = {k: {str(sid): sorted(lst, key=lambda x: -sel_tot(x)) for sid, lst in sids.items()}
                for k, sids in grp.items()}
         return out, ids
-    fates_out, ids1 = emit_sel(V_FATES)
-    derivs_out, ids2 = emit_sel(V_DERIVS)
-    daoyun_out, ids3 = emit_sel(V_DAOYUN)
-    xianmo_out, ids4 = emit_sel(V_XIANMO)
+    sel_out, sel_ids = {}, {}
+    for k in SEL_KINDS:
+        sel_out[k], sel_ids[k] = emit_sel(V_SEL[k])
+    ids1, ids2, ids3, ids4 = (sel_ids[k] for k in ("fates", "derivs", "daoyun", "xianmo"))   # named below, per kind
     # fate bucket: innate if the fate is offered to only one character, else its wiki category
     char_of = defaultdict(set)
     for (char, career, var, sid, oid) in STATE["fates"]:
@@ -1272,7 +1295,7 @@ def write_output():
         "meta": {"season": SEASON, "daoxinMin": DAOXIN_MIN, "halfLifeDays": 4,
                  "selfRecords": STATE["self"], "iconBase": ICON_BASE, "xmIconBase": XM_ICON_BASE,
                  "generated": generated},
-        "fates": fates_out, "derivations": derivs_out, "daoyun": daoyun_out, "xianmo": xianmo_out,
+        **{SEL_OUT_KEY[k]: sel_out[k] for k in SEL_KINDS},
         "names": names, "dnames": dnames, "ynames": ynames, "xnames": xnames,
     }
 

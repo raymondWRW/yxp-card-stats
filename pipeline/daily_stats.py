@@ -68,7 +68,7 @@ BUDGET_MIN = float(os.environ.get("YXP_DAILY_BUDGET_MIN") or 0)
 
 TEMPLATE = copy.deepcopy(sb.STATE)  # an empty state (before anything is folded)
 WEIGHTED = sb.WEIGHTED
-SMALL_KEYS = ("builds", "wc", "char", "tier", "fam_pop", "fates", "derivs", "daoyun", "xianmo", "botexp")
+SMALL_KEYS = ("builds", "wc", "char", "tier", "fam_pop") + sb.SEL_KINDS + ("botexp",)
 COUNTS = ("files", "self", "shards")
 BAND_COLS = ["r0", "r1", "r2", "w0", "w1", "w2", "ww0", "ww1", "ww2"]
 
