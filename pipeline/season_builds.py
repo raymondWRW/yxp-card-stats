@@ -26,6 +26,7 @@ Usage:
 import bisect
 import copy
 import io
+import hashlib
 import json
 import math
 import os
@@ -287,6 +288,41 @@ except Exception:
 SPLIT_VARIANTS = os.environ.get("YXP_SPLIT_VARIANTS", "0") == "1"
 
 
+# ---- label versioning ---------------------------------------------------------------
+# Variant labels are baked into every stored accumulator key, so anything that changes a label
+# must invalidate what was already stored. Instead of remembering to bump a counter, the label
+# logic is FINGERPRINTED: sha1 over the signatures, the rule tables and CLASSIFIER_VERSION.
+# daily_stats stores it in each period's meta and rebuilds a period whose fingerprint differs;
+# load_state does the same for the single-state path. Bump CLASSIFIER_VERSION only when you
+# change classify_variant()'s CODE (data changes are picked up automatically).
+CLASSIFIER_VERSION = 1
+
+
+def _fp(obj):
+    return hashlib.sha1(json.dumps(obj, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()[:12]
+
+
+def combo_label_fps():
+    """{"charId_career": fingerprint} of the label logic that applies to each combo."""
+    out = {k: _fp(v) for k, v in SIGS.items()}
+    rule = {"lichy": sorted(WC_RONGHUI), "lujx": LUJX_HEARTS, "lujx_min": LUJX_MIN_SHARE}
+    out[f"{CHAR_LICHY}_*"] = _fp(rule["lichy"])
+    out[f"{CHAR_LUJX}_*"] = _fp([rule["lujx"], rule["lujx_min"]])
+    return out
+
+
+COMBO_LABEL_FPS = combo_label_fps()
+LABEL_FP = _fp([SPLIT_VARIANTS, SIG_MIN_SCORE, CLASSIFIER_VERSION, COMBO_LABEL_FPS])
+
+
+def label_diff(old):
+    """Human summary of which combos' label logic differs from a stored {combo: fp} map."""
+    if not isinstance(old, dict):
+        return "no label fingerprint stored"
+    ch = sorted(k for k in set(old) | set(COMBO_LABEL_FPS) if old.get(k) != COMBO_LABEL_FPS.get(k))
+    return f"{len(ch)} combo(s) changed: {', '.join(ch[:12])}" + (" ..." if len(ch) > 12 else "") if ch else "global label settings changed"
+
+
 def classify_variant(char, career, talents, late_fams):
     """Per-game strategy label ('' = this combo is not split)."""
     if not SPLIT_VARIANTS:
@@ -351,7 +387,7 @@ STATE = {
     "botexp": defaultdict(_botexp),       # char -> [records, sum_bot_opps, sum_real_opps]
     "done": set(),                        # shard ids folded into this state
     "files": 0, "self": 0, "shards": 0,
-    "schema": SCHEMA, "season": SEASON, "ref": 0,   # ref = the T_REF the weights are relative to
+    "schema": SCHEMA, "season": SEASON, "ref": 0, "labels": None,   # ref = the T_REF the weights are relative to
 }
 # STATE members holding recency-weighted accumulators (what rescale_state touches)
 WEIGHTED = ("builds", "wc", "char", "tier", "fam_pop") + SEL_KINDS
@@ -943,7 +979,7 @@ def save_state(path=None):
     path = path or STATE_PATH
     if PRUNE:
         prune_boards()
-    STATE["schema"] = SCHEMA; STATE["season"] = SEASON; STATE["ref"] = T_REF
+    STATE["schema"] = SCHEMA; STATE["season"] = SEASON; STATE["ref"] = T_REF; STATE["labels"] = LABEL_FP
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     tmp = path + ".tmp"; t0 = time.time()
     with open(tmp, "wb") as f, zstandard.ZstdCompressor(level=3).stream_writer(f) as z:
@@ -994,6 +1030,9 @@ def load_state(path=None):
         return False
     if st.get("schema") != SCHEMA:
         print(f"state schema {st.get('schema')} != {SCHEMA} -> full rebuild")
+        return False
+    if st.get("labels") != LABEL_FP:      # signatures / rule tables / classifier changed since the state was built
+        print(f"state label fingerprint {st.get('labels')} != {LABEL_FP} -> full rebuild")
         return False
     if st.get("season", 9) != SEASON:     # pre-rollover states carried no season field
         print(f"state is for season {st.get('season', 9)} -> full rebuild for season {SEASON}")

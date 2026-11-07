@@ -166,6 +166,9 @@ def list_periods():
     for f in glob.glob(os.path.join(PERIODS, "*.json")):
         m = json.load(open(f))
         if m.get("format") == FORMAT and m.get("season") == sb.SEASON:
+            if m.get("labels") != sb.LABEL_FP:    # built with different variant-label logic -> stale
+                log(f"period {m['id']}: stale labels ({m.get('labels')} != {sb.LABEL_FP}): {sb.label_diff(m.get('labelCombos'))}")
+                continue
             out[m["id"]] = m
     return out
 
@@ -238,7 +241,8 @@ def write_period(pid, meta, small, tables):
     for name, t, sc in zip(TABLES, tables, SCHEMAS):
         pq.write_table(t.select(sc.names).cast(sc), _p(pid, f"{name}.parquet"),
                        compression="zstd", compression_level=9)
-    meta = dict(meta, id=pid, format=FORMAT, season=sb.SEASON, schema=sb.SCHEMA)
+    meta = dict(meta, id=pid, format=FORMAT, season=sb.SEASON, schema=sb.SCHEMA,
+                labels=sb.LABEL_FP, labelCombos=sb.COMBO_LABEL_FPS)
     with open(_p(pid, "json"), "w") as f:        # written last: marks the period complete
         json.dump(meta, f, separators=(",", ":"))
 
