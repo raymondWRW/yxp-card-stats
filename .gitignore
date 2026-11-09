@@ -6,3 +6,9 @@ _season*_state.pkl.zst*
 
 # daily_stats day periods: rebuilt by every run from the Parquet dataset (only weeks are committed)
 data/daily/*/periods/d*
+
+# generated site data lives on the `data` branch (see daily.yml), never in main
+data/season10.json
+data/season10_builds.json
+data/season10_fates.json
+data/elo/

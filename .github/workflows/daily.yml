@@ -124,10 +124,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/season10.json data/season10_builds.json data/season10_fates.json
+          # state only: the generated site data (season10*.json, data/elo) goes to the `data` branch, never to main
           git add -A data/daily
           git add -A vendor/card-components
-          git add -A data/elo
           if git diff --cached --quiet; then
             echo "No data changes today."
           else
@@ -138,12 +137,11 @@ jobs:
             git push
           fi
 
-      # Phase A of moving generated JSON out of main's history: ALSO publish the pure outputs
-      # (season JSON + Elo) as one parentless commit on the `data` branch, force-pushed so it never
-      # grows. Nothing reads this branch yet; main keeps committing them as before.
+      # The pure outputs (season JSON + Elo) live on the parentless `data` branch, force-pushed so
+      # history never grows; deploy.yml builds the site from main + that branch. NOT
+      # continue-on-error: a silent failure here would let a later deploy serve stale data.
       - name: Publish generated data to the data branch
         if: ${{ !cancelled() }}
-        continue-on-error: true
         run: |
           bash .github/scripts/publish_data_branch.sh data             data/season10.json data/season10_builds.json data/season10_fates.json data/elo
 
