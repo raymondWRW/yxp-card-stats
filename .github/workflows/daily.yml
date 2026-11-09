@@ -136,6 +136,15 @@ jobs:
             git push
           fi
 
+      # Phase A of moving generated JSON out of main's history: ALSO publish the pure outputs
+      # (season JSON + Elo) as one parentless commit on the `data` branch, force-pushed so it never
+      # grows. Nothing reads this branch yet; main keeps committing them as before.
+      - name: Publish generated data to the data branch
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: |
+          bash .github/scripts/publish_data_branch.sh data             data/season10.json data/season10_builds.json data/season10_fates.json data/elo
+
       # Mirror the refreshed site to the Hong Kong server (https://elo.kaigua.vip/), which
       # GitHub Pages can't serve reliably from China. Needs the DEPLOY_SSH_KEY secret.
       - name: Deploy to server
