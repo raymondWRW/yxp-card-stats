@@ -15,6 +15,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 env:
   YXP_UID_KEY: ${{ secrets.UID_HASH_KEY }}   # pseudonymises uids (pipeline/uidhash.py); NEVER commit the key
@@ -145,6 +147,20 @@ jobs:
         run: |
           bash .github/scripts/publish_data_branch.sh data             data/season10.json data/season10_builds.json data/season10_fates.json data/elo
 
+      # Assemble the site (main tree + the data just generated in ./data) once; both the Pages
+      # artifact and the server mirror are made from it (.github/scripts/build_site.sh).
+      - name: Build site
+        if: ${{ !cancelled() }}
+        uses: ./.github/actions/build-site
+        with:
+          use-data-branch: "false"
+
+      - name: Upload Pages artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
       # Mirror the refreshed site to the Hong Kong server (https://elo.kaigua.vip/), which
       # GitHub Pages can't serve reliably from China. Needs the DEPLOY_SSH_KEY secret.
       - name: Deploy to server
@@ -157,6 +173,17 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
           echo "162.211.181.181 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA6Gy68Fzq9iwLiSc4UTxYDxAJPsylEXClIoGE6+axyt" > ~/.ssh/known_hosts
-          rsync -rltz --delete --exclude=.git --exclude=.github --exclude=pipeline --exclude=README.md \
+          rsync -rltz --delete \
             -e "ssh -i ~/.ssh/deploy_key -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes" \
-            ./ root@162.211.181.181:/var/www/yxp/
+            _site/ root@162.211.181.181:/var/www/yxp/
+
+  pages:
+    needs: refresh
+    if: ${{ !cancelled() && needs.refresh.result == 'success' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

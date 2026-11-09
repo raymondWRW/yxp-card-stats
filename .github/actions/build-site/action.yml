@@ -1,0 +1,16 @@
+name: Build site
+description: Assemble the static site into ./_site (main tree + generated data from the `data` branch)
+inputs:
+  use-data-branch:
+    description: "Overlay the `data` branch (true), or use the ./data the job just generated (false)"
+    default: "true"
+runs:
+  using: composite
+  steps:
+    - if: inputs.use-data-branch == 'true'
+      uses: actions/checkout@v5
+      with:
+        ref: data
+        path: _data
+    - shell: bash
+      run: bash .github/scripts/build_site.sh _site

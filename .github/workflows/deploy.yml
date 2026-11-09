@@ -1,8 +1,9 @@
-name: Deploy to server
+name: Deploy site
 
-# Copies the static site to the Hong Kong server (https://elo.kaigua.vip/). daily.yml has
-# the same step after its data commit (pushes made with GITHUB_TOKEN don't trigger this
-# workflow), so this one covers manual commits and manual runs.
+# Publishes the static site to GitHub Pages (Actions deploy) and mirrors it to the Hong Kong
+# server (https://elo.kaigua.vip/). The site = main + the generated data on the `data` branch
+# (.github/scripts/build_site.sh). daily.yml does the same after each refresh (pushes made with
+# GITHUB_TOKEN don't trigger this workflow), so this covers manual commits and manual runs.
 on:
   push:
     branches: [main]
@@ -12,15 +13,41 @@ on:
       - "README.md"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 concurrency:
-  group: deploy-server
+  group: deploy-site
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: ./.github/actions/build-site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  pages:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  server:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/build-site
       - name: Rsync site to server
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
@@ -29,6 +56,6 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
           echo "162.211.181.181 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA6Gy68Fzq9iwLiSc4UTxYDxAJPsylEXClIoGE6+axyt" > ~/.ssh/known_hosts
-          rsync -rltz --delete --exclude=.git --exclude=.github --exclude=pipeline --exclude=README.md \
+          rsync -rltz --delete \
             -e "ssh -i ~/.ssh/deploy_key -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes" \
-            ./ root@162.211.181.181:/var/www/yxp/
+            _site/ root@162.211.181.181:/var/www/yxp/
